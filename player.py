@@ -1,12 +1,14 @@
 import pygame 
 
-from physics import Body, AABB
+from physics import Body, AABB, Pos
 
 LEFT = 0
 RIGHT = 1
 WALK_FORCE = 2
 RUN_FORCE = 4
 JUMP_FORCE = 10
+WALL_JUMP_FORCE = 30
+WALL_JUMP_ANGLE = 60
 
 class Player(Body):
     def __init__(self, start_pos=(0, 0)):
@@ -14,12 +16,12 @@ class Player(Body):
         super().__init__(shape)
 
         self.img = pygame.image.load('assets/player/lama.png').convert()
-        self.img.set_colorkey((255, 255, 255))
+        self.img.set_colorkey((255, 0, 255))
         self.img_left = pygame.transform.flip(self.img, True, False)
 
         self.directions = [False, False]  # [Left, Right]
         self.jumping = False
-        self.was_jumping = False
+        self.jump_frames = 0
         self.looking = RIGHT
         self.run = False
 
@@ -49,6 +51,7 @@ class Player(Body):
                 self.directions[RIGHT] = False
             elif event.key == pygame.K_SPACE:
                 self.jumping = False
+                self.jump_frames = 0
             elif event.key == pygame.K_LSHIFT:
                 self.run = False
 
@@ -59,9 +62,22 @@ class Player(Body):
         self.was_jumping = self.jumping
 
     def vertical_logic(self):
-        # player starts jumping from the ground
-        if self.jumping and not self.was_jumping and self.collide_down:
-            self.apply_force((0, -JUMP_FORCE))
+        # player just jumped
+        if self.jumping and self.jump_frames == 0:
+            if self.collide_down:
+                # from the ground
+                self.apply_force((0, -JUMP_FORCE))
+            elif self.collide_left:
+                # from a left wall
+                self.velocity = Pos(0, 0)
+                self.apply_force(Pos.unit_y().rotate(WALL_JUMP_ANGLE) * WALL_JUMP_FORCE)
+            elif self.collide_right:
+                # from a left wall
+                self.velocity = Pos(0, 0)
+                self.apply_force(Pos.unit_y().rotate(-WALL_JUMP_ANGLE) * WALL_JUMP_FORCE)
+
+        if self.jumping:
+            self.jump_frames += 1
 
         if self.jumping and self.velocity.y < 0:
             # jumping in upward phase
@@ -72,6 +88,7 @@ class Player(Body):
         elif not self.jumping and self.velocity.y < 0:
             # still going up but not jumping, we want to go down as fast as we can
             self.apply_force(self.space.gravity)
+
 
 
     def horizontal_logic(self):

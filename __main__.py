@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-from graphalama.app import App
 import pygame
+from graphalama.app import App
 
-from game import GameScreen
+from constants import MENU, PICKER
 from menu import MenuScreen
 from picker import PickerScreen
-from constants import MENU, GAME, SETTINGS, PICKER
+
 pygame.init()
 
 

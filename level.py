@@ -72,12 +72,24 @@ class Level:
     def world_to_map(world_pos):
         return (Pos(world_pos) // Block.DEFAULT_BLOCK_SIZE).i
 
+    def get_block(self, map_pos):
+        x, y = map_pos
+        if (0 <= x < self.map_size.x
+            and 0 <= y < self.map_size.y):
+            return self.grid[y][x]
+
+        return Block('D')
+
+    def get_block_at_world(self, world_pos):
+        map_pos = self.world_to_map(world_pos)
+        return self.get_block(map_pos)
+
     @property
     def map_size(self):
         if len(self.grid) > 0:
-            return len(self.grid), len(self.grid[0])
+            return Pos(len(self.grid), len(self.grid[0]))
         else:
-            return 0, 0
+            return Pos(0, 0)
 
     @property
     def world_size(self):

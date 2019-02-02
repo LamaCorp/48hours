@@ -122,6 +122,13 @@ class Pos:
     def vertical(self):
         return Pos(0, self.y)
 
+    @staticmethod
+    def unit_x():
+        return Pos(1, 0)
+
+    @staticmethod
+    def unit_y():
+        return Pos(0, 1)
 
 class AABB:
     """Axis aligned rectangle: the basic shape."""
@@ -227,6 +234,19 @@ class AABB:
     def pygame_rect(self):
         return pygame.Rect(self.topleft, self.size)
 
+
+class AASegment(AABB):
+    def __init__(self, start, end, pos, vertical=False):
+        """
+        The start and end position are the x or y coordinate depending wheter the segment is vertical or not.
+        pos is the other (shared) coordinate.
+        """
+
+        self.vertical = vertical
+        if self.vertical:
+            super().__init__((pos, min(start, end)), (1, abs(start - end)))
+        else:
+            super().__init__((min(start, end), pos), (abs(start - end), 1))
 
 class Body:
     """A moving object."""
@@ -343,10 +363,10 @@ class Space:
 
     def add(self, *bodies):
         for body in bodies:
-            if isinstance(body, AABB):
-                self.static_bodies.append(body)
-            else:
+            if isinstance(body, Body):
                 self.moving_bodies.append(body)
+            else:
+                self.static_bodies.append(body)
             body.space = self
 
     def simulate(self):
