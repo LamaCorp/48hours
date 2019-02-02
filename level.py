@@ -58,7 +58,7 @@ class Level:
         self.space = Space(gravity=(0, 1))
         self.grid = []
         self.start = (0, 0)  # Where the player has to spawn, map coordinates
-        self.offset = (0, 0)  # Where we start to draw the map, map coordinates
+        self.offset = (5, 5)  # Where we start to draw the map, map coordinates
         self.load_level()
 
         self.space.add(*self.collision_rects())
