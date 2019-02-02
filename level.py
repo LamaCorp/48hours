@@ -12,22 +12,22 @@ class Block:
         # TODO: choose randomly between available textures
         # TODO: remove grass and automatically add grass when there is no block over it
         "G": (
-             pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "grass_000.png")).convert(),
-                                    (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-             True,
-             False
+            pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "grass_000.png")).convert(),
+                                   (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+            True,
+            False
         ),
         "D": (
-             pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_000.png")).convert(),
-                                    (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-             True,
-             False
+            pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_000.png")).convert(),
+                                   (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+            True,
+            False
         ),
         "S": (
-             pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_000.png")).convert(),
-                                    (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-             True,
-             False
+            pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_000.png")).convert(),
+                                   (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+            True,
+            False
         ),
     }
 
@@ -60,7 +60,7 @@ class Level:
         self.space = Space(gravity=(0, 1))
         self.grid = []
         self.start = (0, 0)  # Where the player has to spawn, map coordinates
-        self.offset = 0, 0  # Where we start to draw the map, world coordinates
+        self.offset = Pos(0, 0)  # Where we start to draw the map, world coordinates
         self.load_level()
 
         self.space.add(*self.collision_rects())
@@ -87,7 +87,7 @@ class Level:
     @property
     def world_size(self):
         return Level.map_to_world(self.map_size)
-    
+
     @property
     def size(self):
         return self.map_size
@@ -118,8 +118,8 @@ class Level:
             self.offset = (self.offset[0],
                            self.offset[1] + (player_pos[1] - (1 - Level.OFFSET_THRESHOLD) * screen_size[1]))
 
-        self.offset = (clamp(self.offset[0], 1, Level.map_to_world(self.map_size)[0] - screen_size[0]),
-                       clamp(self.offset[1], 1, Level.map_to_world(self.map_size)[1] - screen_size[1]))
+        self.offset = Pos(clamp(self.offset[0], 1, Level.map_to_world(self.map_size)[0] - screen_size[0]),
+                          clamp(self.offset[1], 1, Level.map_to_world(self.map_size)[1] - screen_size[1]))
 
     def render(self, surf):
         offset_end = (Pos(self.offset) + Pos(surf.get_size())).t

@@ -27,4 +27,4 @@ class GameScreen(Screen):
         super().render(surf)
 
         self.level.render(surf)
-        self.player.render(surf)
+        self.player.render(surf, offset=-self.level.offset)
