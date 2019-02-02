@@ -73,10 +73,10 @@ class Pos:
     def __rmul__(self, other):
         return Pos(self.x * other, self.y * other)
 
-    def __truediv__(self, other: int):
+    def __truediv__(self, other: float):
         return Pos(self[0] / other, self[1] / other)
 
-    def __floordiv__(self, other: int):
+    def __floordiv__(self, other: float):
         return Pos(self[0] // other, self[1] // other)
 
     @property
@@ -92,7 +92,7 @@ class Pos:
     @property
     def i(self):
         """The vector as an integer Pos (round to closest)"""
-        return Pos(round(self[0], round(self[1])))
+        return Pos(round(self[0]), round(self[1]))
 
     def squared_norm(self):
         """Return the squared norm of the vector"""

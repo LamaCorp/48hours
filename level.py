@@ -75,7 +75,7 @@ class Level:
 
     @staticmethod
     def world_to_map(world_pos):
-        return Pos(world_pos) // Block.DEFAULT_BLOCK_SIZE
+        return (Pos(world_pos) // Block.DEFAULT_BLOCK_SIZE).i
 
     @property
     def map_size(self):
