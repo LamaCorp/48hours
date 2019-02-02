@@ -18,7 +18,7 @@ def clamp(x, mini=float('-inf'), maxi=float('inf')):
         return x
     if x < mini:
         return mini
-    if x > maxi: 
+    if x > maxi:
         return maxi
     return x
 
@@ -132,6 +132,7 @@ class Pos:
     @staticmethod
     def unit_y():
         return Pos(0, 1)
+
 
 class AABB:
     """Axis aligned rectangle: the basic shape."""
@@ -251,6 +252,7 @@ class AASegment(AABB):
         else:
             super().__init__((min(start, end), pos), (abs(start - end), 1))
 
+
 class Body:
     """A moving object."""
 
@@ -275,6 +277,7 @@ class Body:
         self.last_collide_right = 0
         self.last_collide_top = 0
 
+        self.collisions = []
 
     def __repr__(self):
         return f"<Body: s {self.shape}, v {self.velocity}, a {self.acceleration}>"
@@ -291,14 +294,14 @@ class Body:
     def center(self, value):
         self.shape.center = value
 
-    def update_x(self, shapes):
+    def update_x(self, tiles):
         """Updates the position on the x coordinate and check for collision with the shapes."""
-        intersect = [s for s in shapes if self.shape.collide(s)]
 
         self.velocity.x += self.acceleration.x
         self.clamp_speed()
         self.shape.x += self.velocity.x
-        intersect = [s for s in shapes if self.shape.collide(s)]
+
+        intersect = [s for s in tiles if self.shape.collide(s)]
 
         if self.velocity.x > 0:
             # we are going right
@@ -306,21 +309,23 @@ class Body:
                 if body.left < self.shape.right:
                     self.shape.right = body.left
                     self.velocity.x *= -self.elasticity
+                    self.collisions.append(tiles[body])
         elif self.velocity.x < 0:
             # we are going left
             for body in intersect:
                 if self.shape.left < body.right:
                     self.shape.left = body.right
                     self.velocity.x *= -self.elasticity
+                    self.collisions.append(tiles[body])
 
         self.acceleration.x = 0
 
-    def update_y(self, shapes):
+    def update_y(self, tiles):
         self.velocity.y += self.acceleration.y
         self.clamp_speed()
         self.shape.y += self.velocity.y
 
-        intersect = [s for s in shapes if self.shape.collide(s)]
+        intersect = [s for s in tiles if self.shape.collide(s)]
 
         if self.velocity.y > 0:
             # we are going down
@@ -328,12 +333,14 @@ class Body:
                 if self.shape.bottom > body.top:
                     self.shape.bottom = body.top
                     self.velocity.y *= -self.elasticity
+                    self.collisions.append(tiles[body])
         elif self.velocity.y < 0:
             # we are going up
             for body in intersect:
                 if body.bottom > self.shape.top:
                     self.shape.top = body.bottom
                     self.velocity.y *= -self.elasticity
+                    self.collisions.append(tiles[body])
 
         self.acceleration.y = 0
 
@@ -400,14 +407,20 @@ class Space:
     def possible_collision_for(self, body):
         tl = self.tile_map.world_to_map(body.topleft)
         br = self.tile_map.world_to_map(body.topleft + body.shape.size)
-        return [
-            AABB(self.tile_map.get_block_world_rect((x, y)))
-            for x in range(tl[0] - 1, br[0] + 2)
-            for y in range(tl[1] - 1, br[1] + 2)
-            if self.tile_map.get_block((x, y)).solid
-        ]
+        d = {}
+        for x in range(tl[0] - 1, br[0] + 2):
+            for y in range(tl[1] - 1, br[1] + 2):
+                block = self.tile_map.get_block((x, y))
+                if block.solid:
+                    rect = AABB(self.tile_map.get_block_world_rect((x, y)))
+                    d[rect] = block
+        return d
+
 
     def simulate(self):
+        for body in self.moving_bodies:
+            body.collisions.clear()
+
         for body in self.moving_bodies:
             if body.mass:
                 body.apply_force(self.gravity)
@@ -417,14 +430,14 @@ class Space:
         # plus it's accurate enough
 
         for body in self.moving_bodies:
-            body.update_x(self.static_bodies + self.possible_collision_for(body))
+            body.update_x(self.possible_collision_for(body))
 
         # check collision vertically
         for body in self.moving_bodies:
-            body.update_y(self.static_bodies + self.possible_collision_for(body))
+            body.update_y(self.possible_collision_for(body))
 
         for body in self.moving_bodies:
-            body.update_sensors(self.static_bodies + self.possible_collision_for(body))
+            body.update_sensors(self.possible_collision_for(body))
 
         for body in self.moving_bodies:
             body.update_history()
