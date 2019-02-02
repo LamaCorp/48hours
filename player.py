@@ -94,6 +94,10 @@ class Player(Body):
         self.horizontal_logic()
 
         self.just_jumped = False
+        if self.velocity.x < 0:
+            self.looking = LEFT
+        elif self.velocity.x > 0:
+            self.looking = RIGHT
 
     def get_state(self):
         if self.collide_down:
