@@ -129,7 +129,7 @@ class Level:
                                 Block.DEFAULT_BLOCK_SIZE,
                                 self.world_size[1] - screen_size[0] - Block.DEFAULT_BLOCK_SIZE),
                           clamp(self.offset[1],
-                                0,
+                                Block.DEFAULT_BLOCK_SIZE,
                                 self.world_size[0] - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def render(self, surf):
