@@ -2,12 +2,12 @@ import os
 import random
 import pygame
 from physics import Space, Pos, AABB, clamp
-from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER
+from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER, DEFAULT_BLOCK_SIZE
 from config import get_available_blocks
 
 
 class Block:
-    DEFAULT_BLOCK_SIZE = 32
+    DEFAULT_BLOCK_SIZE = DEFAULT_BLOCK_SIZE
     BLOCKS = {
         "P": [(None, False, True)],
         ".": [(None, False, False)],
