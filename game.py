@@ -10,8 +10,6 @@ class GameScreen(Screen):
         self.player = Player(level.start)
         self.space = level.space
         self.space.add(self.player)
-        self.ground = AABB((0, 500), (1500, 500))
-        self.space.add(self.ground)
 
         super().__init__(app, bg_color=(0, 165, 255))
 
@@ -29,5 +27,4 @@ class GameScreen(Screen):
         super().render(surf)
 
         self.level.render(surf)
-        surf.fill((0, 0, 0), self.ground.pygame_rect)
         self.player.render(surf)

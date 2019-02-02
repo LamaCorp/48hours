@@ -1,6 +1,6 @@
 import os
 import pygame
-from physics import Space, Pos
+from physics import Space, Pos, AABB
 from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER
 
 
@@ -60,6 +60,8 @@ class Level:
         self.start = (0, 0)
         self.load_level()
 
+        self.space.add(*self.collision_rects())
+
     @staticmethod
     def map_to_world(map_pos):
         return Pos(map_pos) * Block.DEFAULT_BLOCK_SIZE
@@ -83,3 +85,45 @@ class Level:
         for line in range(len(self.grid)):
             for block in range(len(self.grid[line])):
                 self.grid[line][block].render(surf, self.map_to_world((block, line)))
+
+    def collision_rects(self):
+        # we sort them by Y then X
+        positions = [(y, x)
+                     for y, line in enumerate(self.grid)
+                     for x, tile in enumerate(line)
+                     if tile.solid]
+        positions.sort()
+
+        tile_size = Block.DEFAULT_BLOCK_SIZE
+
+        # so we can have line rects easily
+        line_rects = []
+        first = positions[0]
+        last = positions[0]
+        for pos in positions[1:]:
+            if pos[0] == last[0] and pos[1] == last[1] + 1:
+                # just after on the same line : we expand the block
+                last = pos
+            else:
+                # end of last block
+                size = last[1] - first[1] + 1
+                x = first[1] * tile_size
+                y = first[0] * tile_size
+                w = size * tile_size
+                h = tile_size
+                line_rects.append(AABB(x, y, w, h))
+
+                # we start a new block
+                first = pos
+                last = pos
+
+        # we add the last block too
+        size = last[1] - first[1] + 1
+        x = first[1] * tile_size
+        y = first[0] * tile_size
+        w = size * tile_size
+        h = tile_size
+        line_rects.append(AABB(x, y, w, h))
+
+        # todo: merge lines with the same width
+        return line_rects
