@@ -4,7 +4,7 @@ from physics import Body, AABB
 
 LEFT = 0
 RIGHT = 1
-WALK_SPEED = 3
+WALK_SPEED = 4
 JUMP_FORCE = 20
 
 class Player(Body):
@@ -46,7 +46,7 @@ class Player(Body):
         self.was_jumping = self.jumping
 
     def vertical_logic(self):
-        if self.jumping and not self.was_jumping:
+        if self.jumping and not self.was_jumping and self.collide_down:
             self.apply_force((0, -JUMP_FORCE))
 
     def horizontal_logic(self):
@@ -59,4 +59,4 @@ class Player(Body):
             # feet friction
             self.apply_force(-0.2*self.velocity.horizontal)
         else:
-            self.apply_force(-0.4*self.velocity.horizontal)
+            self.apply_force(-0.25*self.velocity.horizontal)
