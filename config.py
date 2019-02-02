@@ -25,3 +25,7 @@ def get_available_blocks(type="dirt"):
 
 
 get_available_levels = get_available(LEVELS_REGEX, MAPS_FOLDER)
+
+
+class LevelConfig:
+    chosen_level = "Level_0.Map"

@@ -8,16 +8,15 @@ from graphalama.constants import BOTTOM, WHITESMOKE
 
 from widgets import MenuButton, SettingsButton, PlayButton
 from constants import LIGHT_DARK
-from config import get_available_levels
+from config import get_available_levels, LevelConfig
 
 
 class PickerScreen(Screen):
     FPS = 60
 
     def __init__(self, app):
-        self.level = get_available_levels[0]
         size = app.display.get_size()
-        self.play_button = PlayButton(app, self.level, (size[0] // 2, size[1] // 2 + 200))
+        self.play_button = PlayButton(app, (size[0] // 2, size[1] // 2 + 200))
         widgets = [
             MenuButton(app, (size[0] - 365, 100)),
             SettingsButton(app, (size[0] - 65, 100)),
@@ -42,8 +41,7 @@ class PickerScreen(Screen):
         super().__init__(app, widgets, (20, 10, 0))
 
     def level_setter(self, level):
-        self.level = level
-        # FIXME: doesn't change the level at all
+        LevelConfig.chosen_level = level
 
     def draw_background(self, display):
         super().draw_background(display)
