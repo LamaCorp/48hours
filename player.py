@@ -14,13 +14,20 @@ class Player(Body):
 
         self.img = pygame.image.load('assets/player/lama.png').convert()
         self.img.set_colorkey((255, 255, 255))
+        self.img_left = pygame.transform.flip(self.img, True, False)
 
         self.directions = [False, False]  # [Left, Right]
         self.jumping = False
         self.was_jumping = False
+        self.looking = RIGHT
 
     def render(self, surf, offset=(0, 0)):
-        surf.blit(self.img, self.topleft + offset)
+        if self.looking == RIGHT:
+            img = self.img
+        else:
+            img = self.img_left
+
+        surf.blit(img, self.topleft + offset)
 
     def update(self, event):
         if event.type == pygame.KEYDOWN:
@@ -61,7 +68,6 @@ class Player(Body):
             self.apply_force(self.space.gravity)
 
 
-
     def horizontal_logic(self):
         if self.directions[LEFT]:
             self.apply_force((-WALK_SPEED, 0))
@@ -72,4 +78,11 @@ class Player(Body):
             # feet friction
             self.apply_force(-0.2*self.velocity.horizontal)
         else:
+            # air friction
             self.apply_force(-0.25*self.velocity.horizontal)
+
+        # update body direction
+        if self.velocity.x < 0:
+            self.looking = LEFT
+        elif self.velocity.x > 0:
+            self.looking = RIGHT
