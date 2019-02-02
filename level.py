@@ -34,33 +34,38 @@ class Block:
     solid = False
     visible = False
     deadly = False
+    rotation = 0
     sheet_pattern = [[]]
 
     @staticmethod
     def new(character='.'):
         dic = {
-            "D": Dirt,
-            "S": Stone,
-            "B": Barbecue,
+            "D": Dirt(),
+            "S": Stone(),
+            "B": Barbecue(),
+            "V": FieryBarbecue("V"),
+            "^": FieryBarbecue("^"),
+            "<": FieryBarbecue("<"),
+            ">": FieryBarbecue(">"),
         }
 
-        return dic.get(character, Block)()
+        return dic.get(character, Block)
 
-    def get_img(self, neighbourg=""):
+    def get_img(self, neighbourg="", rotation=0):
         """Neighbourg is a string of nine chars of the 9 blocks next to this one."""
 
         for y, line in enumerate(self.sheet_pattern):
             for x, pattern in enumerate(line):
                 if pattern.match(neighbourg):
-                    return self.img_at(x, y)
+                    return self.img_at(x, y, rotation)
 
-        return self.img_at(*self.default_sprite_pos)
+        return self.img_at(*self.default_sprite_pos, rotation=rotation)
 
     @classmethod
     @lru_cache()
-    def img_at(cls, x, y):
-        return cls.sheet.subsurface((x * cls.DEFAULT_BLOCK_SIZE, y * cls.DEFAULT_BLOCK_SIZE,
-                                     cls.DEFAULT_BLOCK_SIZE, cls.DEFAULT_BLOCK_SIZE))
+    def img_at(cls, x, y, rotation=0):
+        return pygame.transform.rotate(cls.sheet.subsurface((x * cls.DEFAULT_BLOCK_SIZE, y * cls.DEFAULT_BLOCK_SIZE,
+                                       cls.DEFAULT_BLOCK_SIZE, cls.DEFAULT_BLOCK_SIZE)), rotation)
 
     def render(self, surf, pos=None, neighbours=""):
         if self.solid:
@@ -118,6 +123,28 @@ class Barbecue(Block):
     sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
 
+class FieryBarbecue(Block):
+    character = "^"
+    solid = True
+    visible = True
+    deadly = True
+
+    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "fiery_barbecue.png")).convert()
+    sheet.set_colorkey((255, 0, 255))
+    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+
+    def __init__(self, character="^"):
+        self.character = character
+        if character == "^":
+            self.rotation = 0
+        elif character == "V":
+            self.rotation = 180
+        elif character == "<":
+            self.rotation = 90
+        elif character == ">":
+            self.rotation = -90
+
+
 class Level:
     OFFSET_THRESHOLD = 40 / 100
 
@@ -173,7 +200,7 @@ class Level:
                         for dy in range(-1, 2)
                         for dx in range(-1, 2))
         block = self.get_block(map_pos)
-        return block.get_img(neigh)
+        return block.get_img(neigh, rotation=block.rotation)
 
     @property
     def world_size(self):
