@@ -1,0 +1,9 @@
+# Screens
+MENU = 0
+GAME = 42
+SETTINGS = "TODO"
+PICKER = 93933
+
+# Colors
+DARK = (31, 32, 65)
+LIGHT_DARK = (62, 64, 130)
