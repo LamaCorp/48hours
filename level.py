@@ -1,6 +1,10 @@
 from physics import Space
 
-class Level:    
+EMPTY = (0, "O", None)
+
+
+
+class Level:
     def __init__(self, level='level_0'):
         self.name = level
         self.space = Space()
@@ -8,4 +12,4 @@ class Level:
 
     def render(self, surf):
         pass
-        #TODO: draw the map
+        # TODO: draw the map
