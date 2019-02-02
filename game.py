@@ -15,7 +15,15 @@ class GameScreen(Screen):
 
         super().__init__(app, bg_color=(0, 165, 255))
 
+    def update(self, event):
+        if super().update(event):
+            return True
+
+        return self.player.update(event)
+
+
     def internal_logic(self):
+        self.player.internal_logic()
         self.space.simulate()
 
     def render(self, surf):

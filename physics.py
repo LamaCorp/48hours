@@ -114,6 +114,14 @@ class Pos:
     def copy(self):
         return Pos(self.x, self.y)
 
+    @property
+    def horizontal(self):
+        return Pos(self.x, 0)
+
+    @property
+    def vertical(self):
+        return Pos(0, self.y)
+
 
 class AABB:
     """Axis aligned rectangle: the basic shape."""
