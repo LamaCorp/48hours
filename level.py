@@ -70,6 +70,21 @@ class Level:
     def world_to_map(world_pos):
         return Pos(world_pos) // Block.DEFAULT_BLOCK_SIZE
 
+    @property
+    def map_size(self):
+        if len(self.grid) > 0:
+            return len(self.grid), len(self.grid[0])
+        else:
+            return 0, 0
+
+    @property
+    def world_size(self):
+        return Level.map_to_world(self.map_size)
+    
+    @property
+    def size(self):
+        return self.map_size
+
     def load_level(self):  # TODO: may we improve this?
         with open(os.path.join(MAPS_FOLDER, self.name + ".map"), 'r') as map_file:
             height, width = list(map(int, map_file.readline().split()))
