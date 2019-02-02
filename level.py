@@ -11,7 +11,6 @@ class Block:
     BLOCKS = {
         "P": [(None, False, True)],
         ".": [(None, False, False)],
-        # TODO: choose randomly between available textures
         # TODO: remove grass and automatically add grass when there is no block over it
         "G": [(pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, path.lower())).convert(),
                                       (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
@@ -29,7 +28,7 @@ class Block:
 
     def __init__(self, character='.'):
         if character not in Block.BLOCKS:
-            raise Exception("Shit fuck")  # TODO: maybe be just an empty one
+            character = '.'
         self.block = random.choice(Block.BLOCKS[character])
         self.img = self.block[0]
         self.solid = self.block[1]
@@ -120,15 +119,16 @@ class Level:
                                 Block.DEFAULT_BLOCK_SIZE,
                                 self.world_size[1] - screen_size[0] - Block.DEFAULT_BLOCK_SIZE),
                           clamp(self.offset[1],
-                                Block.DEFAULT_BLOCK_SIZE,
+                                0,
                                 self.world_size[0] - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def render(self, surf):
         offset_end = (Pos(self.offset) + Pos(surf.get_size())).t
         for line in range(Level.world_to_map(self.offset)[1],
-                          clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.map_size[0])):
+                          clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.map_size[0] - 1)):
             for block in range(Level.world_to_map(self.offset)[0],
-                               clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.map_size[1])):
+                               clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.map_size[1] - 1)):
+                #print(str(line) + " pouet " + str(block))
                 self.grid[line][block].render(surf, self.map_to_world((block, line)) - self.offset)
 
     def collision_rects(self):

@@ -15,6 +15,7 @@ class PickerScreen(Screen):
     def __init__(self, app):
         self.level = get_available_levels[0]
         size = app.display.get_size()
+        self.play_button = PlayButton(app, self.level, (size[0] // 2, size[1] // 2 + 200))
         widgets = [
             MenuButton(app, (size[0] - 365, 100)),
             SettingsButton(app, (size[0] - 65, 100)),
@@ -26,10 +27,11 @@ class PickerScreen(Screen):
                            bg_color=LIGHT_DARK,
                            arrow_color=WHITESMOKE,
                            anchor=BOTTOM),
-            PlayButton(app, self.level, (size[0] // 2, size[1] // 2 + 200)),
+            self.play_button,
         ]
 
-        super().__init__(app, widgets, None) # TODO: add background
+        super().__init__(app, widgets, None)  # TODO: add background
 
     def level_setter(self, level):
         self.level = level
+        # FIXME: doesn't change the level at all

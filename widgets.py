@@ -48,7 +48,7 @@ def PlayButton(app, level, pos=None, anchor=CENTER):
     from game import GameScreen
     from level import Level
     return Button(text="Play",
-                  function=lambda: app.set_temp_screen(lambda app: GameScreen(app, Level(level))),
+                  function=lambda: app.set_temp_screen(lambda app: GameScreen(app, Level("level_1.map"))),
                   pos=pos,
                   shape=RoundedRect((200, 50), 100),
                   color=WHITESMOKE,
