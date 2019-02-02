@@ -3,16 +3,6 @@ import pygame
 from physics import Space
 from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER
 
-
-DEFAULT_PATH = ""
-
-EMPTY = (0, "0")
-GRASS = (1, "G")
-DIRT = (2, "D")
-STONE = (3, "S")
-
-DEFAULT_PATH = ""
-
 # TODO: make dis a dictionnary
 START = ("P", None)
 EMPTY = (".", None)
