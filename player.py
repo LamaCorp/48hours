@@ -5,7 +5,7 @@ from physics import Body, AABB
 LEFT = 0
 RIGHT = 1
 WALK_SPEED = 4
-JUMP_FORCE = 20
+JUMP_FORCE = 10
 
 class Player(Body):
     def __init__(self, start_pos=(0, 0)):
@@ -46,8 +46,21 @@ class Player(Body):
         self.was_jumping = self.jumping
 
     def vertical_logic(self):
+        # player starts jumping from the ground
         if self.jumping and not self.was_jumping and self.collide_down:
             self.apply_force((0, -JUMP_FORCE))
+
+        if self.jumping and self.velocity.y < 0:
+            # jumping in upward phase
+            self.apply_force(-self.space.gravity * 0.6)
+        elif self.jumping and self.velocity.y > 0:
+            # hovering down when jump is still pressed
+            self.apply_force(-self.space.gravity * 0.2)
+        elif not self.jumping and self.velocity.y < 0:
+            # still going up but not jumping, we want to go down as fast as we can
+            self.apply_force(self.space.gravity)
+
+
 
     def horizontal_logic(self):
         if self.directions[LEFT]:

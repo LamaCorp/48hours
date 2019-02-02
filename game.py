@@ -10,7 +10,7 @@ class GameScreen(Screen):
         self.player = Player()
         self.space = level.space
         self.space.add(self.player)
-        self.ground = AABB((0, 500), (1000, 500))
+        self.ground = AABB((0, 500), (1500, 500))
         self.space.add(self.ground)
 
         super().__init__(app, bg_color=(0, 165, 255))
