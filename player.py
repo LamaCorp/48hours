@@ -41,11 +41,8 @@ class Player(Body):
                 self.jumping = True
             elif event.key == pygame.K_LSHIFT:
                 self.run = True
-                print(876543456789)
-            else:
-                print(event)
 
-        if event.type == pygame.KEYUP:
+        elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 self.directions[LEFT] = False
             elif event.key == pygame.K_RIGHT:
