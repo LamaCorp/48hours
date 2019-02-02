@@ -97,7 +97,7 @@ class Level:
                 for i in range(len(line)):
                     line[i] = Block(line[i])
                     if line[i].is_start:
-                        self.start = (h, i)
+                        self.start = (i, h)
                 self.grid.append(line)
 
     def render(self, surf):
