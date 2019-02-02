@@ -314,6 +314,18 @@ class Body:
         if self.max_velocity.y is not None:
             self.velocity.y = clamp(self.velocity.y, -self.max_velocity.y, self.max_velocity.y)
 
+    def apply_force(self, force=(0, 0)):
+        """
+        Apply of force respecting the mass of the object.
+
+        If the object has no mass, just add the force to the acceleration.
+        """
+
+        if self.mass == 0:
+            self.acceleration += force
+        else:
+            self.acceleration += Pos(force) / self.mass
+
 
 class Space:
     def __init__(self, gravity=(0, 0)):
