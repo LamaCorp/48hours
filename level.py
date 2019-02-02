@@ -127,7 +127,7 @@ class Barbecue(Block):
 
 
 class Brochette:
-    img = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "brochettes_todo.jpg")).convert()
+    img = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "brochette_1.png")).convert()
     img.set_colorkey((255, 0, 255))
     img = pygame.transform.scale(img, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
