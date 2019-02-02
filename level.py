@@ -62,6 +62,10 @@ class Level:
 
         self.space.add(*self.collision_rects())
 
+    @property
+    def world_start(self):
+        return self.map_to_world(self.start)
+
     @staticmethod
     def map_to_world(map_pos):
         return Pos(map_pos) * Block.DEFAULT_BLOCK_SIZE

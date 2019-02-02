@@ -7,7 +7,7 @@ from player import Player
 class GameScreen(Screen):
     def __init__(self, app, level):
         self.level = level
-        self.player = Player(level.start)
+        self.player = Player(level.world_start)
         self.space = level.space
         self.space.add(self.player)
 
