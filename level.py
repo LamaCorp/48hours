@@ -1,6 +1,6 @@
 import os
 import pygame
-from physics import Space, Pos, AABB
+from physics import Space, Pos, AABB, clamp
 from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER
 
 
@@ -57,7 +57,8 @@ class Level:
         self.name = level
         self.space = Space(gravity=(0, 1))
         self.grid = []
-        self.start = (0, 0)
+        self.start = (0, 0)  # Where the player has to spawn, map coordinates
+        self.offset = (0, 0)  # Where we start to draw the map, map coordinates
         self.load_level()
 
         self.space.add(*self.collision_rects())
@@ -100,10 +101,15 @@ class Level:
                         self.start = (i, h)
                 self.grid.append(line)
 
+    def update_offset(self, player_pos):
+        # TODO
+        self.offset = 0, 0
+
     def render(self, surf):
-        for line in range(len(self.grid)):
-            for block in range(len(self.grid[line])):
-                self.grid[line][block].render(surf, self.map_to_world((block, line)))
+        offset_end = (Pos(self.offset) + Pos(Level.world_to_map(surf.get_size()))).t
+        for line in range(self.offset[0], clamp(offset_end[1] + 1, 0, self.map_size[0])):
+            for block in range(self.offset[1], clamp(offset_end[0] + 1, 0, self.map_size[1])):
+                self.grid[line][block].render(surf, self.map_to_world((block - self.offset[0], line - self.offset[1])))
 
     def collision_rects(self):
         # we sort them by Y then X
