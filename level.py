@@ -190,6 +190,7 @@ class Level:
         self.start = (0, 0)  # Where the player has to spawn, map coordinates
         self.offset = Pos(0, 0)  # Where we start to draw the map, world coordinates
         self.load_level()
+        self.screen_size = (0, 0)
 
     @property
     def world_start(self):
@@ -276,12 +277,16 @@ class Level:
                                 self.world_size.y - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def internal_logic(self):
-        for line in range(0, self.size[0]):
-            for block in range(0, self.size[1]):
+        offset_end = (Pos(self.offset) + self.screen_size).t
+        for line in range(clamp(Level.world_to_map(self.offset)[1] - 20, 0, self.size[1] - 1),
+                          clamp(Level.world_to_map(offset_end)[1] + 20, 0, self.size[1] - 1)):
+            for block in range(clamp(Level.world_to_map(self.offset)[0] - 20, 0, self.size[0] - 1),
+                               clamp(Level.world_to_map(offset_end)[0] + 20, 0, self.size[0] - 1)):
                 self.get_block((block, line)).internal_logic(self.map_to_world((block, line)))
 
     def render(self, surf):
-        offset_end = (Pos(self.offset) + Pos(surf.get_size())).t
+        self.screen_size = Pos(surf.get_size())
+        offset_end = (Pos(self.offset) + self.screen_size).t
         for line in range(Level.world_to_map(self.offset)[1],
                           clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.size[1] - 1)):
             for block in range(Level.world_to_map(self.offset)[0],
