@@ -10,6 +10,7 @@ from physics import Space, Pos, clamp
 
 START = "P"
 
+
 def re_compile(matrix):
     """Compile the matrix of pattern and replace the " " by dots to match the air."""
     compiled = []
@@ -32,13 +33,15 @@ class Block:
     default_sprite_pos = (0, 0)
     solid = False
     visible = False
+    deadly = False
     sheet_pattern = [[]]
 
     @staticmethod
     def new(character='.'):
         dic = {
             "D": Dirt,
-            "S": Stone
+            "S": Stone,
+            "B": Barbecue,
         }
 
         return dic.get(character, Block)()
@@ -68,6 +71,7 @@ class Dirt(Block):
     character = "D"
     solid = True
     visible = True
+    deadly = False
     default_sprite_pos = 1, 1
     sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_sheet.png")).convert()
     sheet.set_colorkey((255, 0, 255))
@@ -88,6 +92,7 @@ class Stone(Block):
     character = "S"
     solid = True
     visible = True
+    deadly = False
     default_sprite_pos = 1, 1
 
     sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_sheet.png")).convert()
@@ -100,6 +105,17 @@ class Stone(Block):
         [".?. ??. .", ".?.???. .", ".?.?? . .", ".?. ? . ."], #". . ??.? ", ". .??  ?."],
         [". . ??. .", ". .???. .", ". .?? . .", ". . ? . ."], #".?  ??. .", " ?.?? . ."]
     ])
+
+
+class Barbecue(Block):
+    character = "B"
+    solid = True
+    visible = True
+    deadly = True
+
+    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "barbecue.png")).convert()
+    sheet.set_colorkey((255, 0, 255))
+    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
 
 class Level:
