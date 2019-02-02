@@ -4,7 +4,8 @@ from physics import Body, AABB
 
 LEFT = 0
 RIGHT = 1
-WALK_SPEED = 4
+WALK_FORCE = 2
+RUN_FORCE = 4
 JUMP_FORCE = 10
 
 class Player(Body):
@@ -20,6 +21,7 @@ class Player(Body):
         self.jumping = False
         self.was_jumping = False
         self.looking = RIGHT
+        self.run = False
 
     def render(self, surf, offset=(0, 0)):
         if self.looking == RIGHT:
@@ -35,16 +37,23 @@ class Player(Body):
                 self.directions[LEFT] = True
             elif event.key == pygame.K_RIGHT:
                 self.directions[RIGHT] = True
-            elif event.key == pygame.K_UP:
+            elif event.key == pygame.K_SPACE:
                 self.jumping = True
+            elif event.key == pygame.K_LSHIFT:
+                self.run = True
+                print(876543456789)
+            else:
+                print(event)
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 self.directions[LEFT] = False
             elif event.key == pygame.K_RIGHT:
                 self.directions[RIGHT] = False
-            elif event.key == pygame.K_UP:
+            elif event.key == pygame.K_SPACE:
                 self.jumping = False
+            elif event.key == pygame.K_LSHIFT:
+                self.run = False
 
     def internal_logic(self):
         self.vertical_logic()
@@ -69,14 +78,20 @@ class Player(Body):
 
 
     def horizontal_logic(self):
+        h_force = RUN_FORCE if self.run else WALK_FORCE
         if self.directions[LEFT]:
-            self.apply_force((-WALK_SPEED, 0))
+            self.apply_force((-h_force, 0))
         if self.directions[RIGHT]:
-            self.apply_force((WALK_SPEED, 0))
+            self.apply_force((h_force, 0))
 
         if self.collide_down:
             # feet friction
-            self.apply_force(-0.2*self.velocity.horizontal)
+            if any(self.directions):
+                self.apply_force(-0.2*self.velocity.horizontal)
+            else:
+                # apply more friction when not moving, we want to stop quick
+                self.apply_force(-0.4*self.velocity.horizontal)
+
         else:
             # air friction
             self.apply_force(-0.25*self.velocity.horizontal)

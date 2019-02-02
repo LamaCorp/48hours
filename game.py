@@ -1,6 +1,5 @@
 from graphalama.app import Screen
 
-from physics import AABB
 from player import Player
 
 
