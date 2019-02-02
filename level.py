@@ -132,15 +132,15 @@ class Brochette:
     img = pygame.transform.scale(img, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
     def __init__(self, start_pos, direction=(0, 0)):
-        self.pos = Pos(start_pos)
+        self.pos = start_pos
         self.speed = 25
-        self.direction = Pos(direction)
+        self.direction = direction
 
     def internal_logic(self):
         self.pos += self.direction * self.speed
 
     def render(self, surf, offset=(0, 0)):
-        surf.blit(Brochette.img, Pos(self.pos) - Pos(offset))
+        surf.blit(Brochette.img, self.pos - offset)
 
 
 class FieryBarbecue(Block):
@@ -255,7 +255,7 @@ class Level:
                 self.grid.append(line)
 
     def update_offset(self, player_pos, screen_size):
-        player_pos = Pos(player_pos) - Pos(self.offset)
+        player_pos = player_pos - self.offset
         if player_pos[0] < self.OFFSET_THRESHOLD * screen_size[0]:
             self.offset = (self.offset[0] - (self.OFFSET_THRESHOLD * screen_size[0] - player_pos[0]),
                            self.offset[1])
@@ -277,7 +277,7 @@ class Level:
                                 self.world_size.y - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def internal_logic(self):
-        offset_end = (Pos(self.offset) + self.screen_size).t
+        offset_end = (self.offset + self.screen_size).t
         for line in range(clamp(Level.world_to_map(self.offset)[1] - 20, 0, self.size[1] - 1),
                           clamp(Level.world_to_map(offset_end)[1] + 20, 0, self.size[1] - 1)):
             for block in range(clamp(Level.world_to_map(self.offset)[0] - 20, 0, self.size[0] - 1),
@@ -286,7 +286,7 @@ class Level:
 
     def render(self, surf):
         self.screen_size = Pos(surf.get_size())
-        offset_end = (Pos(self.offset) + self.screen_size).t
+        offset_end = (self.offset + self.screen_size).t
         for line in range(Level.world_to_map(self.offset)[1],
                           clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.size[1] - 1)):
             for block in range(Level.world_to_map(self.offset)[0],
