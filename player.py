@@ -2,7 +2,7 @@ from enum import Enum, auto
 
 import pygame
 
-from physics import Body, AABB, Pos, clamp
+from physics import Body, AABB, Pos
 
 LEFT = 0
 RIGHT = 1
@@ -89,7 +89,6 @@ class Player(Body):
             self.state_duration = 0
 
         self.state = new_state
-        print(self.state)
 
         self.vertical_logic()
         self.horizontal_logic()

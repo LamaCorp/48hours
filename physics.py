@@ -5,9 +5,12 @@ Maybe one day it'll get bigger.
 """
 
 from math import cos, sin, pi, sqrt
-from typing import List
+from typing import List, TYPE_CHECKING
 
 import pygame
+
+if TYPE_CHECKING:
+    from level import Level
 
 
 def clamp(x, mini=float('-inf'), maxi=float('inf')):
@@ -290,12 +293,11 @@ class Body:
 
     def update_x(self, shapes):
         """Updates the position on the x coordinate and check for collision with the shapes."""
-        self.collide_left = False
-        self.collide_right = False
+        intersect = [s for s in shapes if self.shape.collide(s)]
+
         self.velocity.x += self.acceleration.x
         self.clamp_speed()
         self.shape.x += self.velocity.x
-
         intersect = [s for s in shapes if self.shape.collide(s)]
 
         if self.velocity.x > 0:
@@ -304,21 +306,16 @@ class Body:
                 if body.left < self.shape.right:
                     self.shape.right = body.left
                     self.velocity.x *= -self.elasticity
-                    self.collide_right = True
         elif self.velocity.x < 0:
             # we are going left
             for body in intersect:
                 if self.shape.left < body.right:
                     self.shape.left = body.right
                     self.velocity.x *= -self.elasticity
-                    self.collide_left = True
 
         self.acceleration.x = 0
 
     def update_y(self, shapes):
-        self.collide_down = False
-        self.collide_top = False
-
         self.velocity.y += self.acceleration.y
         self.clamp_speed()
         self.shape.y += self.velocity.y
@@ -331,14 +328,12 @@ class Body:
                 if self.shape.bottom > body.top:
                     self.shape.bottom = body.top
                     self.velocity.y *= -self.elasticity
-                    self.collide_down = True
         elif self.velocity.y < 0:
             # we are going up
             for body in intersect:
                 if body.bottom > self.shape.top:
                     self.shape.top = body.bottom
                     self.velocity.y *= -self.elasticity
-                    self.collide_top = True
 
         self.acceleration.y = 0
 
@@ -388,9 +383,10 @@ class Body:
 
 
 class Space:
-    def __init__(self, gravity=(0, 0)):
+    def __init__(self, tile_map=None, gravity=(0, 0)):
+        self.tile_map = tile_map  # type: Level
         self.gravity = Pos(gravity)
-        self.static_bodies = []  # type: List[Body]
+        self.static_bodies = []  # type: List[AABB]
         self.moving_bodies = []  # type: List[Body]
 
     def add(self, *bodies):
@@ -401,24 +397,34 @@ class Space:
                 self.static_bodies.append(body)
             body.space = self
 
+    def possible_collision_for(self, body):
+        tl = self.tile_map.world_to_map(body.topleft)
+        br = self.tile_map.world_to_map(body.topleft + body.shape.size)
+        return [
+            AABB(self.tile_map.get_block_world_rect((x, y)))
+            for x in range(tl[0] - 1, br[0] + 2)
+            for y in range(tl[1] - 1, br[1] + 2)
+            if self.tile_map.get_block((x, y)).solid
+        ]
+
     def simulate(self):
         for body in self.moving_bodies:
             if body.mass:
-                body.acceleration += self.gravity / body.mass
+                body.apply_force(self.gravity)
 
         # check collision horizontally
         # we don't do both at the same time because it simplifies A LOT the thing
         # plus it's accurate enough
 
         for body in self.moving_bodies:
-            body.update_x(self.static_bodies)
+            body.update_x(self.static_bodies + self.possible_collision_for(body))
 
         # check collision vertically
         for body in self.moving_bodies:
-            body.update_y(self.static_bodies)
+            body.update_y(self.static_bodies + self.possible_collision_for(body))
 
         for body in self.moving_bodies:
-            body.update_sensors(self.static_bodies)
+            body.update_sensors(self.static_bodies + self.possible_collision_for(body))
 
         for body in self.moving_bodies:
             body.update_history()

@@ -1,9 +1,11 @@
 import os
 import random
+
 import pygame
-from physics import Space, Pos, AABB, clamp
-from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER, DEFAULT_BLOCK_SIZE
+
 from config import get_available_blocks
+from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER, DEFAULT_BLOCK_SIZE
+from physics import Space, Pos, clamp
 
 
 class Block:
@@ -52,13 +54,11 @@ class Level:
 
     def __init__(self, level='level_0'):
         self.name = level
-        self.space = Space(gravity=(0, 1))
+        self.space = Space(self, gravity=(0, 1))
         self.grid = []
         self.start = (0, 0)  # Where the player has to spawn, map coordinates
         self.offset = Pos(0, 0)  # Where we start to draw the map, world coordinates
         self.load_level()
-
-        self.space.add(*self.collision_rects())
 
     @property
     def world_start(self):
@@ -75,10 +75,23 @@ class Level:
     def get_block(self, map_pos):
         x, y = map_pos
         if (0 <= x < self.map_size.x
-            and 0 <= y < self.map_size.y):
+                and 0 <= y < self.map_size.y):
             return self.grid[y][x]
 
         return Block('D')
+
+    def get_slice(self, map_top_left, map_bottom_right):
+        """Return a list of all block totally covering the given rectangle."""
+        for y in range(map_top_left[1], map_bottom_right[1] + 1):
+            for x in range(map_top_left[0], map_bottom_right[0] + 1):
+                yield self.get_block((x, y))
+
+    def get_block_world_rect(self, map_pos):
+        """Get the rect for collision checking of the block at the given position"""
+        return (
+            self.map_to_world(map_pos),
+            (Block.DEFAULT_BLOCK_SIZE, Block.DEFAULT_BLOCK_SIZE)
+        )
 
     def get_block_at_world(self, world_pos):
         map_pos = self.world_to_map(world_pos)
@@ -86,13 +99,15 @@ class Level:
 
     @property
     def map_size(self):
+        """(width, height), in blocks"""
         if len(self.grid) > 0:
-            return Pos(len(self.grid), len(self.grid[0]))
+            return Pos(len(self.grid[0]), len(self.grid))
         else:
             return Pos(0, 0)
 
     @property
     def world_size(self):
+        """(width, height), in pixels"""
         return Level.map_to_world(self.map_size)
 
     @property
@@ -127,57 +142,15 @@ class Level:
 
         self.offset = Pos(clamp(self.offset[0],
                                 Block.DEFAULT_BLOCK_SIZE,
-                                self.world_size[1] - screen_size[0] - Block.DEFAULT_BLOCK_SIZE),
+                                self.world_size.x - screen_size[0] - Block.DEFAULT_BLOCK_SIZE),
                           clamp(self.offset[1],
                                 Block.DEFAULT_BLOCK_SIZE,
-                                self.world_size[0] - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
+                                self.world_size.y - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def render(self, surf):
         offset_end = (Pos(self.offset) + Pos(surf.get_size())).t
         for line in range(Level.world_to_map(self.offset)[1],
-                          clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.map_size[0] - 1)):
+                          clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.map_size[1] - 1)):
             for block in range(Level.world_to_map(self.offset)[0],
-                               clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.map_size[1] - 1)):
+                               clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.map_size[0] - 1)):
                 self.grid[line][block].render(surf, self.map_to_world((block, line)) - self.offset)
-
-    def collision_rects(self):
-        # we sort them by Y then X
-        positions = [(y, x)
-                     for y, line in enumerate(self.grid)
-                     for x, tile in enumerate(line)
-                     if tile.solid]
-        positions.sort()
-
-        tile_size = Block.DEFAULT_BLOCK_SIZE
-
-        # so we can have line rects easily
-        line_rects = []
-        first = positions[0]
-        last = positions[0]
-        for pos in positions[1:]:
-            if pos[0] == last[0] and pos[1] == last[1] + 1:
-                # just after on the same line : we expand the block
-                last = pos
-            else:
-                # end of last block
-                size = last[1] - first[1] + 1
-                x = first[1] * tile_size
-                y = first[0] * tile_size
-                w = size * tile_size
-                h = tile_size
-                line_rects.append(AABB(x, y, w, h))
-
-                # we start a new block
-                first = pos
-                last = pos
-
-        # we add the last block too
-        size = last[1] - first[1] + 1
-        x = first[1] * tile_size
-        y = first[0] * tile_size
-        w = size * tile_size
-        h = tile_size
-        line_rects.append(AABB(x, y, w, h))
-
-        # todo: merge lines with the same width
-        return line_rects
