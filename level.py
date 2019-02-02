@@ -5,18 +5,34 @@ from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER
 
 
 class Block:
+    DEFAULT_BLOCK_SIZE = 32
     BLOCKS = {
         "P": (None, False, True),
         ".": (None, False, False),
         # TODO: choose randomly between available textures
         # TODO: remove grass and automatically add grass when there is no block over it
-        "G": (pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "grass_000.png")).convert(), True, False),
-        "D": (pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_000.png")).convert(), True, False),
-        "S": (pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_000.png")).convert(), True, False),
+        "G": (
+             pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "grass_000.png")).convert(),
+                                    (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+             True,
+             False
+        ),
+        "D": (
+             pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_000.png")).convert(),
+                                    (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+             True,
+             False
+        ),
+        "S": (
+             pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_000.png")).convert(),
+                                    (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+             True,
+             False
+        ),
     }
 
     def __init__(self, character='.'):
-        if not character in Block.BLOCKS:
+        if character not in Block.BLOCKS:
             raise Exception("Shit fuck")  # TODO: maybe be just an empty one
         self.block = Block.BLOCKS[character]
         self.img = self.block[0]
@@ -44,11 +60,13 @@ class Level:
         self.start = (0, 0)
         self.load_level()
 
-    def map_to_world(self, map_pos):
-        return Pos(map_pos) * 16
+    @staticmethod
+    def map_to_world(map_pos):
+        return Pos(map_pos) * Block.DEFAULT_BLOCK_SIZE
 
-    def world_to_map(self, world_pos):
-        return Pos(world_pos) // 16
+    @staticmethod
+    def world_to_map(world_pos):
+        return Pos(world_pos) // Block.DEFAULT_BLOCK_SIZE
 
     def load_level(self):  # TODO: may we improve this?
         with open(os.path.join(MAPS_FOLDER, self.name + ".map"), 'r') as map_file:
