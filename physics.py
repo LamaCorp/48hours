@@ -360,6 +360,17 @@ class Body:
         else:
             self.acceleration += Pos(force) / self.mass
 
+    def update_sensors(self, shapes):
+        left = AASegment(self.shape.top, self.shape.bottom, self.shape.left - 1, vertical=True)
+        right = AASegment(self.shape.top, self.shape.bottom, self.shape.right + 1, vertical=True)
+        top = AASegment(self.shape.left, self.shape.right, self.shape.top - 1, vertical=False)
+        bottom = AASegment(self.shape.left, self.shape.right, self.shape.bottom + 1, vertical=False)
+
+        self.collide_left = any(left.collide(s) for s in shapes)
+        self.collide_right = any(right.collide(s) for s in shapes)
+        self.collide_down = any(bottom.collide(s) for s in shapes)
+        self.collide_top = any(top.collide(s) for s in shapes)
+
     def update_history(self):
         self.last_collide_top += 1
         self.last_collide_down += 1
@@ -405,6 +416,9 @@ class Space:
         # check collision vertically
         for body in self.moving_bodies:
             body.update_y(self.static_bodies)
+
+        for body in self.moving_bodies:
+            body.update_sensors(self.static_bodies)
 
         for body in self.moving_bodies:
             body.update_history()
