@@ -267,6 +267,12 @@ class Body:
         self.collide_right = False
         self.collide_top = False
 
+        self.last_collide_left = 0
+        self.last_collide_down = 0
+        self.last_collide_right = 0
+        self.last_collide_top = 0
+
+
     def __repr__(self):
         return f"<Body: s {self.shape}, v {self.velocity}, a {self.acceleration}>"
 
@@ -354,6 +360,21 @@ class Body:
         else:
             self.acceleration += Pos(force) / self.mass
 
+    def update_history(self):
+        self.last_collide_top += 1
+        self.last_collide_down += 1
+        self.last_collide_left += 1
+        self.last_collide_right += 1
+
+        if self.collide_top:
+            self.last_collide_top = 0
+        if self.collide_down:
+            self.last_collide_down = 0
+        if self.collide_left:
+            self.last_collide_left = 0
+        if self.collide_right:
+            self.last_collide_right = 0
+
 
 class Space:
     def __init__(self, gravity=(0, 0)):
@@ -384,3 +405,6 @@ class Space:
         # check collision vertically
         for body in self.moving_bodies:
             body.update_y(self.static_bodies)
+
+        for body in self.moving_bodies:
+            body.update_history()

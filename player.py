@@ -9,6 +9,7 @@ RUN_FORCE = 4
 JUMP_FORCE = 10
 WALL_JUMP_FORCE = 30
 WALL_JUMP_ANGLE = 60
+INPUT_TOLLERANCE = 3
 
 class Player(Body):
     def __init__(self, start_pos=(0, 0)):
@@ -64,14 +65,14 @@ class Player(Body):
     def vertical_logic(self):
         # player just jumped
         if self.jumping and self.jump_frames == 0:
-            if self.collide_down:
+            if self.last_collide_down < INPUT_TOLLERANCE:
                 # from the ground
                 self.apply_force((0, -JUMP_FORCE))
-            elif self.collide_left:
+            elif self.last_collide_left < INPUT_TOLLERANCE:
                 # from a left wall
                 self.velocity = Pos(0, 0)
                 self.apply_force(Pos.unit_y().rotate(WALL_JUMP_ANGLE) * WALL_JUMP_FORCE)
-            elif self.collide_right:
+            elif self.last_collide_right < INPUT_TOLLERANCE:
                 # from a left wall
                 self.velocity = Pos(0, 0)
                 self.apply_force(Pos.unit_y().rotate(-WALL_JUMP_ANGLE) * WALL_JUMP_FORCE)
