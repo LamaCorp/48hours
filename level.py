@@ -100,8 +100,6 @@ class Level:
 
     def update_offset(self, player_pos, screen_size):
         player_pos = Pos(player_pos) - Pos(self.offset)
-        print("player", player_pos)
-        print("offset", self.offset)
         if player_pos[0] < self.OFFSET_THRESHOLD * screen_size[0]:
             self.offset = (self.offset[0] - (self.OFFSET_THRESHOLD * screen_size[0] - player_pos[0]),
                            self.offset[1])
@@ -128,7 +126,6 @@ class Level:
                           clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.map_size[0] - 1)):
             for block in range(Level.world_to_map(self.offset)[0],
                                clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.map_size[1] - 1)):
-                #print(str(line) + " pouet " + str(block))
                 self.grid[line][block].render(surf, self.map_to_world((block, line)) - self.offset)
 
     def collision_rects(self):
