@@ -1,6 +1,6 @@
 import os
 import pygame
-from physics import Space
+from physics import Space, Pos
 from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER
 
 # TODO: make dis a dictionnary
@@ -22,6 +22,12 @@ class Level:
         self.width = 0
         self.start = (0, 0)
         self.load_level()
+
+    def map_to_world(self, map_pos):
+        return Pos(map_pos) * 16
+
+    def world_to_map(self, world_pos):
+        return Pos(world_pos) // 16
 
     def load_level(self):
         with open(os.path.join(MAPS_FOLDER, self.name + ".map"), 'r') as map_file:
@@ -50,8 +56,7 @@ class Level:
                 self.grid.append(line)
 
     def render(self, surf):
-        size = surf.get_size()
         for line in range(len(self.grid)):
             for block in range(len(self.grid[line])):
                 if self.grid[line][block] != START and self.grid[line][block] != EMPTY:
-                    surf.blit(self.grid[line][block][1], (block * 17, line * 17))
+                    surf.blit(self.grid[line][block][1], self.map_to_world((block, line)))

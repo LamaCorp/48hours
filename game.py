@@ -5,9 +5,9 @@ from player import Player
 
 
 class GameScreen(Screen):
-    def __init__(self, app, level=None):
+    def __init__(self, app, level):
         self.level = level
-        self.player = Player()
+        self.player = Player(level.start)
         self.space = level.space
         self.space.add(self.player)
         self.ground = AABB((0, 500), (1500, 500))
@@ -21,7 +21,6 @@ class GameScreen(Screen):
 
         return self.player.update(event)
 
-
     def internal_logic(self):
         self.player.internal_logic()
         self.space.simulate()
@@ -30,5 +29,5 @@ class GameScreen(Screen):
         super().render(surf)
 
         self.level.render(surf)
-        surf.fill( (0, 0, 0), self.ground.pygame_rect)
+        surf.fill((0, 0, 0), self.ground.pygame_rect)
         self.player.render(surf)
