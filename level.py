@@ -1,40 +1,36 @@
 import os
+import random
 import pygame
 from physics import Space, Pos, AABB, clamp
 from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER
+from config import get_available_blocks
 
 
 class Block:
     DEFAULT_BLOCK_SIZE = 32
     BLOCKS = {
-        "P": (None, False, True),
-        ".": (None, False, False),
+        "P": [(None, False, True)],
+        ".": [(None, False, False)],
         # TODO: choose randomly between available textures
         # TODO: remove grass and automatically add grass when there is no block over it
-        "G": (
-            pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "grass_000.png")).convert(),
-                                   (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-            True,
-            False
-        ),
-        "D": (
-            pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_000.png")).convert(),
-                                   (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-            True,
-            False
-        ),
-        "S": (
-            pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_000.png")).convert(),
-                                   (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-            True,
-            False
-        ),
+        "G": [(pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, path.lower())).convert(),
+                                      (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+               True, False)
+              for path in get_available_blocks("grass")],
+        "D": [(pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, path.lower())).convert(),
+                                      (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+               True, False)
+              for path in get_available_blocks("dirt")],
+        "S": [(pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, path.lower())).convert(),
+                                      (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
+               True, False)
+              for path in get_available_blocks("stone")],
     }
 
     def __init__(self, character='.'):
         if character not in Block.BLOCKS:
             raise Exception("Shit fuck")  # TODO: maybe be just an empty one
-        self.block = Block.BLOCKS[character]
+        self.block = random.choice(Block.BLOCKS[character])
         self.img = self.block[0]
         self.solid = self.block[1]
         self.start = self.block[2]
@@ -53,7 +49,7 @@ class Block:
 
 
 class Level:
-    OFFSET_THRESHOLD = 30 / 100
+    OFFSET_THRESHOLD = 40 / 100
 
     def __init__(self, level='level_0'):
         self.name = level
@@ -93,7 +89,7 @@ class Level:
         return self.map_size
 
     def load_level(self):  # TODO: may we improve this?
-        with open(os.path.join(MAPS_FOLDER, self.name + ".map"), 'r') as map_file:
+        with open(os.path.join(MAPS_FOLDER, self.name.lower()), 'r') as map_file:
             height, width = list(map(int, map_file.readline().split()))
             for h in range(height):
                 line = list(map_file.readline().strip())
@@ -108,25 +104,31 @@ class Level:
         print("player", player_pos)
         print("offset", self.offset)
         if player_pos[0] < self.OFFSET_THRESHOLD * screen_size[0]:
-            self.offset = self.offset[0] - (self.OFFSET_THRESHOLD * screen_size[0] - player_pos[0]), self.offset[1]
+            self.offset = (self.offset[0] - (self.OFFSET_THRESHOLD * screen_size[0] - player_pos[0]),
+                           self.offset[1])
         elif player_pos[0] > (1 - self.OFFSET_THRESHOLD) * screen_size[0]:
             self.offset = (self.offset[0] + (player_pos[0] - (1 - self.OFFSET_THRESHOLD) * screen_size[0]),
                            self.offset[1])
         if player_pos[1] < self.OFFSET_THRESHOLD * screen_size[1]:
-            self.offset = self.offset[0], self.offset[1] - (self.OFFSET_THRESHOLD * screen_size[1] - player_pos[1])
+            self.offset = (self.offset[0],
+                           self.offset[1] - (self.OFFSET_THRESHOLD * screen_size[1] - player_pos[1]))
         elif player_pos[1] > (1 - self.OFFSET_THRESHOLD) * screen_size[1]:
             self.offset = (self.offset[0],
                            self.offset[1] + (player_pos[1] - (1 - self.OFFSET_THRESHOLD) * screen_size[1]))
 
-        self.offset = Pos(clamp(self.offset[0], 1, self.world_size[1] - screen_size[0]),
-                          clamp(self.offset[1], 1, self.world_size[0] - screen_size[1]))
+        self.offset = Pos(clamp(self.offset[0],
+                                Block.DEFAULT_BLOCK_SIZE,
+                                self.world_size[1] - screen_size[0] - Block.DEFAULT_BLOCK_SIZE),
+                          clamp(self.offset[1],
+                                Block.DEFAULT_BLOCK_SIZE,
+                                self.world_size[0] - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def render(self, surf):
         offset_end = (Pos(self.offset) + Pos(surf.get_size())).t
         for line in range(Level.world_to_map(self.offset)[1],
-                          clamp(Level.world_to_map(offset_end)[1] + 1, 0, self.map_size[0])):
+                          clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.map_size[0])):
             for block in range(Level.world_to_map(self.offset)[0],
-                               clamp(Level.world_to_map(offset_end)[0] + 1, 0, self.map_size[1])):
+                               clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.map_size[1])):
                 self.grid[line][block].render(surf, self.map_to_world((block, line)) - self.offset)
 
     def collision_rects(self):
