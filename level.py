@@ -1,12 +1,10 @@
 import os
-import random
 import re
 from functools import lru_cache
 from typing import List
 
 import pygame
 
-from config import get_available_blocks
 from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER, DEFAULT_BLOCK_SIZE
 from physics import Space, Pos, clamp
 
@@ -19,18 +17,11 @@ def re_compile(matrix):
         compiled_line = []
         for pattern in line:
             pattern = pattern.replace(" ", r"\.")
+            pattern =  pattern.replace("?", r"[DS]")
             pattern = re.compile(pattern)
             compiled_line.append(pattern)
         compiled.append(compiled_line)
     return compiled
-
-
-DIRT_SHEET_PATTERN = re_compile([
-    [". . DD.D.", ". .DDDDDD", ". .DD .D.", ". . D .D.", "DDD.DD.D ", "DDDDD. D."],
-    [".D. DD.D.", "DDDDDDDDD", ".D.DD .D.", ".D. D .D.", ".D .DDDDD", " D.DD.DDD"],
-    [".D. DD. .", ".D.DDD. .", ".D.DD . .", ".D. D . .", ". . DD.D ", ". .DD  D."],
-    [". . DD. .", ". .DDD. .", ". .DD . .", ". . D . .", ".D  DD. .", " D.DD . ."]
-])
 
 
 class Block:
@@ -41,6 +32,7 @@ class Block:
     default_sprite_pos = (0, 0)
     solid = False
     visible = False
+    sheet_pattern = [[]]
 
     @staticmethod
     def new(character='.'):
@@ -54,7 +46,7 @@ class Block:
     def get_img(self, neighbourg=""):
         """Neighbourg is a string of nine chars of the 9 blocks next to this one."""
 
-        for y, line in enumerate(DIRT_SHEET_PATTERN):
+        for y, line in enumerate(self.sheet_pattern):
             for x, pattern in enumerate(line):
                 if pattern.match(neighbourg):
                     return self.img_at(x, y)
@@ -81,14 +73,33 @@ class Dirt(Block):
     sheet.set_colorkey((255, 0, 255))
     sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
 
+    # . is any block
+    # ? is any block but not air
+    # " " is only air
+    sheet_pattern = re_compile([
+        [". . ??.?.", ". .??????", ". .?? .?.", ". . ? .?.", "???.??.? ", "?????. ?."],
+        [".?. ??.?.", "?????????", ".?.?? .?.", ".?. ? .?.", ".? .?????", " ?.??.???"],
+        [".?. ??. .", ".?.???. .", ".?.?? . .", ".?. ? . .", ". . ??.? ", ". .??  ?."],
+        [". . ??. .", ". .???. .", ". .?? . .", ". . ? . .", ".?  ??. .", " ?.?? . ."]
+    ])
+
 
 class Stone(Block):
     character = "S"
     solid = True
     visible = True
-    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_000.png")).convert()
-    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+    default_sprite_pos = 1, 1
 
+    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_sheet.png")).convert()
+    sheet.set_colorkey((255, 0, 255))
+    sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
+
+    sheet_pattern = re_compile([
+        [". . ??.?.", ". .??????", ". .?? .?.", ". . ? .?."], #"???.??.? ", "?????. ?."],
+        [".?. ??.?.", "?????????", ".?.?? .?.", ".?. ? .?."], #".? .?????", " ?.??.???"],
+        [".?. ??. .", ".?.???. .", ".?.?? . .", ".?. ? . ."], #". . ??.? ", ". .??  ?."],
+        [". . ??. .", ". .???. .", ". .?? . .", ". . ? . ."], #".?  ??. .", " ?.?? . ."]
+    ])
 
 
 class Level:
