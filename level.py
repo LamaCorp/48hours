@@ -1,5 +1,6 @@
 import os
 import re
+import time
 from functools import lru_cache
 from typing import List
 
@@ -18,7 +19,7 @@ def re_compile(matrix):
         compiled_line = []
         for pattern in line:
             pattern = pattern.replace(" ", r"\.")
-            pattern =  pattern.replace("?", r"[DS]")
+            pattern = pattern.replace("?", r"[DS]")
             pattern = re.compile(pattern)
             compiled_line.append(pattern)
         compiled.append(compiled_line)
@@ -67,9 +68,11 @@ class Block:
         return pygame.transform.rotate(cls.sheet.subsurface((x * cls.DEFAULT_BLOCK_SIZE, y * cls.DEFAULT_BLOCK_SIZE,
                                        cls.DEFAULT_BLOCK_SIZE, cls.DEFAULT_BLOCK_SIZE)), rotation)
 
-    def render(self, surf, pos=None, neighbours=""):
-        if self.solid:
-            surf.blit(self.get_img(neighbours), pos)
+    def internal_logic(self, pos=None):
+        pass
+
+    def render(self, surf, offset=None):
+        pass
 
 
 class Dirt(Block):
@@ -123,6 +126,23 @@ class Barbecue(Block):
     sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
 
+class Brochette:
+    img = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "brochettes_todo.jpg")).convert()
+    img.set_colorkey((255, 0, 255))
+    img = pygame.transform.scale(img, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+
+    def __init__(self, start_pos, direction=(0, 0)):
+        self.pos = Pos(start_pos)
+        self.speed = 25
+        self.direction = Pos(direction)
+
+    def internal_logic(self):
+        self.pos += self.direction * self.speed
+
+    def render(self, surf, offset=(0, 0)):
+        surf.blit(Brochette.img, Pos(self.pos) - Pos(offset))
+
+
 class FieryBarbecue(Block):
     character = "^"
     solid = True
@@ -133,16 +153,30 @@ class FieryBarbecue(Block):
     sheet.set_colorkey((255, 0, 255))
     sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
+    char_dic = {
+        "^": (0, Pos(0, -1)),  # Rotation and direction of brochettes
+        "V": (180, Pos(0, 1)),
+        "<": (90, Pos(-1, 0)),
+        ">": (-90, Pos(1, 0))
+    }
+
     def __init__(self, character="^"):
         self.character = character
-        if character == "^":
-            self.rotation = 0
-        elif character == "V":
-            self.rotation = 180
-        elif character == "<":
-            self.rotation = 90
-        elif character == ">":
-            self.rotation = -90
+        self.rotation = FieryBarbecue.char_dic[self.character][0]
+        self.previous_spawn = 40
+        self.brochettes = []
+
+    def internal_logic(self, pos=None):
+        self.previous_spawn += 1
+        if self.previous_spawn >= 45:
+            self.brochettes.append(Brochette(pos, FieryBarbecue.char_dic[self.character][1]))
+            self.previous_spawn = 0
+        for brochette in self.brochettes:
+            brochette.internal_logic()
+
+    def render(self, surf, offset=None):
+        for brochette in self.brochettes:
+            brochette.render(surf, offset)
 
 
 class Level:
@@ -241,6 +275,11 @@ class Level:
                                 Block.DEFAULT_BLOCK_SIZE,
                                 self.world_size.y - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
+    def internal_logic(self):
+        for line in range(0, self.size[0]):
+            for block in range(0, self.size[1]):
+                self.get_block((block, line)).internal_logic(self.map_to_world((block, line)))
+
     def render(self, surf):
         offset_end = (Pos(self.offset) + Pos(surf.get_size())).t
         for line in range(Level.world_to_map(self.offset)[1],
@@ -249,3 +288,4 @@ class Level:
                                clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.size[0] - 1)):
                 if self.grid[line][block].visible:
                     surf.blit(self.get_img_at((block, line)), self.map_to_world((block, line)) - self.offset)
+                    self.get_block((block, line)).render(surf, self.offset)

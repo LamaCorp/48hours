@@ -20,6 +20,7 @@ WALL_SLIDE_FRICTION = 0.01
 MAX_WALL_VELOCITY = 5
 WALL_STIKY_FRAMES = 20
 
+
 class State(Enum):
     STILL = auto()
     WALK = auto()
