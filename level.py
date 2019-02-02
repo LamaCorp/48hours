@@ -53,6 +53,8 @@ class Block:
 
 
 class Level:
+    OFFSET_THRESHOLD = 30 / 100
+
     def __init__(self, level='level_0'):
         self.name = level
         self.space = Space(gravity=(0, 1))
@@ -101,8 +103,18 @@ class Level:
                         self.start = (i, h)
                 self.grid.append(line)
 
-    def update_offset(self, player_pos):
-        self.offset = 0
+    def update_offset(self, player_pos, screen_size):
+        if player_pos[0] < Level.OFFSET_THRESHOLD * screen_size[0]:
+            self.offset = self.offset[0] - (Level.OFFSET_THRESHOLD * screen_size[0] - player_pos[0]), self.offset[1]
+        elif player_pos[0] > (1 - Level.OFFSET_THRESHOLD) * screen_size[0]:
+            self.offset = self.offset[0] + (Level.OFFSET_THRESHOLD * screen_size[0] - player_pos[0]), self.offset[1]
+        if player_pos[1] < Level.OFFSET_THRESHOLD * screen_size[1]:
+            self.offset = self.offset[0], self.offset[1] - (Level.OFFSET_THRESHOLD * screen_size[1] - player_pos[1])
+        elif player_pos[0] > (1 - Level.OFFSET_THRESHOLD) * screen_size[0]:
+            self.offset = self.offset[0], self.offset[1] + (Level.OFFSET_THRESHOLD * screen_size[1] - player_pos[1])
+
+        self.offset = (clamp(self.offset[0], 0, screen_size[0] - Level.map_to_world(self.map_size)[0]),
+                       clamp(self.offset[1], 0, screen_size[1] - Level.map_to_world(self.map_size)[1]))
 
     def render(self, surf):
         offset_end = (Pos(self.offset) + Pos(surf.get_size())).t
