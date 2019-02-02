@@ -60,7 +60,7 @@ class Level:
         self.space = Space(gravity=(0, 1))
         self.grid = []
         self.start = (0, 0)  # Where the player has to spawn, map coordinates
-        self.offset = (Block.DEFAULT_BLOCK_SIZE * 5, Block.DEFAULT_BLOCK_SIZE * 5)  # Where we start to draw the map, world coordinates TODO: set it back to default: 0, 0
+        self.offset = 0, 0  # Where we start to draw the map, world coordinates
         self.load_level()
 
         self.space.add(*self.collision_rects())
@@ -104,20 +104,29 @@ class Level:
                 self.grid.append(line)
 
     def update_offset(self, player_pos, screen_size):
+        player_pos = Pos(player_pos) - Pos(self.offset)
+        print("player", player_pos)
+        print("offset", self.offset)
         if player_pos[0] < Level.OFFSET_THRESHOLD * screen_size[0]:
             self.offset = self.offset[0] - (Level.OFFSET_THRESHOLD * screen_size[0] - player_pos[0]), self.offset[1]
         elif player_pos[0] > (1 - Level.OFFSET_THRESHOLD) * screen_size[0]:
-            self.offset = self.offset[0] + (Level.OFFSET_THRESHOLD * screen_size[0] - player_pos[0]), self.offset[1]
+            self.offset = (self.offset[0] + (player_pos[0] - (1 - Level.OFFSET_THRESHOLD) * screen_size[0]),
+                           self.offset[1])
         if player_pos[1] < Level.OFFSET_THRESHOLD * screen_size[1]:
             self.offset = self.offset[0], self.offset[1] - (Level.OFFSET_THRESHOLD * screen_size[1] - player_pos[1])
-        elif player_pos[0] > (1 - Level.OFFSET_THRESHOLD) * screen_size[0]:
-            self.offset = self.offset[0], self.offset[1] + (Level.OFFSET_THRESHOLD * screen_size[1] - player_pos[1])
+        elif player_pos[1] > (1 - Level.OFFSET_THRESHOLD) * screen_size[1]:
+            self.offset = (self.offset[0],
+                           self.offset[1] + (player_pos[1] - (1 - Level.OFFSET_THRESHOLD) * screen_size[1]))
 
-        self.offset = (clamp(self.offset[0], 0, screen_size[0] - Level.map_to_world(self.map_size)[0]),
-                       clamp(self.offset[1], 0, screen_size[1] - Level.map_to_world(self.map_size)[1]))
+        self.offset = (clamp(self.offset[0], 1, Level.map_to_world(self.map_size)[0] - screen_size[0]),
+                       clamp(self.offset[1], 1, Level.map_to_world(self.map_size)[1] - screen_size[1]))
 
     def render(self, surf):
         offset_end = (Pos(self.offset) + Pos(surf.get_size())).t
+        for line in range(self.map_size[0]):
+            for block in range(self.map_size[1]):
+                self.grid[line][block].render(surf, self.map_to_world((block, line)) - self.offset)
+        return
         for line in range(Level.world_to_map(self.offset)[0],
                           clamp(Level.world_to_map(offset_end)[1] + 1, 0, self.map_size[0])):
             for block in range(Level.world_to_map(self.offset)[1],
