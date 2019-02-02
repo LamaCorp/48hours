@@ -1,5 +1,8 @@
 import os
 import random
+import re
+from functools import lru_cache
+from typing import List
 
 import pygame
 
@@ -7,46 +10,85 @@ from config import get_available_blocks
 from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER, DEFAULT_BLOCK_SIZE
 from physics import Space, Pos, clamp
 
+START = "P"
+
+def re_compile(matrix):
+    """Compile the matrix of pattern and replace the " " by dots to match the air."""
+    compiled = []
+    for line in matrix:
+        compiled_line = []
+        for pattern in line:
+            pattern = pattern.replace(" ", r"\.")
+            pattern = re.compile(pattern)
+            compiled_line.append(pattern)
+        compiled.append(compiled_line)
+    return compiled
+
+
+DIRT_SHEET_PATTERN = re_compile([
+    [". . DD.D.", ". .DDDDDD", ". .DD .D.", ". . D .D.", "DDD.DD.D ", "DDDDD. D."],
+    [".D. DD.D.", "DDDDDDDDD", ".D.DD .D.", ".D. D .D.", ".D .DDDDD", " D.DD.DDD"],
+    [".D. DD. .", ".D.DDD. .", ".D.DD . .", ".D. D . .", ". . DD.D ", ". .DD  D."],
+    [". . DD. .", ". .DDD. .", ". .DD . .", ". . D . .", ".D  DD. .", " D.DD . ."]
+])
+
 
 class Block:
     DEFAULT_BLOCK_SIZE = DEFAULT_BLOCK_SIZE
-    BLOCKS = {
-        "P": [(None, False, True)],
-        ".": [(None, False, False)],
-        # TODO: remove grass and automatically add grass when there is no block over it
-        "G": [(pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, path.lower())).convert(),
-                                      (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-               True, False)
-              for path in get_available_blocks("grass")],
-        "D": [(pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, path.lower())).convert(),
-                                      (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-               True, False)
-              for path in get_available_blocks("dirt")],
-        "S": [(pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, path.lower())).convert(),
-                                      (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)),
-               True, False)
-              for path in get_available_blocks("stone")],
-    }
 
-    def __init__(self, character='.'):
-        if character not in Block.BLOCKS:
-            character = '.'
-        self.block = random.choice(Block.BLOCKS[character])
-        self.img = self.block[0]
-        self.solid = self.block[1]
-        self.start = self.block[2]
+    character = '.'
+    sheet = None  # type: pygame.Surface
+    default_sprite_pos = (0, 0)
+    solid = False
+    visible = False
 
-    def render(self, surf, pos=None):
-        if self.is_solid:
-            surf.blit(self.img, pos)
+    @staticmethod
+    def new(character='.'):
+        dic = {
+            "D": Dirt,
+            "S": Stone
+        }
 
-    @property
-    def is_solid(self):
-        return self.solid
+        return dic.get(character, Block)()
 
-    @property
-    def is_start(self):
-        return self.start
+    def get_img(self, neighbourg=""):
+        """Neighbourg is a string of nine chars of the 9 blocks next to this one."""
+
+        for y, line in enumerate(DIRT_SHEET_PATTERN):
+            for x, pattern in enumerate(line):
+                if pattern.match(neighbourg):
+                    return self.img_at(x, y)
+
+        return self.img_at(*self.default_sprite_pos)
+
+    @classmethod
+    @lru_cache()
+    def img_at(cls, x, y):
+        return cls.sheet.subsurface((x * cls.DEFAULT_BLOCK_SIZE, y * cls.DEFAULT_BLOCK_SIZE,
+                                     cls.DEFAULT_BLOCK_SIZE, cls.DEFAULT_BLOCK_SIZE))
+
+    def render(self, surf, pos=None, neighbours=""):
+        if self.solid:
+            surf.blit(self.get_img(neighbours), pos)
+
+
+class Dirt(Block):
+    character = "D"
+    solid = True
+    visible = True
+    default_sprite_pos = 1, 1
+    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_sheet.png")).convert()
+    sheet.set_colorkey((255, 0, 255))
+    sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
+
+
+class Stone(Block):
+    character = "S"
+    solid = True
+    visible = True
+    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_000.png")).convert()
+    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+
 
 
 class Level:
@@ -55,7 +97,8 @@ class Level:
     def __init__(self, level='level_0'):
         self.name = level
         self.space = Space(self, gravity=(0, 1))
-        self.grid = []
+        self.size = Pos(0, 0)
+        self.grid = []  # type: List[List[Block]]
         self.start = (0, 0)  # Where the player has to spawn, map coordinates
         self.offset = Pos(0, 0)  # Where we start to draw the map, world coordinates
         self.load_level()
@@ -74,11 +117,11 @@ class Level:
 
     def get_block(self, map_pos):
         x, y = map_pos
-        if (0 <= x < self.map_size.x
-                and 0 <= y < self.map_size.y):
+        if (0 <= x < self.size.x
+                and 0 <= y < self.size.y):
             return self.grid[y][x]
 
-        return Block('D')
+        return Stone()
 
     def get_slice(self, map_top_left, map_bottom_right):
         """Return a list of all block totally covering the given rectangle."""
@@ -97,32 +140,29 @@ class Level:
         map_pos = self.world_to_map(world_pos)
         return self.get_block(map_pos)
 
-    @property
-    def map_size(self):
-        """(width, height), in blocks"""
-        if len(self.grid) > 0:
-            return Pos(len(self.grid[0]), len(self.grid))
-        else:
-            return Pos(0, 0)
+    @lru_cache(maxsize=None)
+    def get_img_at(self, map_pos):
+        neigh = "".join(self.get_block((map_pos[0] + dx, map_pos[1] + dy)).character
+                        for dy in range(-1, 2)
+                        for dx in range(-1, 2))
+        block = self.get_block(map_pos)
+        return block.get_img(neigh)
 
     @property
     def world_size(self):
         """(width, height), in pixels"""
-        return Level.map_to_world(self.map_size)
-
-    @property
-    def size(self):
-        return self.map_size
+        return Level.map_to_world(self.size)
 
     def load_level(self):  # TODO: may we improve this?
         with open(os.path.join(MAPS_FOLDER, self.name.lower()), 'r') as map_file:
             height, width = list(map(int, map_file.readline().split()))
+            self.size = Pos(width, height)
             for h in range(height):
                 line = list(map_file.readline().strip())
                 for i in range(len(line)):
-                    line[i] = Block(line[i])
-                    if line[i].is_start:
+                    if line[i] == START:
                         self.start = (i, h)
+                    line[i] = Block.new(line[i])
                 self.grid.append(line)
 
     def update_offset(self, player_pos, screen_size):
@@ -150,7 +190,8 @@ class Level:
     def render(self, surf):
         offset_end = (Pos(self.offset) + Pos(surf.get_size())).t
         for line in range(Level.world_to_map(self.offset)[1],
-                          clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.map_size[1] - 1)):
+                          clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.size[1] - 1)):
             for block in range(Level.world_to_map(self.offset)[0],
-                               clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.map_size[0] - 1)):
-                self.grid[line][block].render(surf, self.map_to_world((block, line)) - self.offset)
+                               clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.size[0] - 1)):
+                if self.grid[line][block].visible:
+                    surf.blit(self.get_img_at((block, line)), self.map_to_world((block, line)) - self.offset)
