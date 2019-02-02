@@ -5,6 +5,7 @@ from physics import Body, AABB
 LEFT = 0
 RIGHT = 1
 WALK_SPEED = 3
+JUMP_FORCE = 20
 
 class Player(Body):
     def __init__(self, start_pos=(0, 0)):
@@ -15,6 +16,8 @@ class Player(Body):
         self.img.set_colorkey((255, 255, 255))
 
         self.directions = [False, False]  # [Left, Right]
+        self.jumping = False
+        self.was_jumping = False
 
     def render(self, surf, offset=(0, 0)):
         surf.blit(self.img, self.topleft + offset)
@@ -25,19 +28,26 @@ class Player(Body):
                 self.directions[LEFT] = True
             elif event.key == pygame.K_RIGHT:
                 self.directions[RIGHT] = True
+            elif event.key == pygame.K_UP:
+                self.jumping = True
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 self.directions[LEFT] = False
             elif event.key == pygame.K_RIGHT:
                 self.directions[RIGHT] = False
+            elif event.key == pygame.K_UP:
+                self.jumping = False
 
     def internal_logic(self):
         self.vertical_logic()
         self.horizontal_logic()
 
+        self.was_jumping = self.jumping
+
     def vertical_logic(self):
-        pass
+        if self.jumping and not self.was_jumping:
+            self.apply_force((0, -JUMP_FORCE))
 
     def horizontal_logic(self):
         if self.directions[LEFT]:
