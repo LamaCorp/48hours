@@ -17,7 +17,6 @@ def get_available(what, where):
         if match:
             names.append(match.group(0).title())
 
-    print(names)
     return sorted(names)
 
 
