@@ -123,7 +123,6 @@ class Stone(Block):
             cls._sheet = sheet
         return cls._sheet
 
-
     sheet_pattern = re_compile([
         [". . ??.?.", ". .??????", ". .?? .?.", ". . ? .?."],  # "???.??.? ", "?????. ?."],
         [".?. ??.?.", "?????????", ".?.?? .?.", ".?. ? .?."],  # ".? .?????", " ?.??.???"],
@@ -146,6 +145,7 @@ class Barbecue(Block):
             sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
             cls._sheet = sheet
         return cls._sheet
+
 
 class FieryBarbecue(Block):
     character = "^"
@@ -201,7 +201,6 @@ class EndBlock(Block):
     # This isn't called every frame. Instead, it is called when the player touches it
     def on_collision(self, level):
         level.explode()
-
 
 
 BLOCKS = [

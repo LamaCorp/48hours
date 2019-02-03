@@ -467,6 +467,7 @@ class Space:
 
     def simulate(self):
         # first we update/move all projectiles
+        from entities import Brochette
         for proj in self.projectiles[:]:
             proj.internal_logic()
             if proj.dead:

@@ -23,7 +23,6 @@ class Brochette(Projectile):
             for brochette in get_available_blocks("brochette")]
         return cls._img
 
-
     def __init__(self, start_pos, physics=(0, Pos(0, 0))):
         shape = AABB(start_pos, (DEFAULT_BLOCK_SIZE - 2, DEFAULT_BLOCK_SIZE - 2))
         shape.topleft += (1, 1)
@@ -33,10 +32,15 @@ class Brochette(Projectile):
         self.rotation = physics[0] - 90
         self.sheet = pygame.transform.rotate(random.choice(Brochette.img), self.rotation)
         self.sheet.set_colorkey((255, 0, 255))
+        self.ttl = 500
 
     def render(self, surf, offset=(0, 0)):
         surf.blit(self.sheet, self.topleft + offset)
 
+    def internal_logic(self):
+        self.ttl -= 1
+        if self.ttl <= 0:
+            self.dead = True
 
 
 class AK47(Projectile):
