@@ -5,8 +5,8 @@ from typing import List
 
 from blocks import Block, Stone
 from constants import MAPS_FOLDER, START
-from config import LEVELS
-from entities import Spawn, Object
+from config import LEVELS, CONFIG, get_index_from_name
+from entities import Spawn, Object, AK47
 from physics import Space, Pos, clamp, Projectile
 
 
@@ -90,7 +90,7 @@ class Level:
         """(width, height), in pixels"""
         return Level.map_to_world(self.size)
     @classmethod
-    def load(cls, path):
+    def load(cls, path, num=-1):
         try:
             level = cls.load_v1(path)
             level.path = path
@@ -100,7 +100,7 @@ class Level:
 
 
         try:
-            level = cls.load_v2(path)
+            level = cls.load_v2(path, num)
             level.path = path
             return level
         except:
@@ -108,7 +108,7 @@ class Level:
             raise
 
     @classmethod
-    def load_v2(cls, path):
+    def load_v2(cls, path, num=-1):
         with open(path, "r") as f:
             d = json.loads(f.read())
 
@@ -122,7 +122,6 @@ class Level:
         ]
         objects = [Object.from_json(o) for o in d["objects"]]
 
-
         level = cls()
         level.size = size
         level.grid = map
@@ -133,8 +132,12 @@ class Level:
             if isinstance(obj, Spawn):
                 level.start = obj.pos
             elif isinstance(obj, Projectile):
-                level.spawn(obj)
-                print(obj)
+                print(level.num)
+                if isinstance(obj, AK47) and CONFIG.levels_stats[str(num)][2] == 1:
+                    pass
+                else:
+                    level.spawn(obj)
+                    print(obj)
 
         return level
 
@@ -152,7 +155,7 @@ class Level:
     @classmethod
     def load_num(cls, num):
         path = os.path.join(MAPS_FOLDER, LEVELS[num][0])
-        level = cls.load(path)
+        level = cls.load(path, num)
         level.num = num
         return level
 

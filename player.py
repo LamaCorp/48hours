@@ -234,6 +234,7 @@ class Player(Body):
                     self.space.tile_map.reset()
                 if isinstance(proj, AK47):
                     self.ak47 = True
+                    CONFIG.levels_stats[str(self.space.tile_map.num)][2] = 1
                     proj.dead = True  # we picked it up
             if colli.type is CollisionType.BLOCK:
                 block = colli.object

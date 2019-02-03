@@ -73,4 +73,7 @@ class StatisticsScreen(IdleScreen):
 
     @staticmethod
     def get_nb_ak47():
-        return 0
+        total = 0
+        for level in CONFIG.levels_stats:
+            total += CONFIG.levels_stats[level][2]
+        return total

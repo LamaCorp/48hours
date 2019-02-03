@@ -79,7 +79,7 @@ class GameScreen(Screen):
             run_time = time.time() - self.start_time
             level_stats = CONFIG.levels_stats[str(self.level.num)]
             if level_stats[1] == -1 or run_time < level_stats[1]:
-                CONFIG.levels_stats[str(self.level.num)] = (level_stats[0], run_time)
+                CONFIG.levels_stats[str(self.level.num)][1] = run_time
             if CONFIG.level + 1 in LEVELS:
                 CONFIG.level += 1
             self.app.set_screen(PICKER)
@@ -89,8 +89,7 @@ class GameScreen(Screen):
             self.space = self.level.space
             self.space.add(self.player)
             self.start_time = time.time()
-            level_stats = CONFIG.levels_stats[str(self.level.num)]
-            CONFIG.levels_stats[str(self.level.num)] = (level_stats[0] + 1, level_stats[1])
+            CONFIG.levels_stats[str(self.level.num)][0] += 1
         elif self.level.expolding:
             self.level.internal_logic()
         else:
