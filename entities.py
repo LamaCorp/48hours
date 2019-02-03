@@ -51,28 +51,32 @@ class Spawn(Object):
         return cls._img
 
 
-class AK47(Projectile):
+class AK47(Object, Projectile):
     character = "K"
     deadly = False
-    solid = False
-    visible = True
     rotation = None
-    _sheet = None
+
+    def __init__(self, **kwargs):
+        Object.__init__(self, **kwargs)
+
+        shape = AABB(self.pos[0] * DEFAULT_BLOCK_SIZE, self.pos[1] * DEFAULT_BLOCK_SIZE,
+                     DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)
+        Projectile.__init__(self, shape)
 
     @classproperty
-    def sheet(cls):
-        if cls._sheet is None:
+    def img(cls):
+        if cls._img is None:
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-            cls._sheet = sheet
-        return cls._sheet
+            cls._img = sheet
+        return cls._img
 
     def get_img(self, neigh, rotation):
-        return self.sheet
+        return self.img
 
-    def internal_logic(self, level):
-        pass
+    def render(self, surf, offset=(0, 0)):
+        surf.blit(self.img, self.topleft + offset)
 
 
 class Brochette(Projectile):
@@ -96,7 +100,6 @@ class Brochette(Projectile):
         img.set_colorkey((255, 0, 255))
         img.set_alpha(round(alpha))
         return img
-
 
     def __init__(self, start_pos, physics=(0, Pos(0, 0))):
         shape = AABB(start_pos, (DEFAULT_BLOCK_SIZE - 2, DEFAULT_BLOCK_SIZE - 2))
@@ -126,5 +129,5 @@ class Brochette(Projectile):
 
 OBJECTS = {
     SPAWN: Spawn,
-    # "AK47": AK47
+    "AK47": AK47
 }

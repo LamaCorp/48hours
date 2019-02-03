@@ -47,7 +47,6 @@ class Block:
             "D": Dirt,
             "S": Stone,
             "B": Barbecue,
-            "K": AK47,
             "E": EndBlock,
             "V": partial(FieryBarbecue, "V"),
             "^": partial(FieryBarbecue, "^"),

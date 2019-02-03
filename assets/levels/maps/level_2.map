@@ -37,7 +37,7 @@
         "S......................................................................................................................S",
         "SDD....B..................................................................................D............................S",
         "SDDDDDDDDDDD>.........DDD^...........D..D...............................D>........D......DD.........DD.B...D.........E.S",
-        "SDDDDDDDDDSD.DDDDD.B..DDDDDDDDD.....<D..DD>...K....DDDD^DDD^DDD..DDDD...DDDDD....DDDDD.B.DD>........DDDD..DDD....D..DDDS",
+        "SDDDDDDDDDSD.DDDDD.B..DDDDDDDDD.....<D..DD>........DDDD^DDD^DDD..DDDD...DDDDD....DDDDD.B.DD>........DDDD..DDD....D..DDDS",
         "SSSDDSSDDDSDDDDDDDDDDDDSSDDDDSDDDDDDDD^DDDDDDDDD..DDDDDDDDDDDDDD^DDDDD^DDSSDDDDDDDDDDDDDDDDD...D.DDDDDDDDDDDDD^DDDDDDDDS",
         "SSSSSSSSSSSSSSDDDSDDDSSSDDDDSSDDDDDSDDDDDDDDSSDDDDDDDDSDDDDDDSSDDDDSSDDDDSSSDDDDDDDDDDDSSDDDDDDDDDDDDDDSSDDDSDDDDDDDDDDS",
         "SSSSSSSSSSSSSSSSSSDDSSSDDDSSSSSSDSSSSSSDSSDDSSSDSSSSSDSSSSSSSSSSSSSSSSDDSSSSSSDDDDDDSSSSSSSSDDDDDDSSSSSSSDDDSSSDDDDDSSSS",
@@ -51,6 +51,13 @@
             "pos": [
                 2,
                 29
+            ]
+        },
+        {
+            "type": "AK47",
+            "pos": [
+                46,
+                33
             ]
         }
     ],

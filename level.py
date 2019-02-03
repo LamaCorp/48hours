@@ -7,7 +7,7 @@ from blocks import Block, Stone
 from constants import MAPS_FOLDER, START
 from config import LEVELS
 from entities import Spawn, Object
-from physics import Space, Pos, clamp
+from physics import Space, Pos, clamp, Projectile
 
 
 class Level:
@@ -131,6 +131,9 @@ class Level:
         for obj in objects:
             if isinstance(obj, Spawn):
                 level.start = obj.pos
+            elif isinstance(obj, Projectile):
+                level.spawn(obj)
+                print(obj)
 
         return level
 
