@@ -122,6 +122,7 @@ class LevelEdit(Level):
                 self.grid[y][x] = Block.new('.', (x, y))
 
         self.objects.clear()
+        self.space.projectiles.clear()  # we we load, object like AK47 are directly added in this list
         self.img_cache.clear()
 
     def render(self, surf):

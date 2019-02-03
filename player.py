@@ -4,6 +4,7 @@ import os
 import pygame
 
 from blocks import Block
+from entities import AK47
 from physics import Body, AABB, Pos, CollisionData, CollisionType
 from config import CONFIG, PLAYERS
 from constants import PLAYER_FOLDER
@@ -56,15 +57,28 @@ class Player(Body):
         self.state = State.STILL
         self.state_duration = 0
         self.respawn = 50 if respawn else 0
+        self.ak47 = False
 
     def render(self, surf, offset=(0, 0)):
+        if not self.visible:
+            return
+
         if self.looking == RIGHT:
             img = self.img
         else:
             img = self.img_left
 
-        if self.visible:
-            surf.blit(img, self.topleft + offset)
+        surf.blit(img, self.topleft + offset)
+
+        if self.ak47:
+            ak47_img = AK47.get_img(self.looking == RIGHT)
+
+            y = self.shape.center.y + ak47_img.get_height() // 2
+            if self.looking == LEFT:
+                pos = (self.shape.left, y)
+            else:
+                pos = (self.shape.right - ak47_img.get_width(), y)
+            surf.blit(ak47_img, pos + offset)
 
     def update(self, event):
         if event.type == pygame.KEYDOWN:
@@ -218,6 +232,9 @@ class Player(Body):
                 proj = colli.object
                 if proj.deadly:
                     self.space.tile_map.reset()
+                if isinstance(proj, AK47):
+                    self.ak47 = True
+                    proj.dead = True  # we picked it up
             if colli.type is CollisionType.BLOCK:
                 block = colli.object
                 assert isinstance(block, Block)

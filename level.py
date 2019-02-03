@@ -105,7 +105,6 @@ class Level:
             print('Can not load as v2')
             raise
 
-
     @classmethod
     def load_v2(cls, path):
         with open(path, "r") as f:
@@ -224,7 +223,6 @@ class Level:
             proj.render(surf, -self.offset)
 
     def spawn(self, body):
-        print("SPAWNED", body)
         self.space.add(body)
 
     def reset(self):

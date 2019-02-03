@@ -60,20 +60,25 @@ class AK47(Object, Projectile):
         Object.__init__(self, **kwargs)
 
         shape = AABB(self.pos[0] * DEFAULT_BLOCK_SIZE, self.pos[1] * DEFAULT_BLOCK_SIZE,
-                     DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE)
+                     *self.img.get_size())
         Projectile.__init__(self, shape)
 
     @classproperty
     def img(cls):
         if cls._img is None:
+            # size = (32, 10)
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
             sheet.set_colorkey((255, 0, 255))
-            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            # sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
             cls._img = sheet
         return cls._img
 
-    def get_img(self, neigh, rotation):
-        return self.img
+    @classmethod
+    @lru_cache(maxsize=2)
+    def get_img(cls, flipped=False):
+        if flipped:
+            return pygame.transform.flip(cls.img, True, False)
+        return cls.img
 
     def render(self, surf, offset=(0, 0)):
         surf.blit(self.img, self.topleft + offset)
