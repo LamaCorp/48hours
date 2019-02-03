@@ -27,16 +27,27 @@ class Brochette(Projectile):
         self.sheet = pygame.transform.rotate(random.choice(Brochette.img), self.rotation)
         self.sheet.set_colorkey((255, 0, 255))
 
-    def internal_logic(self):
-        if self.collisions:
-            self.dead = True
-
     def render(self, surf, offset=(0, 0)):
         surf.blit(self.sheet, self.topleft + offset)
 
-    def on_collision(self, level):
-        del self
 
-    def __del__(self):
+class AK47(Projectile):
+    character = "K"
+    deadly = False
+    solid = False
+    visible = True
+    rotation = None
+
+    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
+    sheet.set_colorkey((255, 0, 255))
+    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+
+    def get_img(self, neigh, rotation):
+        return self.sheet
+
+    def on_collision(self, level):
+        self.dead = True
+        self.visible = False
+
+    def internal_logic(self, level):
         pass
-        # TODO: delete me

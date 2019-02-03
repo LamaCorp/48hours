@@ -6,7 +6,7 @@ from functools import partial, lru_cache
 import pygame
 
 from constants import DEFAULT_BLOCK_SIZE, LEVELS_GRAPHICAL_FOLDER, ASSETS
-from entities import Brochette
+from entities import Brochette, AK47
 from physics import Pos
 
 
@@ -173,14 +173,3 @@ class EndBlock(Block):
     # This isn't called every frame. Instead, it is called when the player touches it
     def on_collision(self, level):
         level.explode()
-
-
-class AK47(Block):
-    character = "K"
-    solid = False
-    visible = True
-    deadly = False
-
-    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
-    sheet.set_colorkey((255, 0, 255))
-    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
