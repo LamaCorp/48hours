@@ -98,7 +98,6 @@ class Level:
         except:
             print('Can not load as v1')
 
-
         try:
             level = cls.load_v2(path, num)
             level.path = path
@@ -133,7 +132,7 @@ class Level:
                 level.start = obj.pos
             elif isinstance(obj, Projectile):
                 print(level.num)
-                if isinstance(obj, AK47) and CONFIG.levels_stats[str(num)][2] == 1:
+                if isinstance(obj, AK47) and CONFIG.levels_stats[str(num)][2] >= 1:
                     pass
                 else:
                     level.spawn(obj)

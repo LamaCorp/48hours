@@ -28,9 +28,9 @@ PLAYERS = {
     1: ("lama_shadow.png", "Shadow"),
     2: ("lama_licorne.png", "Unicorn"),
     3: ("lama_rasta.png", "Rasta"),
-    4: ("lama_kilt.png", "Irish"),
+    4: ("lama_kilt.png", "Scottish"),
     5: ("lama_gay.png", "Gaaaaaay"),
-    6: ("lama_gay_kilt.png", "Gay Irish"),
+    6: ("lama_gay_kilt.png", "Gay Scottish"),
 }
 
 LEVELS = {
@@ -40,16 +40,6 @@ LEVELS = {
     3: ("level_3.map", "3: Get your shit together, Garry"),
     4: ("level_4.map", "4: Getting to know each other"),
 }
-
-get_available_levels = [LEVELS[l][1] for l in LEVELS]
-get_available_players = [PLAYERS[p][1] for p in PLAYERS]
-
-
-def get_index_from_name(DIC, name):
-    for i in DIC:
-        if DIC[i][1] == name:
-            return i
-    return -1
 
 
 class Config(configlib.Config):
@@ -69,6 +59,36 @@ class Config(configlib.Config):
 
 
 CONFIG = Config()
+
+
+get_available_levels = [LEVELS[l][1] for l in LEVELS]
+
+
+def get_nb_ak47():
+    total = 0
+    for level in CONFIG.levels_stats:
+        total += CONFIG.levels_stats[level][2]
+    return total
+
+
+def __get_available_players():
+    nb_ak47 = get_nb_ak47()
+    players_available = []
+    for p in PLAYERS:
+        if nb_ak47 >= p:
+            players_available.append(PLAYERS[p][1])
+    return players_available
+
+
+get_available_players = __get_available_players()
+
+
+def get_index_from_name(DIC, name):
+    for i in DIC:
+        if DIC[i][1] == name:
+            return i
+    return -1
+
 
 if __name__ == '__main__':
     configlib.update_config(Config)
