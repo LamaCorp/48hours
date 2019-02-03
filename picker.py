@@ -17,7 +17,7 @@ class PickerScreen(IdleScreen):
         self.selector = CarouselSwitch(options=get_available_levels,
                                        on_choice=PickerScreen.level_setter,
                                        pos=(size[0] // 2, size[1] // 2 - 75),
-                                       shape=RoundedRect((500, 75)),
+                                       shape=RoundedRect((525, 75)),
                                        color=WHITESMOKE,
                                        bg_color=LIGHT_DARK,
                                        arrow_color=WHITESMOKE,
