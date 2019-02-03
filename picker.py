@@ -16,14 +16,14 @@ class PickerScreen(Screen):
 
     def __init__(self, app):
         size = app.display.get_size()
-        self.play_button = PlayButton(app, (size[0] // 2, size[1] // 2 + 200))
+        self.play_button = PlayButton(app, (size[0] // 2, size[1] // 2 + 75))
         widgets = [
             MenuButton(app, (size[0] - 365, 100)),
-            SettingsButton(app, (size[0] - 65, 100)),
+            SettingsButton(app, (size[0] - 135, 100)),
             CarouselSwitch(options=get_available_levels,
                            on_choice=self.level_setter,
-                           pos=(size[0] // 2, size[1] // 2 - 200),
-                           shape=RoundedRect((300, 50)),
+                           pos=(size[0] // 2, size[1] // 2 - 75),
+                           shape=RoundedRect((400, 75)),
                            color=WHITESMOKE,
                            bg_color=LIGHT_DARK,
                            arrow_color=WHITESMOKE,
