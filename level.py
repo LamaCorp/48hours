@@ -235,6 +235,7 @@ class Level:
         self.to_reset = True
 
     def explode(self, start_pos):
+        self.over = True
         self.expolding = True
         self.expolsion_heads.append(start_pos)
 
