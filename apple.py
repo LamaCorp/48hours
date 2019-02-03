@@ -89,8 +89,17 @@ class LevelEdit(Level):
             self.grid[pos[1]][pos[0]] = block
             self.clean_cache_around(pos)
 
-    def remove_block(self, pos):
+    def erase(self, pos):
         self.grid[pos[1]][pos[0]] = Block(pos)
+        for obj in self.objects[:]:
+            print(len(self.objects), obj.pos, pos)
+            if obj.pos == pos:
+                self.objects.remove(obj)
+                try:
+                    self.space.projectiles.remove(obj)
+                except ValueError:
+                    pass
+
         self.clean_cache_around(pos)
 
     def add_object(self, pos, object):
@@ -265,7 +274,7 @@ class EditScreen(Screen):
             if self.tool == self.BRUSH:
                 self.level.add_block(pos, self.tile_index)
             elif self.tool == self.ERASER:
-                self.level.remove_block(pos)
+                self.level.erase(pos)
             elif self.tool == self.OBJECTBRUSH:
                 self.level.add_object(pos, self.current_object)
 

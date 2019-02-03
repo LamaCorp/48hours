@@ -309,7 +309,7 @@ class Body:
         self.collisions = []  # type: List[CollisionData]
 
     def __repr__(self):
-        return f"<Body: s {self.shape}, v {self.velocity}, a {self.acceleration}>"
+        return f"<{self.__class__.__name__}: s {self.shape}, v {self.velocity}, a {self.acceleration}>"
 
     @property
     def topleft(self):

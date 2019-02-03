@@ -224,6 +224,7 @@ class Level:
             proj.render(surf, -self.offset)
 
     def spawn(self, body):
+        print("SPAWNED", body)
         self.space.add(body)
 
     def reset(self):
