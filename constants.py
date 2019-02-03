@@ -23,3 +23,6 @@ START = "P"
 
 # Physical constant
 BROCHETTE_VELOCITY = 15
+
+# Brochettes
+FRAME_BEFORE_DESPAWN = 60

@@ -3,12 +3,13 @@ import random
 
 import pygame
 
-from constants import LEVELS_GRAPHICAL_FOLDER, DEFAULT_BLOCK_SIZE, BROCHETTE_VELOCITY
+from constants import LEVELS_GRAPHICAL_FOLDER, DEFAULT_BLOCK_SIZE, BROCHETTE_VELOCITY, FRAME_BEFORE_DESPAWN
 from config import get_available_blocks
 from helper import classproperty
-from physics import AABB, Pos, Projectile
+from physics import AABB, Pos, Projectile, CollisionType
 
 SPAWN = "Spawn"
+
 
 class Object:
     _img = None  # type: pygame.Surface
@@ -42,45 +43,11 @@ class Spawn(Object):
             img = pygame.Surface((DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
             img.set_colorkey((0, 0, 0))
             # red circle
-            pygame.draw.circle(img, (255, 0, 0), (DEFAULT_BLOCK_SIZE//2,)*2,
-                               (DEFAULT_BLOCK_SIZE//4))
+            pygame.draw.circle(img, (255, 0, 0), (DEFAULT_BLOCK_SIZE // 2,) * 2,
+                               (DEFAULT_BLOCK_SIZE // 4))
 
             cls._img = img
         return cls._img
-
-
-class Brochette(Projectile):
-    deadly = True
-    _img = None
-
-    @classproperty
-    def img(cls):
-        if cls._img is None:
-            cls._img = [
-                pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER,
-                                                                      brochette.lower())).convert(),
-                                       (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-                for brochette in get_available_blocks("brochette")]
-        return cls._img
-
-    def __init__(self, start_pos, physics=(0, Pos(0, 0))):
-        shape = AABB(start_pos, (DEFAULT_BLOCK_SIZE - 2, DEFAULT_BLOCK_SIZE - 2))
-        shape.topleft += (1, 1)
-        # shape.center = start_pos
-        super().__init__(shape, mass=0)
-        self.velocity = physics[1] * BROCHETTE_VELOCITY
-        self.rotation = physics[0] - 90
-        self.sheet = pygame.transform.rotate(random.choice(Brochette.img), self.rotation)
-        self.sheet.set_colorkey((255, 0, 255))
-        self.ttl = 500
-
-    def render(self, surf, offset=(0, 0)):
-        surf.blit(self.sheet, self.topleft + offset)
-
-    def internal_logic(self):
-        self.ttl -= 1
-        if self.ttl <= 0:
-            self.dead = True
 
 
 class AK47(Projectile):
@@ -109,6 +76,46 @@ class AK47(Projectile):
 
     def internal_logic(self, level):
         pass
+
+
+class Brochette(Projectile):
+    deadly = True
+    _img = None
+
+    @classproperty
+    def img(cls):
+        if cls._img is None:
+            cls._img = [
+                pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER,
+                                                                      brochette.lower())).convert(),
+                                       (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+                for brochette in get_available_blocks("brochette")]
+        return cls._img
+
+    def __init__(self, start_pos, physics=(0, Pos(0, 0))):
+        shape = AABB(start_pos, (DEFAULT_BLOCK_SIZE - 2, DEFAULT_BLOCK_SIZE - 2))
+        shape.topleft += (1, 1)
+        # shape.center = start_pos
+        super().__init__(shape, mass=0)
+        self.velocity = physics[1] * BROCHETTE_VELOCITY
+        self.rotation = physics[0] - 90
+        self.sheet = pygame.transform.rotate(random.choice(Brochette.img), self.rotation)
+        self.sheet.set_colorkey((255, 0, 255))
+        self.ttl = FRAME_BEFORE_DESPAWN
+
+    def render(self, surf, offset=(0, 0)):
+        surf.blit(self.sheet, self.topleft + offset)
+
+    def internal_logic(self):
+
+        for colli in self.collisions:
+            if colli.type == CollisionType.BLOCK:
+                self.sleep = True
+
+        if self.sleep:
+            self.ttl -= 1
+            if self.ttl <= 0:
+                self.dead = True
 
 
 OBJECTS = {

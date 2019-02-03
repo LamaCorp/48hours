@@ -3,14 +3,29 @@ Custom physics engine that take care only of AABBs.
 
 Maybe one day it'll get bigger.
 """
-
+from enum import Enum, auto
 from math import cos, sin, pi, sqrt
 from typing import List, TYPE_CHECKING
+from typing import Union
 
 import pygame
 
 if TYPE_CHECKING:
-    from level import Level
+    from level import Level, Block
+
+
+class CollisionType(Enum):
+    PROJECTILE = auto()
+    BLOCK = auto()
+    BODY = auto()
+    OBJECT = auto()
+
+
+class CollisionData:
+    def __init__(self, type: CollisionType, object, shape):
+        self.type = type
+        self.object = object  # type: Union[Body, Projectile, Block]
+        self.shape = shape
 
 
 def clamp(x, mini=float('-inf'), maxi=float('inf')):
@@ -269,6 +284,9 @@ class Body:
     def __init__(self, shape, mass=1, elasticity=0, max_velocity=(None, None), space=None):
 
         self.dead = False
+        self.sleep = False
+        """Ignore all collisions with and from this body."""
+
         self.elasticity = elasticity
         self.mass = mass
         self.shape = shape  # type: AABB
@@ -288,7 +306,7 @@ class Body:
         self.last_collide_right = 0
         self.last_collide_top = 0
 
-        self.collisions = []
+        self.collisions = []  # type: List[CollisionData]
 
     def __repr__(self):
         return f"<Body: s {self.shape}, v {self.velocity}, a {self.acceleration}>"
@@ -320,14 +338,18 @@ class Body:
                 if aabb.left < self.shape.right:
                     self.shape.right = aabb.left
                     self.velocity.x *= -self.elasticity
-                    self.collisions.append(tiles[aabb])
+
+                    colli = CollisionData(CollisionType.BLOCK, tiles[aabb], shape=aabb)
+                    self.collisions.append(colli)
         elif self.velocity.x < 0:
             # we are going left
             for aabb in intersect:
                 if self.shape.left < aabb.right:
                     self.shape.left = aabb.right
                     self.velocity.x *= -self.elasticity
-                    self.collisions.append(tiles[aabb])
+
+                    colli = CollisionData(CollisionType.BLOCK, tiles[aabb], shape=aabb)
+                    self.collisions.append(colli)
 
         self.acceleration.x = 0
 
@@ -344,21 +366,29 @@ class Body:
                 if self.shape.bottom > aabb.top:
                     self.shape.bottom = aabb.top
                     self.velocity.y *= -self.elasticity
-                    self.collisions.append(tiles[aabb])
+
+                    colli = CollisionData(CollisionType.BLOCK, tiles[aabb], shape=aabb)
+                    self.collisions.append(colli)
+
         elif self.velocity.y < 0:
             # we are going up
             for aabb in intersect:
                 if aabb.bottom > self.shape.top:
                     self.shape.top = aabb.bottom
                     self.velocity.y *= -self.elasticity
-                    self.collisions.append(tiles[aabb])
+
+                    colli = CollisionData(CollisionType.BLOCK, tiles[aabb], shape=aabb)
+                    self.collisions.append(colli)
 
         self.acceleration.y = 0
 
     def check_collisions(self, projectiles):
         for proj in projectiles:
             if self.shape.collide(proj.shape):
-                self.collisions.append(proj)
+                proj_coli = CollisionData(CollisionType.BODY, self, self.shape)
+                self_coli = CollisionData(CollisionType.PROJECTILE, proj, proj.shape)
+                self.collisions.append(self_coli)
+                proj.collisions.append(proj_coli)
 
     def clamp_speed(self):
         if self.max_velocity.x is not None:
@@ -472,6 +502,8 @@ class Space:
             proj.internal_logic()
             if proj.dead:
                 self.projectiles.remove(proj)
+            elif proj.sleep:
+                pass
             else:
                 proj.collisions.clear()
                 if proj.mass:
@@ -483,6 +515,8 @@ class Space:
             body.internal_logic()
             if body.dead:
                 self.moving_bodies.remove(body)
+            elif body.sleep:
+                pass
             else:
                 body.collisions.clear()
                 if body.mass:
@@ -495,7 +529,7 @@ class Space:
                 body.update_y(self.possible_collision_for(body))
 
                 # we check for collisions with projectiles
-                body.check_collisions(self.projectiles)
+                body.check_collisions(proj for proj in self.projectiles if not proj.sleep)
 
                 # Finally we check if we are grounded/against a wall...
                 body.update_sensors(self.possible_collision_for(body))

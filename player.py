@@ -3,7 +3,8 @@ from enum import Enum, auto
 import os
 import pygame
 
-from physics import Body, AABB, Pos
+from blocks import Block
+from physics import Body, AABB, Pos, CollisionData, CollisionType
 from config import CONFIG, PLAYERS
 from constants import PLAYER_FOLDER
 
@@ -39,7 +40,7 @@ class Player(Body):
     def __init__(self, start_pos=(0, 0), respawn=False):
         size = (76 * 3 // 4, 70 * 3 // 4)
         shape = AABB(start_pos, size)
-        super().__init__(shape)
+        super().__init__(shape, max_velocity=(16, 16))
         self.visible = True
 
         self.img = pygame.image.load(os.path.join(PLAYER_FOLDER, PLAYERS[CONFIG.player][0])).convert()
@@ -213,6 +214,14 @@ class Player(Body):
 
     def handle_collisions(self):
         for colli in self.collisions:
-            colli.on_collision(self.space.tile_map)
-            if colli.deadly:
-                self.space.tile_map.reset()
+            if colli.type == CollisionType.PROJECTILE:
+                proj = colli.object
+                if proj.deadly:
+                    self.space.tile_map.reset()
+            if colli.type is CollisionType.BLOCK:
+                block = colli.object
+                assert isinstance(block, Block)
+                if block.deadly:
+                    self.space.tile_map.reset()
+                elif block.character == 'E':
+                    self.space.tile_map.explode()
