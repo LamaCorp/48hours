@@ -76,9 +76,10 @@ class LevelEdit(Level):
                     del self.img_cache[p]
 
     def add_block(self, pos, block):
-        block = BLOCKS[block](pos=pos)
-        self.grid[pos[1]][pos[0]] = block
-        self.clean_cache_around(pos)
+        if 0 <= pos[0] < self.size[0] and 0 <= pos[1] < self.size[1]:
+            block = BLOCKS[block](pos=pos)
+            self.grid[pos[1]][pos[0]] = block
+            self.clean_cache_around(pos)
 
     def remove_block(self, pos):
         self.grid[pos[1]][pos[0]] = Block(pos)
