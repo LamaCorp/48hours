@@ -5,7 +5,8 @@ import pygame
 from graphalama.buttons import CarouselSwitch
 from graphalama.colors import Gradient, MultiGradient
 from graphalama.constants import (CENTER, NICE_BLUE, PURPLE, GREEN,
-                                  Monokai, YELLOW, RED, TOP, WHITESMOKE, RAINBOW, LEFT, RIGHT)
+                                  Monokai, YELLOW, RED, TOP, WHITESMOKE, RAINBOW, LEFT, RIGHT, TRANSPARENT, LLAMA,
+                                  BOTTOMRIGHT)
 from graphalama.font import default_font
 from graphalama.maths import Pos
 from graphalama.shapes import RoundedRect, Rectangle
@@ -57,6 +58,16 @@ def PlayButton(app, pos=None, anchor=CENTER):
                   anchor=anchor)
 
 
+def ResumeButton(function, pos=None, anchor=CENTER):
+    return Button(text="Resume",
+                  function=function,
+                  pos=pos,
+                  shape=RoundedRect((200, 50), 100),
+                  color=WHITESMOKE,
+                  bg_color=Gradient(NICE_BLUE, PURPLE),
+                  anchor=anchor)
+
+
 def MenuButton(app, pos=None, anchor=CENTER):
     return Button(text="Menu",
                   function=lambda: app.set_screen(MENU),
@@ -88,6 +99,16 @@ def SettingsCarousel(options, func, pos):
 
 def SettingsLabel(name, pos):
     return SimpleText(name + "  ", pos, color=WHITESMOKE, anchor=RIGHT)
+
+
+def PauseButton(function, pos=None):
+    """A button that pauses the game by calling function """
+    return Button(text="||",
+                  function=function,
+                  pos=pos,
+                  color=LLAMA,
+                  bg_color=TRANSPARENT,
+                  anchor=BOTTOMRIGHT)
 
 
 class CountDown(SimpleText):
