@@ -1,12 +1,12 @@
 import os
 
 import pygame
-from physics import Body, AABB, Pos
 
 from constants import LEVELS_GRAPHICAL_FOLDER, DEFAULT_BLOCK_SIZE, BROCHETTE_VELOCITY
+from physics import AABB, Pos, Projectile
 
 
-class Brochette(Body):
+class Brochette(Projectile):
     img = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "brochette_1.png")).convert()
     img.set_colorkey((255, 0, 255))
     img = pygame.transform.scale(img, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))

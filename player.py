@@ -3,6 +3,8 @@ from enum import Enum, auto
 import os
 import pygame
 
+from blocks import Block
+from entities import Brochette
 from physics import Body, AABB, Pos
 from config import PlayerConfig
 from constants import PLAYER_FOLDER
@@ -105,6 +107,8 @@ class Player(Body):
         elif self.velocity.x > 0:
             self.looking = RIGHT
 
+        self.handle_collisions()
+
     def get_state(self):
         if self.collide_down:
             # on the ground
@@ -201,3 +205,14 @@ class Player(Body):
                 self.apply_force((direc * force, 0))
                 # feet friction (aka max speed)
                 self.apply_force(-FEET_FRICTION * self.velocity.horizontal)
+
+    def handle_collisions(self):
+        for colli in self.collisions:
+            if isinstance(colli, Block):
+                if colli.deadly:
+                    self.respawn()
+            elif isinstance(colli, Brochette):
+                self.respawn()
+
+    def respawn(self):
+        self.shape.topleft = Pos(self.space.tile_map.world_start)  # copy

@@ -126,5 +126,8 @@ class Level:
         for body in self.space.moving_bodies:
             body.render(surf, -self.offset)
 
+        for proj in self.space.projectiles:
+            proj.render(surf, -self.offset)
+
     def spawn(self, body):
         self.space.add(body)

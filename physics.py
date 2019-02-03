@@ -316,18 +316,18 @@ class Body:
 
         if self.velocity.x > 0:
             # we are going right
-            for body in intersect:
-                if body.left < self.shape.right:
-                    self.shape.right = body.left
+            for aabb in intersect:
+                if aabb.left < self.shape.right:
+                    self.shape.right = aabb.left
                     self.velocity.x *= -self.elasticity
-                    self.collisions.append(tiles[body])
+                    self.collisions.append(tiles[aabb])
         elif self.velocity.x < 0:
             # we are going left
-            for body in intersect:
-                if self.shape.left < body.right:
-                    self.shape.left = body.right
+            for aabb in intersect:
+                if self.shape.left < aabb.right:
+                    self.shape.left = aabb.right
                     self.velocity.x *= -self.elasticity
-                    self.collisions.append(tiles[body])
+                    self.collisions.append(tiles[aabb])
 
         self.acceleration.x = 0
 
@@ -340,20 +340,25 @@ class Body:
 
         if self.velocity.y > 0:
             # we are going down
-            for body in intersect:
-                if self.shape.bottom > body.top:
-                    self.shape.bottom = body.top
+            for aabb in intersect:
+                if self.shape.bottom > aabb.top:
+                    self.shape.bottom = aabb.top
                     self.velocity.y *= -self.elasticity
-                    self.collisions.append(tiles[body])
+                    self.collisions.append(tiles[aabb])
         elif self.velocity.y < 0:
             # we are going up
-            for body in intersect:
-                if body.bottom > self.shape.top:
-                    self.shape.top = body.bottom
+            for aabb in intersect:
+                if aabb.bottom > self.shape.top:
+                    self.shape.top = aabb.bottom
                     self.velocity.y *= -self.elasticity
-                    self.collisions.append(tiles[body])
+                    self.collisions.append(tiles[aabb])
 
         self.acceleration.y = 0
+
+    def check_collisions(self, projectiles):
+        for proj in projectiles:
+            if self.shape.collide(proj.shape):
+                self.collisions.append(proj)
 
     def clamp_speed(self):
         if self.max_velocity.x is not None:
@@ -412,8 +417,22 @@ class Body:
         (10 * self.velocity).debug_draw(surf, offset, self.center)
 
 
+class Projectile(Body):
+    """
+    Not necessarily a bullet, but any collectible/brochette...
+
+    A projectile isn't moved when there is a collision with the player, nor the player does.
+    (at least, not automatically)
+    """
+
+    def update_sensors(self, shapes):
+        # don't care about sensors
+        pass
+
+
 class Space:
     def __init__(self, tile_map=None, gravity=(0, 0)):
+        self.projectiles = []  # type: List[Projectile]
         self.tile_map = tile_map  # type: Level
         self.gravity = Pos(gravity)
         self.static_bodies = []  # type: List[AABB]
@@ -421,7 +440,9 @@ class Space:
 
     def add(self, *bodies):
         for body in bodies:
-            if isinstance(body, Body):
+            if isinstance(body, Projectile):
+                self.projectiles.append(body)
+            elif isinstance(body, Body):
                 self.moving_bodies.append(body)
             else:
                 self.static_bodies.append(body)
@@ -440,36 +461,41 @@ class Space:
         return d
 
     def simulate(self):
-        for body in self.moving_bodies:
-            body.internal_logic()
 
+        # first we update/move all projectiles
+        for proj in self.projectiles[:]:
+            proj.internal_logic()
+            if proj.dead:
+                self.projectiles.remove(proj)
+            else:
+                proj.collisions.clear()
+                if proj.mass:
+                    proj.apply_force(self.gravity)
+                proj.update_x(self.possible_collision_for(proj))
+                proj.update_y(self.possible_collision_for(proj))
 
         for body in self.moving_bodies[:]:
-            body.collisions.clear()
+            body.internal_logic()
             if body.dead:
                 self.moving_bodies.remove(body)
+            else:
+                body.collisions.clear()
+                if body.mass:
+                    body.apply_force(self.gravity)
 
-        for body in self.moving_bodies:
-            if body.mass:
-                body.apply_force(self.gravity)
+                # check collision horizontally
+                # we don't do both at the same time because it simplifies A LOT the thing
+                # plus it's accurate enough
+                body.update_x(self.possible_collision_for(body))
+                body.update_y(self.possible_collision_for(body))
 
-        # check collision horizontally
-        # we don't do both at the same time because it simplifies A LOT the thing
-        # plus it's accurate enough
+                # we check for collisions with projectiles
+                body.check_collisions(self.projectiles)
 
-        for body in self.moving_bodies:
-            body.update_x(self.possible_collision_for(body))
-
-        # check collision vertically
-        for body in self.moving_bodies:
-            body.update_y(self.possible_collision_for(body))
-
-        for body in self.moving_bodies:
-            body.update_sensors(self.possible_collision_for(body))
-
-        for body in self.moving_bodies:
-            body.update_history()
+                # Finally we check if we are grounded/against a wall...
+                body.update_sensors(self.possible_collision_for(body))
+                body.update_history()
 
     def debug_draw(self, surf, offset=(0, 0)):
-        for body in self.moving_bodies:
+        for body in self.moving_bodies + self.projectiles:
             body.debug_draw(surf, offset)
