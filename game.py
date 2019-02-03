@@ -97,7 +97,7 @@ class GameScreen(Screen):
             self.level.internal_logic()
 
         fps = round(self.app.clock.get_fps())
-        if fps < 50:
+        if fps < 50 and not self.level.to_reset:
             print(f"\033[31mLOW FPS: {fps}\033[m")
 
     def render(self, surf):
