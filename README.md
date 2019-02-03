@@ -1,5 +1,7 @@
 # 48 hours of code between two friends and a wonderful library
 
+[![pipeline status](https://gitlab.com/lama-corp/48hours/badges/master/pipeline.svg)](https://gitlab.com/lama-corp/48hours/commits/master)
+[![coverage report](https://gitlab.com/lama-corp/48hours/badges/master/coverage.svg)](https://gitlab.com/lama-corp/48hours/commits/master)
 
 Let's see what can come out of it
 
