@@ -461,9 +461,6 @@ class Projectile(Body):
         # don't care about sensors
         pass
 
-    def on_collision(self, level):
-        pass
-
 
 class Space:
     def __init__(self, tile_map=None, gravity=(0, 0)):

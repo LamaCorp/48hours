@@ -1,5 +1,6 @@
 import os
 import random
+from functools import lru_cache
 
 import pygame
 
@@ -70,10 +71,6 @@ class AK47(Projectile):
     def get_img(self, neigh, rotation):
         return self.sheet
 
-    def on_collision(self, level):
-        self.dead = True
-        self.visible = False
-
     def internal_logic(self, level):
         pass
 
@@ -92,6 +89,15 @@ class Brochette(Projectile):
                 for brochette in get_available_blocks("brochette")]
         return cls._img
 
+    @classmethod
+    @lru_cache()
+    def get_image(cls, rot, alpha, variant):
+        img = pygame.transform.rotate(variant, rot)
+        img.set_colorkey((255, 0, 255))
+        img.set_alpha(round(alpha))
+        return img
+
+
     def __init__(self, start_pos, physics=(0, Pos(0, 0))):
         shape = AABB(start_pos, (DEFAULT_BLOCK_SIZE - 2, DEFAULT_BLOCK_SIZE - 2))
         shape.topleft += (1, 1)
@@ -99,12 +105,12 @@ class Brochette(Projectile):
         super().__init__(shape, mass=0)
         self.velocity = physics[1] * BROCHETTE_VELOCITY
         self.rotation = physics[0] - 90
-        self.sheet = pygame.transform.rotate(random.choice(Brochette.img), self.rotation)
-        self.sheet.set_colorkey((255, 0, 255))
+        self.variant = random.choice(self.img)
         self.ttl = FRAME_BEFORE_DESPAWN
 
     def render(self, surf, offset=(0, 0)):
-        surf.blit(self.sheet, self.topleft + offset)
+        surf.blit(self.get_image(self.rotation, 255 * self.ttl / FRAME_BEFORE_DESPAWN, self.variant),
+                  self.topleft + offset)
 
     def internal_logic(self):
 
