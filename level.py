@@ -107,7 +107,7 @@ class Level:
             raise
 
     @classmethod
-    def load_v2(cls, path, num=-1):
+    def load_v2(cls, path, num=-1, is_editor=False):
         with open(path, "r") as f:
             d = json.loads(f.read())
 
@@ -132,7 +132,7 @@ class Level:
                 level.start = obj.pos
             elif isinstance(obj, Projectile):
                 print(level.num)
-                if isinstance(obj, AK47) and CONFIG.levels_stats[str(num)][2] >= 1:
+                if not is_editor and isinstance(obj, AK47) and CONFIG.levels_stats[str(num)][2] >= 1:
                     pass
                 else:
                     level.spawn(obj)
@@ -153,7 +153,7 @@ class Level:
 
     @classmethod
     def load_num(cls, num):
-        path = os.path.join(MAPS_FOLDER, LEVELS[num][0])
+        path = os.path.join(MAPS_FOLDER, LEVELS[str(num)][0])
         level = cls.load(path, num)
         level.num = num
         return level

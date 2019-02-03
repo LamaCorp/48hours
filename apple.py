@@ -42,12 +42,13 @@ class LevelEdit(Level):
 
 
         try:
-            level = cls.load_v2(path)
+            level = cls.load_v2(path, is_editor=True)
             level.path = path
             return level
         except:
             print('Can not load as v2')
             print("Creating new level")
+            raise
 
         level = cls()
         level.size = Pos(size)

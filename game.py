@@ -80,7 +80,7 @@ class GameScreen(Screen):
             level_stats = CONFIG.levels_stats[str(self.level.num)]
             if level_stats[1] == -1 or run_time < level_stats[1]:
                 CONFIG.levels_stats[str(self.level.num)][1] = run_time
-            if CONFIG.level + 1 in LEVELS:
+            if str(CONFIG.level + 1) in LEVELS:
                 CONFIG.level += 1
             self.app.set_screen(PICKER)
         elif self.level.to_reset:

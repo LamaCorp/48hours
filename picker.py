@@ -53,7 +53,7 @@ class PickerScreen(IdleScreen):
 
     @staticmethod
     def level_setter(level):
-        CONFIG.level = get_index_from_name(LEVELS, level)
+        CONFIG.level = int(get_index_from_name(LEVELS, level))
 
     def death_count_text(self, n_death):
         death_count = "You'll die soon..."
