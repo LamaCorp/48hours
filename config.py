@@ -1,7 +1,7 @@
 import os
 import re
-
-from constants import PLAYER_FOLDER, MAPS_FOLDER, LEVELS_GRAPHICAL_FOLDER
+import configlib
+from constants import PLAYER_FOLDER, LEVELS_GRAPHICAL_FOLDER, ASSETS
 
 LEVELS_REGEX = re.compile(r'level_[0-9]*\.map')
 BLOCKS_BASE_REGEX = r'_[0-9]*\.png'
@@ -41,9 +41,15 @@ def get_level_index_from_name(name):
     return -1
 
 
-class LevelConfig:
+class Config(configlib.Config):
+    __config_path__ = os.path.abspath(os.path.join(ASSETS, "config.json"))
+
     chosen_level = 0
 
-
-class PlayerConfig:
     player = "lama_normal.png"
+
+
+CONFIG = Config()
+
+if __name__ == '__main__':
+    configlib.update_config(Config)

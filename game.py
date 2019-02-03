@@ -3,7 +3,7 @@ from graphalama.app import Screen
 from player import Player
 from level import Level
 from constants import PICKER
-from config import LevelConfig, LEVELS
+from config import CONFIG, LEVELS
 
 
 class GameScreen(Screen):
@@ -23,8 +23,8 @@ class GameScreen(Screen):
 
     def internal_logic(self):
         if self.level.over:
-            if LevelConfig.chosen_level + 1 in LEVELS:
-                LevelConfig.chosen_level += 1
+            if CONFIG.chosen_level + 1 in LEVELS:
+                CONFIG.chosen_level += 1
             self.app.set_screen(PICKER)
         elif self.level.to_reset:
             self.level = Level(self.level.num)

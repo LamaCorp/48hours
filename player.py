@@ -3,10 +3,8 @@ from enum import Enum, auto
 import os
 import pygame
 
-from blocks import Block, EndBlock
-from entities import Brochette
 from physics import Body, AABB, Pos
-from config import PlayerConfig
+from config import CONFIG
 from constants import PLAYER_FOLDER
 
 LEFT = 0
@@ -38,13 +36,13 @@ class State(Enum):
 
 
 class Player(Body):
-    def __init__(self, start_pos=(0, 0), respawn = False):
+    def __init__(self, start_pos=(0, 0), respawn=False):
         size = (76 * 3 // 4, 70 * 3 // 4)
         shape = AABB(start_pos, size)
         super().__init__(shape)
         self.visible = True
 
-        self.img = pygame.image.load(os.path.join(PLAYER_FOLDER, PlayerConfig.player)).convert()
+        self.img = pygame.image.load(os.path.join(PLAYER_FOLDER, CONFIG.player)).convert()
         self.img = pygame.transform.scale(self.img, size)
         self.img.set_colorkey((255, 0, 255))
         self.img_left = pygame.transform.flip(self.img, True, False)

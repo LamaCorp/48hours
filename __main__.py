@@ -6,6 +6,7 @@ from constants import MENU, PICKER, SETTINGS
 from menu import MenuScreen
 from picker import PickerScreen
 from settings import SettingsScreen
+from config import CONFIG
 
 pygame.init()
 
@@ -19,4 +20,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # ensure it saves
+    with CONFIG:
+        main()

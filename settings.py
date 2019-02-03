@@ -8,7 +8,7 @@ from graphalama.constants import BOTTOM, WHITESMOKE
 
 from widgets import MenuButton
 from constants import LIGHT_DARK
-from config import get_available_players, PlayerConfig
+from config import get_available_players, CONFIG
 
 
 class SettingsScreen(Screen):
@@ -26,7 +26,7 @@ class SettingsScreen(Screen):
                                               arrow_color=WHITESMOKE,
                                               anchor=BOTTOM)
         widgets = [
-            MenuButton(app, (size[0] - 365, 100)),
+            MenuButton(app, (size[0] - 135, 100)),
             self.player_selector,
         ]
 
@@ -43,7 +43,7 @@ class SettingsScreen(Screen):
 
     @staticmethod
     def player_setter(player):
-        PlayerConfig.player = player.lower()
+        CONFIG.player = player.lower()
 
     def draw_background(self, display):
         super().draw_background(display)

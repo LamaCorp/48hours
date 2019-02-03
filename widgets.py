@@ -47,9 +47,9 @@ def PickerButton(app, pos=None, anchor=CENTER):
 def PlayButton(app, pos=None, anchor=CENTER):
     from game import GameScreen
     from level import Level
-    from config import LevelConfig
+    from config import CONFIG
     return Button(text="Play",
-                  function=lambda: app.set_temp_screen(lambda app: GameScreen(app, Level(LevelConfig.chosen_level))),
+                  function=lambda: app.set_temp_screen(lambda app: GameScreen(app, Level(CONFIG.chosen_level))),
                   pos=pos,
                   shape=RoundedRect((200, 50), 100),
                   color=WHITESMOKE,
