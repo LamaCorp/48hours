@@ -11,7 +11,7 @@ from graphalama.constants import (CENTER, NICE_BLUE, PURPLE, GREEN,
 from idle_screen import IdleScreen
 from config import CONFIG
 from constants import DARK
-from widgets import Title, MenuButton
+from widgets import Title, MenuButton, Segment
 
 
 class StatisticsScreen(IdleScreen):
@@ -21,7 +21,7 @@ class StatisticsScreen(IdleScreen):
         def stats(text, figure, n):
             y = size[1] // 2 + 100 * (n + 1)
             x = size[0] // 2 - 300
-            text = SimpleText(text=text + ":",
+            text = SimpleText(text=text,
                               pos=(x, y),
                               color=WHITESMOKE,
                               anchor=LEFT)
@@ -29,8 +29,10 @@ class StatisticsScreen(IdleScreen):
                                 pos=(x + 600, y),
                                 color=(255, 165, 0),
                                 anchor=RIGHT)
+            segm = Segment(text.absolute_rect.bottomright, figure.absolute_rect.bottomleft, (100, 100, 100))
+            segm.pos = (segm.pos[0], segm.pos[1] - 6)
 
-            return text, figure
+            return text, figure, segm
 
         widgets = [
             Title("Statistics, math, numbers, science", size, font_size=110),
@@ -65,7 +67,9 @@ class StatisticsScreen(IdleScreen):
         for level in CONFIG.levels_stats:
             if CONFIG.levels_stats[level][1] != -1:
                 levels_completed += 1
-        return str(levels_completed * 100 / len(CONFIG.levels_stats)) + "%"
+
+        percent = levels_completed * 100 / len(CONFIG.levels_stats)
+        return f"{int(percent)}%"
 
     @staticmethod
     def get_nb_ak47():

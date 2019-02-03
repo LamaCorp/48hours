@@ -110,6 +110,7 @@ class Level:
     def load_v2(cls, path):
         with open(path, "r") as f:
             d = json.loads(f.read())
+
         size = Pos(d["size"])
         map = [
             [

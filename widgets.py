@@ -6,9 +6,11 @@ from graphalama.buttons import CarouselSwitch
 from graphalama.colors import Gradient, MultiGradient
 from graphalama.constants import (CENTER, NICE_BLUE, PURPLE, GREEN,
                                   Monokai, YELLOW, RED, TOP, WHITESMOKE, RAINBOW, LEFT, RIGHT, TRANSPARENT, LLAMA,
-                                  TOPRIGHT)
+                                  TOPRIGHT, TOPLEFT)
+from graphalama.core import Widget
 from graphalama.font import default_font
 from graphalama.maths import Pos
+from graphalama.shadow import NoShadow
 from graphalama.shapes import RoundedRect, Rectangle
 from graphalama.widgets import SimpleText, Button
 
@@ -122,7 +124,6 @@ def PauseButton(function, pos=None):
                   anchor=TOPRIGHT)
 
 
-
 class CountDown(SimpleText):
     """Big timer before the end of the game."""
 
@@ -199,9 +200,9 @@ class CountDown(SimpleText):
             pos += surf.get_width(), 0
 
         content_surf.set_alpha(self.transparency)
-        content_surf.set_colorkey((0,0,0))
+        content_surf.set_colorkey((0, 0, 0))
 
-    @lru_cache(maxsize=11*3)  # three colors * (10 digits + colon)
+    @lru_cache(maxsize=11 * 3)  # three colors * (10 digits + colon)
     def render_char(self, char, color):
         return self.font.render(char, False, color, )
 
@@ -215,3 +216,44 @@ class CountDown(SimpleText):
             self._content = pygame.Surface(self.content_rect.size)
             self.draw_content(self._content)
         return self._content
+
+
+class Segment(Widget):
+
+    def __init__(self, a, b, color=None):
+        size = (abs(a[0] - b[0]) + 1,
+                abs(a[1] - b[1]) + 1)
+        topleft = (min(a[0], b[0]),
+                   min(a[1], b[1]))
+
+        a, b = sorted((a, b))
+        if a == topleft:
+            if a[1] == b[1]:
+                self.case = "-"  # horizontal
+            elif a[0] == b[0]:
+                self.case = "|"  # veritcal
+            else:
+                self.case = "\\"  # diagonal segment \
+        else:
+            self.case = "/"  # diagonal /
+
+        super().__init__(pos=topleft,
+                         shape=Rectangle(size, border=0, padding=0),
+                         color=color,
+                         bg_color=TRANSPARENT,
+                         shadow=NoShadow(),
+                         anchor=TOPLEFT)
+
+    def draw_content(self, content_surf):
+        w, h = content_surf.get_size()
+        print(w, h)
+        if self.case == "-":
+            pygame.draw.line(content_surf, self.color.color, (0, 0), (w, 0))
+        elif self.case == "|":
+            pygame.draw.line(content_surf, self.color.color, (0, 0), (0, h))
+        elif self.case == "\\":
+            pygame.draw.line(content_surf, self.color.color, (0, 0), (w, h))
+        else:
+            pygame.draw.line(content_surf, self.color.color, (0, h), (w, 0))
+
+
