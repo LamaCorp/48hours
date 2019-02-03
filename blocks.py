@@ -148,14 +148,14 @@ class FieryBarbecue(Block):
         super().__init__(pos)
         self.character = character
         self.rotation = FieryBarbecue.char_dic[self.character][0]
-        self.next_spawn = 5
+        self.next_spawn = 25
         self.brochettes = []
 
     def internal_logic(self, level):
         self.next_spawn -= 1
         if self.next_spawn == 0:
             level.spawn(Brochette(level.map_to_world(self.pos), FieryBarbecue.char_dic[self.character][1]))
-            self.next_spawn = 45
+            self.next_spawn = 70
 
 
 class EndBlock(Block):
