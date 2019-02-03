@@ -4,7 +4,7 @@ import os
 import pygame
 
 from physics import Body, AABB, Pos
-from config import CONFIG
+from config import CONFIG, PLAYERS
 from constants import PLAYER_FOLDER
 
 LEFT = 0
@@ -42,7 +42,7 @@ class Player(Body):
         super().__init__(shape)
         self.visible = True
 
-        self.img = pygame.image.load(os.path.join(PLAYER_FOLDER, CONFIG.player)).convert()
+        self.img = pygame.image.load(os.path.join(PLAYER_FOLDER, PLAYERS[CONFIG.player][0])).convert()
         self.img = pygame.transform.scale(self.img, size)
         self.img.set_colorkey((255, 0, 255))
         self.img_left = pygame.transform.flip(self.img, True, False)

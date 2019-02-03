@@ -23,8 +23,8 @@ class GameScreen(Screen):
 
     def internal_logic(self):
         if self.level.over:
-            if CONFIG.chosen_level + 1 in LEVELS:
-                CONFIG.chosen_level += 1
+            if CONFIG.level + 1 in LEVELS:
+                CONFIG.level += 1
             self.app.set_screen(PICKER)
         elif self.level.to_reset:
             self.level = Level(self.level.num)

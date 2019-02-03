@@ -8,7 +8,7 @@ from graphalama.constants import BOTTOM, WHITESMOKE
 
 from widgets import MenuButton
 from constants import LIGHT_DARK
-from config import get_available_players, CONFIG
+from config import get_available_players, CONFIG, get_index_from_name, PLAYERS
 
 
 class SettingsScreen(Screen):
@@ -30,7 +30,7 @@ class SettingsScreen(Screen):
             self.player_selector,
         ]
 
-        self.player_selector.option_index = 4
+        self.player_selector.option_index = CONFIG.player
 
         self.lama_logo = pygame.image.load('assets/players/lama_normal.png').convert()
         for _ in range(4):
@@ -43,7 +43,7 @@ class SettingsScreen(Screen):
 
     @staticmethod
     def player_setter(player):
-        CONFIG.player = player.lower()
+        CONFIG.player = get_index_from_name(PLAYERS, player)
 
     def draw_background(self, display):
         super().draw_background(display)
