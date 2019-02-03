@@ -1,27 +1,23 @@
 #!/usr/bin/env python3
 
-import json
-from collections import defaultdict
-from functools import lru_cache, partial
-from typing import Dict, List
+from functools import partial
 
 import click
-import pygame;
-
-from entities import OBJECTS, Spawn, SPAWN
-from graphalama.colors import ImageBrush
-from graphalama.constants import CENTER
-from graphalama.shapes import Rectangle
-
-pygame.init()
 from graphalama.app import Screen, App
 from graphalama.buttons import CarouselSwitch, Button, ImageButton
+from graphalama.colors import ImageBrush
+from graphalama.constants import CENTER
 from graphalama.core import Widget
+from graphalama.shapes import Rectangle
+import pygame
 
 from blocks import Block, BLOCKS, Stone
-from constants import LEVELS_FOLDER, DEFAULT_BLOCK_SIZE, MAPS_FOLDER
+from constants import DEFAULT_BLOCK_SIZE, MAPS_FOLDER
+from entities import OBJECTS, Spawn, SPAWN
 from level import Level
-from physics import AABB, Pos
+from physics import Pos
+
+pygame.init()
 
 MAP_SIZE = (120, 40)
 LEVEL_NAME = "fail"
@@ -38,8 +34,19 @@ class LevelEdit(Level):
     @classmethod
     def load(cls, path, size=(120, 40)):
         try:
-            return Level.load(path)
+            level = cls.load_v1(path)
+            level.path = path
+            return level
         except:
+            print('Can not load as v1')
+
+
+        try:
+            level = cls.load_v2(path)
+            level.path = path
+            return level
+        except:
+            print('Can not load as v2')
             print("Creating new level")
 
         level = cls()
