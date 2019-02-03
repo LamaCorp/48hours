@@ -1,0 +1,34 @@
+code_quality:
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
+  artifacts:
+    paths: [gl-code-quality-report.json]
+
+archlinux:
+  image: base/archlinux
+  script:
+    - echo -e "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+    - pacman -Syu --noconfirm
+    - pacman -S --noconfirm python python-pip xorg-server-xvfb git sdl sdl2 sdl_image sdl2_image lib32-sdl lib32-sdl2 lib32-sdl_image lib32-sdl2_image
+    - Xvfb :1 -screen 0 1920x1080x32 &> xvfb.log  &
+    - export DISPLAY=:1.0
+    - export SDL_VIDEODRIVER=dummy
+    - python -m venv .venv
+    - source .venv/bin/activate
+    - pip install -U pip
+    - pip install -U -r requirements.txt
+    - ls .
+    - python . &
+    - sleep 10
+    - killall python
