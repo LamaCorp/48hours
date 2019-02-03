@@ -1,8 +1,11 @@
 from enum import Enum, auto
 
+import os
 import pygame
 
 from physics import Body, AABB, Pos
+from config import PlayerConfig
+from constants import PLAYER_FOLDER
 
 LEFT = 0
 RIGHT = 1
@@ -37,7 +40,7 @@ class Player(Body):
         shape = AABB(start_pos, (76, 70))
         super().__init__(shape)
 
-        self.img = pygame.image.load('assets/player/lama.png').convert()
+        self.img = pygame.image.load(os.path.join(PLAYER_FOLDER, PlayerConfig.player)).convert()
         self.img = pygame.transform.scale2x(self.img)
         self.img.set_colorkey((255, 0, 255))
         self.img_left = pygame.transform.flip(self.img, True, False)

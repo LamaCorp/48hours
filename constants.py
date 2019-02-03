@@ -12,9 +12,9 @@ LIGHT_DARK = (62, 64, 130)
 
 # Folder
 ASSETS = os.path.abspath(os.path.join(os.path.dirname(__file__), 'assets'))
-PLAYER_FOLDER = os.path.join(ASSETS, 'player')
-LEVELS_FOLDER = os.path.join(ASSETS, "levels")
-LEVELS_GRAPHICAL_FOLDER = os.path.join(LEVELS_FOLDER, "graphical")
-MAPS_FOLDER = os.path.join(LEVELS_FOLDER, "maps")
+PLAYER_FOLDER = os.path.join(ASSETS, 'players')
+LEVELS_FOLDER = os.path.join(ASSETS, 'levels')
+LEVELS_GRAPHICAL_FOLDER = os.path.join(LEVELS_FOLDER, 'graphical')
+MAPS_FOLDER = os.path.join(LEVELS_FOLDER, 'maps')
 
 DEFAULT_BLOCK_SIZE = 32

@@ -187,7 +187,7 @@ class Level:
         self.space = Space(self, gravity=(0, 1))
         self.size = Pos(0, 0)
         self.grid = []  # type: List[List[Block]]
-        self.start = (0, 0)  # Where the player has to spawn, map coordinates
+        self.start = (0, 0)  # Where the players has to spawn, map coordinates
         self.offset = Pos(0, 0)  # Where we start to draw the map, world coordinates
         self.load_level()
         self.screen_size = (0, 0)

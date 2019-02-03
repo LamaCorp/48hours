@@ -1,8 +1,8 @@
 import pygame
 from graphalama.app import Screen
 
-from constants import SETTINGS, PICKER
 from widgets import Title, PickerButton, SettingsButton, QuitButton
+
 
 class MenuScreen(Screen):
     FPS = 30
@@ -16,7 +16,7 @@ class MenuScreen(Screen):
             QuitButton(app, (size[0] // 2, size[1] // 2 + 65)),
         ]
 
-        self.lama_logo = pygame.image.load('assets/player/lama.png').convert()
+        self.lama_logo = pygame.image.load('assets/players/lama_normal.png').convert()
         for _ in range(4):
             self.lama_logo = pygame.transform.scale2x(self.lama_logo)
         self.lama_logo_left = pygame.transform.flip(self.lama_logo, True, False)
