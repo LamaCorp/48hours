@@ -25,7 +25,7 @@ class Level:
         self.over = False
         self.to_reset = False
         self.expolding = False
-        self.expolsion_heads = []
+        self.expolsion_heads = set()
 
     def __str__(self):
         return "\n".join([
@@ -52,10 +52,17 @@ class Level:
         return Pos((display_pos[0] + self.offset.x) // Block.DEFAULT_BLOCK_SIZE,
                    (display_pos[1] + self.offset.y) // Block.DEFAULT_BLOCK_SIZE)
 
+    def inside_map(self, map_pos):
+       return 0 <= map_pos[0] < self.size.x and 0 <= map_pos[1] < self.size.y
+
+    def inside_display(self, map_pos):
+        world = self.map_to_world(map_pos)
+        return (self.offset.x <= world.x < self.offset.x + self.screen_size[0]
+            and self.offset.y <= world.y < self.offset.y + self.screen_size[1])
+
     def get_block(self, map_pos):
         x, y = map_pos
-        if (0 <= x < self.size.x
-                and 0 <= y < self.size.y):
+        if self.inside_map(map_pos):
             return self.grid[y][x]
 
         return Stone()
@@ -237,10 +244,23 @@ class Level:
         self.to_reset = True
 
     def explode(self, start_pos):
-        self.over = True
         self.expolding = True
-        self.expolsion_heads.append(start_pos)
+        self.expolsion_heads.add(start_pos)
 
     def explosion_logic(self):
         for head in self.expolsion_heads:
             self.grid[head[1]][head[0]].explode()
+
+        # we spread the explosions to al neighbours not exploded
+        new_heads = set()
+        for head in self.expolsion_heads:
+            for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+                x, y = head[0] + dx, head[1] + dy
+                if self.inside_display((x, y)) and not self.grid[y][x].exploded:
+                    new_heads.add((x, y))
+
+        self.expolsion_heads.clear()
+        self.expolsion_heads = new_heads
+
+        if not self.expolsion_heads:
+            self.over = True

@@ -42,6 +42,7 @@ class Block:
 
     def __init__(self, pos=(0, 0)):
         self.pos = pos
+        self.exploded = False
 
     @staticmethod
     def new(character='.', pos=(0, 0)):
@@ -70,7 +71,8 @@ class Block:
         return self.img_at(*self.default_sprite_pos, rotation=rotation)
 
     def explode(self):
-        self.visible = True
+        self.visible = False
+        self.exploded = True
 
     @classmethod
     # @lru_cache()

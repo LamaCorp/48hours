@@ -77,10 +77,7 @@ class GameScreen(Screen):
 
     def internal_logic(self):
         if self.level.over:
-            run_time = time.time() - self.start_time
-            level_stats = CONFIG.levels_stats[str(self.level.num)]
-            if level_stats[1] == -1 or run_time < level_stats[1]:
-                CONFIG.levels_stats[str(self.level.num)][1] = run_time
+
             if str(CONFIG.level + 1) in LEVELS:
                 CONFIG.level += 1
             self.app.set_screen(PICKER)
@@ -92,6 +89,10 @@ class GameScreen(Screen):
             self.start_time = time.time()
             CONFIG.levels_stats[str(self.level.num)][0] += 1
         elif self.level.expolding:
+            run_time = time.time() - self.start_time
+            level_stats = CONFIG.levels_stats[str(self.level.num)]
+            if level_stats[1] == -1 or run_time < level_stats[1]:
+                CONFIG.levels_stats[str(self.level.num)][1] = run_time
             self.level.internal_logic()
         else:
             self.space.simulate()
