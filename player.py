@@ -37,11 +37,13 @@ class State(Enum):
 
 class Player(Body):
     def __init__(self, start_pos=(0, 0)):
-        shape = AABB(start_pos, (76, 70))
+        size = (76 * 3 // 4, 70 * 3 // 4)
+        shape = AABB(start_pos, size)
         super().__init__(shape)
+        print(size)
 
         self.img = pygame.image.load(os.path.join(PLAYER_FOLDER, PlayerConfig.player)).convert()
-        self.img = pygame.transform.scale2x(self.img)
+        self.img = pygame.transform.scale(self.img, size)
         self.img.set_colorkey((255, 0, 255))
         self.img_left = pygame.transform.flip(self.img, True, False)
 
