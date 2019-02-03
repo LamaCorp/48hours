@@ -1,3 +1,5 @@
+from functools import partial
+
 from graphalama.text import SimpleText
 from graphalama.shapes import  Rectangle
 from graphalama.font import default_font
@@ -15,31 +17,36 @@ from widgets import Title, MenuButton
 class StatisticsScreen(IdleScreen):
     def __init__(self, app):
         size = app.display.get_size()
+
+        def stats(text, figure, n):
+            y = size[1] // 2 + 100 * (n + 1)
+            x = size[0] // 2 - 300
+            text = SimpleText(text=text + ":",
+                              pos=(x, y),
+                              color=WHITESMOKE,
+                              anchor=LEFT)
+            figure = SimpleText(text=figure,
+                                pos=(x + 600, y),
+                                color=(255, 165, 0),
+                                anchor=RIGHT)
+
+            return text, figure
+
         widgets = [
-            SimpleText(text="Statistics, math, numbers, science",
-                       pos=(size[0] / 2, 50),
-                       shape=Rectangle((size[0] + 2, 133), border=1),
-                       color=MultiGradient(*RAINBOW),
-                       bg_color=DARK + (172,),
-                       border_color=MultiGradient(*RAINBOW),
-                       font=default_font(110),
-                       anchor=TOP),
+            Title("Statistics, math, numbers, science", size, font_size=110),
             MenuButton(app, (size[0] - 135, 250)),
-            SimpleText(text="{:>30}: {:>4}".format("Total deaths", self.get_total_deaths()),
-                       pos=(size[0] // 2, size[1] // 2 - 200),
-                       color=WHITESMOKE),
-            SimpleText(text="{:>30}: {:>4}".format("Average deaths per level", self.get_avg_deaths_per_lvl()),
-                       pos=(size[0] // 2, size[1] // 2 - 100),
-                       color=WHITESMOKE),
-            SimpleText(text="{:>30}: {:>4}".format("Total completion", self.get_total_completion()),
-                       pos=(size[0] // 2, size[1] // 2),
-                       color=WHITESMOKE),
-            SimpleText(text="{:>30}: {:>4}".format("Автомат Калашникова picked up", self.get_nb_ak47()),
-                       pos=(size[0] // 2, size[1] // 2 + 100),
-                       color=WHITESMOKE),
+            *stats("Death count", self.get_total_deaths(), 0),
+            *stats("Average death per level", self.get_avg_deaths_per_lvl(), 1),
+            *stats("Total completion", self.get_total_completion(), 2),
+            *stats("Автомат Калашникова picked up", self.get_nb_ak47(), 3)
         ]
 
         super().__init__(app, widgets, (20, 10, 0))
+
+    def format_stat(self, text, number):
+        number = str(number)
+        return "{} {:.>{dots}} {}".format(text, "", number,
+                                         dots=40 - len(text) -len(number))
 
     @staticmethod
     def get_total_deaths():

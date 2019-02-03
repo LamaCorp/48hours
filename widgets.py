@@ -15,14 +15,14 @@ from graphalama.widgets import SimpleText, Button
 from constants import MENU, SETTINGS, PICKER, STATS, LIGHT_DARK, DARK
 
 
-def Title(text, screen_size, anchor=TOP):
+def Title(text, screen_size, anchor=TOP, font_size=150):
     return SimpleText(text=text,
                       pos=(screen_size[0] / 2, 50),
                       shape=Rectangle((screen_size[0] + 2, 200), border=1),
                       color=MultiGradient(*RAINBOW),
                       bg_color=DARK + (172,),
                       border_color=MultiGradient(*RAINBOW),
-                      font=default_font(150),
+                      font=default_font(font_size),
                       anchor=anchor)
 
 
@@ -120,6 +120,7 @@ def PauseButton(function, pos=None):
                   color=LLAMA,
                   bg_color=TRANSPARENT,
                   anchor=TOPRIGHT)
+
 
 
 class CountDown(SimpleText):
