@@ -2,13 +2,13 @@ import os
 
 import pygame
 
-from graphalama.buttons import CarouselSwitch
+from graphalama.buttons import CarouselSwitch, Button
 from graphalama.shapes import RoundedRect
 from graphalama.text import SimpleText
-from graphalama.constants import BOTTOM, WHITESMOKE
+from graphalama.constants import BOTTOM, WHITESMOKE, Monokai
 
 from widgets import MenuButton, Title
-from constants import LIGHT_DARK, PLAYER_FOLDER
+from constants import LIGHT_DARK, PLAYER_FOLDER, KEY_BIND
 from config import get_available_players, CONFIG, get_index_from_name, PLAYERS
 from idle_screen import IdleScreen
 
@@ -33,6 +33,14 @@ class SettingsScreen(IdleScreen):
                        color=WHITESMOKE,
                        anchor=BOTTOM),
             self.player_selector,
+            Button(text="Key Bindings",
+                   function=lambda: app.set_screen(KEY_BIND),
+                   shape=RoundedRect((250, 50), 100),
+                   color=Monokai.PINK,
+                   bg_color=(200, 200, 200, 72),
+                   pos=(size[0] // 2, size[1] // 2 + 100),
+                   anchor=BOTTOM),
+
         ]
 
         self.player_selector.option_index = CONFIG.player
@@ -57,5 +65,5 @@ class SettingsScreen(IdleScreen):
 
         rect = self.img_preview.get_rect()
         size = self.app.display.get_size()
-        rect.center = (size[0] // 2, size[1] // 2 + 250)
+        rect.center = (size[0] // 2, size[1] // 2 + 300)
         display.blit(self.img_preview, rect)

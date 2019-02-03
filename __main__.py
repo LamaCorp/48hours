@@ -2,11 +2,12 @@
 import pygame
 from graphalama.app import App
 
-from constants import MENU, PICKER, SETTINGS, STATS
+from constants import MENU, PICKER, SETTINGS, STATS, KEY_BIND
 from menu import MenuScreen
 from picker import PickerScreen
 from settings import SettingsScreen
 from statistics import StatisticsScreen
+from key_bindings import KeyBindingsScreen
 from config import CONFIG
 
 pygame.init()
@@ -18,6 +19,7 @@ def main():
         PICKER: PickerScreen,
         SETTINGS: SettingsScreen,
         STATS: StatisticsScreen,
+        KEY_BIND: KeyBindingsScreen,
     }, MENU).run()
 
 
