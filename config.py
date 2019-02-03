@@ -1,5 +1,6 @@
 import os
 import re
+import pygame
 import configlib
 from constants import LEVELS_GRAPHICAL_FOLDER, ASSETS
 
@@ -48,6 +49,13 @@ class Config(configlib.Config):
     level = 0
 
     player = 0
+
+    key_bindings = {
+        "LEFT": pygame.K_LEFT,
+        "RIGHT": pygame.K_RIGHT,
+        "JUMP": pygame.K_SPACE,
+        "RUN": pygame.K_LSHIFT,
+    }
 
     levels_stats = {
         '0': [0, -1, 0],  # Number of deaths in the level, best time, has the AK-47 been taken?
