@@ -7,6 +7,7 @@ import pygame
 
 from constants import DEFAULT_BLOCK_SIZE, LEVELS_GRAPHICAL_FOLDER, ASSETS
 from entities import Brochette, AK47
+from helper import classproperty
 from physics import Pos
 
 
@@ -28,6 +29,7 @@ class Block:
     DEFAULT_BLOCK_SIZE = DEFAULT_BLOCK_SIZE
 
     character = '.'
+    _sheet = None
     sheet = None  # type: pygame.Surface
     default_sprite_pos = (0, 0)
     solid = False
@@ -84,9 +86,6 @@ class Dirt(Block):
     visible = True
     deadly = False
     default_sprite_pos = 1, 1
-    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_sheet.png")).convert()
-    sheet.set_colorkey((255, 0, 255))
-    sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
 
     # . is any block
     # ? is any block but not air
@@ -98,6 +97,15 @@ class Dirt(Block):
         [". . ??. .", ". .???. .", ". .?? . .", ". . ? . .", ".?  ??. .", " ?.?? . ."]
     ])
 
+    @classproperty
+    def sheet(cls):
+        if cls._sheet is None:
+            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_sheet.png")).convert()
+            sheet.set_colorkey((255, 0, 255))
+            sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
+            cls._sheet = sheet
+        return cls._sheet
+
 
 class Stone(Block):
     character = "S"
@@ -106,9 +114,15 @@ class Stone(Block):
     deadly = False
     default_sprite_pos = 1, 1
 
-    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_sheet.png")).convert()
-    sheet.set_colorkey((255, 0, 255))
-    sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
+    @classproperty
+    def sheet(cls):
+        if cls._sheet is None:
+            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_sheet.png")).convert()
+            sheet.set_colorkey((255, 0, 255))
+            sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
+            cls._sheet = sheet
+        return cls._sheet
+
 
     sheet_pattern = re_compile([
         [". . ??.?.", ". .??????", ". .?? .?.", ". . ? .?."],  # "???.??.? ", "?????. ?."],
@@ -124,10 +138,14 @@ class Barbecue(Block):
     visible = True
     deadly = True
 
-    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "barbecue.png")).convert()
-    sheet.set_colorkey((255, 0, 255))
-    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-
+    @classproperty
+    def sheet(cls):
+        if cls._sheet is None:
+            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "barbecue.png")).convert()
+            sheet.set_colorkey((255, 0, 255))
+            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            cls._sheet = sheet
+        return cls._sheet
 
 class FieryBarbecue(Block):
     character = "^"
@@ -135,16 +153,21 @@ class FieryBarbecue(Block):
     visible = True
     deadly = True
 
-    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "fiery_barbecue.png")).convert()
-    sheet.set_colorkey((255, 0, 255))
-    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-
     char_dic = {
         "^": (0, Pos(0, -1)),  # Rotation and direction of brochettes
         "V": (180, Pos(0, 1)),
         "<": (90, Pos(-1, 0)),
         ">": (-90, Pos(1, 0))
     }
+
+    @classproperty
+    def sheet(cls):
+        if cls._sheet is None:
+            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "fiery_barbecue.png")).convert()
+            sheet.set_colorkey((255, 0, 255))
+            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            cls._sheet = sheet
+        return cls._sheet
 
     def __init__(self, character="^", pos=(0, 0)):
         super().__init__(pos)
@@ -166,10 +189,43 @@ class EndBlock(Block):
     visible = True
     deadly = False
 
-    sheet = pygame.image.load(os.path.join(ASSETS, "logo.png")).convert()
-    sheet.set_colorkey((255, 0, 255))
-    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+    @classproperty
+    def sheet(cls):
+        if cls._sheet is None:
+            sheet = pygame.image.load(os.path.join(ASSETS, "logo.png")).convert()
+            sheet.set_colorkey((255, 0, 255))
+            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            cls._sheet = sheet
+        return cls._sheet
 
     # This isn't called every frame. Instead, it is called when the player touches it
     def on_collision(self, level):
         level.explode()
+
+
+class AK47(Block):
+    character = "K"
+    solid = False
+    visible = True
+    deadly = False
+
+    @classproperty
+    def sheet(cls):
+        if cls._sheet is None:
+            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
+            sheet.set_colorkey((255, 0, 255))
+            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            cls._sheet = sheet
+        return cls._sheet
+
+
+
+BLOCKS = [
+    Block,
+    Dirt,
+    Stone,
+    Barbecue,
+    FieryBarbecue,
+    EndBlock,
+    AK47
+]

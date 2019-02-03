@@ -5,17 +5,24 @@ import pygame
 
 from constants import LEVELS_GRAPHICAL_FOLDER, DEFAULT_BLOCK_SIZE, BROCHETTE_VELOCITY
 from config import get_available_blocks
+from helper import classproperty
 from physics import AABB, Pos, Projectile
 
 
 class Brochette(Projectile):
     deadly = True
+    _img = None
 
-    img = [
-        pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER,
-                                                              brochette.lower())).convert(),
-                               (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-        for brochette in get_available_blocks("brochette")]
+    @classproperty
+    def img(cls):
+        if cls._img is None:
+            cls._img = [
+            pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER,
+                                                                  brochette.lower())).convert(),
+                                   (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            for brochette in get_available_blocks("brochette")]
+        return cls._img
+
 
     def __init__(self, start_pos, physics=(0, Pos(0, 0))):
         shape = AABB(start_pos, (DEFAULT_BLOCK_SIZE - 2, DEFAULT_BLOCK_SIZE - 2))

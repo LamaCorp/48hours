@@ -11,14 +11,13 @@ from physics import Space, Pos, clamp
 class Level:
     OFFSET_THRESHOLD = 40 / 100
 
-    def __init__(self, level=0):
-        self.num = level
+    def __init__(self):
+        self.num = 0
         self.space = Space(self, gravity=(0, 1))
         self.size = Pos(0, 0)
         self.grid = []  # type: List[List[Block]]
         self.start = (0, 0)  # Where the players has to spawn, map coordinates
         self.offset = Pos(0, 0)  # Where we start to draw the map, world coordinates
-        self.load_level()
         self.screen_size = (0, 0)
         self.over = False
         self.to_reset = False
@@ -73,17 +72,29 @@ class Level:
         """(width, height), in pixels"""
         return Level.map_to_world(self.size)
 
-    def load_level(self):  # TODO: may we improve this?
-        with open(os.path.join(MAPS_FOLDER, LEVELS[self.num][0]), 'r') as map_file:
+    @classmethod
+    def load_v1_num(cls, num):
+        path = os.path.join(MAPS_FOLDER, LEVELS[num][0])
+        level = cls.load_v1(path)
+        level.num = num
+        return level
+
+    @classmethod
+    def load_v1(cls, path):  # TODO: may we improve this?
+        level = cls()
+
+        with open(path, 'r') as map_file:
             height, width = list(map(int, map_file.readline().split()))
-            self.size = Pos(width, height)
+            level.size = Pos(width, height)
             for h in range(height):
                 line = list(map_file.readline().strip())
                 for i in range(len(line)):
                     if line[i] == START:
-                        self.start = (i, h)
+                        level.start = (i, h)
                     line[i] = Block.new(line[i], (i, h))
-                self.grid.append(line)
+                level.grid.append(line)
+
+        return level
 
     def update_offset(self, player_pos, screen_size):
         player_pos = player_pos - self.offset
@@ -109,20 +120,20 @@ class Level:
 
     def internal_logic(self):
         offset_end = (self.offset + self.screen_size).t
-        for line in range(clamp(Level.world_to_map(self.offset)[1] - 20, 0, self.size[1] - 1),
-                          clamp(Level.world_to_map(offset_end)[1] + 20, 0, self.size[1] - 1)):
-            for block in range(clamp(Level.world_to_map(self.offset)[0] - 20, 0, self.size[0] - 1),
-                               clamp(Level.world_to_map(offset_end)[0] + 20, 0, self.size[0] - 1)):
+        for line in range(clamp(self.world_to_map(self.offset)[1] - 20, 0, self.size[1] - 1),
+                          clamp(self.world_to_map(offset_end)[1] + 20, 0, self.size[1] - 1)):
+            for block in range(clamp(self.world_to_map(self.offset)[0] - 20, 0, self.size[0] - 1),
+                               clamp(self.world_to_map(offset_end)[0] + 20, 0, self.size[0] - 1)):
                 block = self.grid[line][block]
                 block.internal_logic(self)
 
     def render(self, surf):
         self.screen_size = Pos(surf.get_size())
         offset_end = (self.offset + self.screen_size).t
-        for line in range(Level.world_to_map(self.offset)[1],
-                          clamp(Level.world_to_map(offset_end)[1] + 2, 0, self.size[1] - 1)):
-            for block in range(Level.world_to_map(self.offset)[0],
-                               clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.size[0] - 1)):
+        for line in range(self.world_to_map(self.offset)[1],
+                          clamp(self.world_to_map(offset_end)[1] + 2, 0, self.size[1] - 1)):
+            for block in range(self.world_to_map(self.offset)[0],
+                               clamp(self.world_to_map(offset_end)[0] + 2, 0, self.size[0] - 1)):
                 if self.grid[line][block].visible:
                     surf.blit(self.get_img_at((block, line)), self.map_to_world((block, line)) - self.offset)
 

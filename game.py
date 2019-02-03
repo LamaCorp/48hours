@@ -75,7 +75,7 @@ class GameScreen(Screen):
                 CONFIG.level += 1
             self.app.set_screen(PICKER)
         elif self.level.to_reset:
-            self.level = Level(self.level.num)
+            self.level = Level.load_v1_num(self.level.num)
             self.player = Player(self.level.world_start, respawn=True)
             self.space = self.level.space
             self.space.add(self.player)
