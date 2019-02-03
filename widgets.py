@@ -12,7 +12,7 @@ from graphalama.maths import Pos
 from graphalama.shapes import RoundedRect, Rectangle
 from graphalama.widgets import SimpleText, Button
 
-from constants import MENU, SETTINGS, PICKER, LIGHT_DARK, DARK
+from constants import MENU, SETTINGS, PICKER, STATS, LIGHT_DARK, DARK
 
 
 def Title(text, screen_size, anchor=TOP):
@@ -36,13 +36,24 @@ def SettingsButton(app, pos=None, anchor=CENTER):
                   anchor=anchor)
 
 
+def StatisticsButton(app, pos=None, anchor=CENTER):
+    return Button(text="Statistics",
+                  function=lambda: app.set_screen(STATS),
+                  shape=RoundedRect((200, 50), 100),
+                  color=Monokai.PURPLE,
+                  bg_color=(200, 200, 200, 72),
+                  pos=pos,
+                  anchor=anchor)
+
+
 def PickerButton(app, pos=None, anchor=CENTER):
     return Button(text="Play",
-          function=lambda: app.set_screen(PICKER),
-          shape=RoundedRect((200, 50), 100),               color=WHITESMOKE,
-          bg_color=Gradient(NICE_BLUE, PURPLE),
-          pos=pos,
-          anchor=anchor)
+                  function=lambda: app.set_screen(PICKER),
+                  shape=RoundedRect((200, 50), 100),
+                  color=WHITESMOKE,
+                  bg_color=Gradient(NICE_BLUE, PURPLE),
+                  pos=pos,
+                  anchor=anchor)
 
 
 def PlayButton(app, pos=None, anchor=CENTER):

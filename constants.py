@@ -3,8 +3,9 @@ import os
 # Screens
 MENU = 0
 GAME = 42
-SETTINGS = "TODO"
+SETTINGS = 67140
 PICKER = 93933
+STATS = 67115
 
 # Colors
 DARK = (31, 32, 65)
