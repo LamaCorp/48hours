@@ -36,6 +36,7 @@ PLAYERS = {
 LEVELS = {
     0: ("level_0.map", "EZ PZ"),
     1: ("level_1.map", "Can we get started?"),
+    2: ("level_2.map", "Get your shit together, Garry")
 }
 
 get_available_levels = [LEVELS[l][1] for l in LEVELS]
