@@ -25,12 +25,24 @@ def get_available_blocks(block_type="dirt"):
     return get_available(block_regex, LEVELS_GRAPHICAL_FOLDER)
 
 
-get_available_levels = get_available(LEVELS_REGEX, MAPS_FOLDER)
 get_available_players = get_available(PLAYERS_REGEX, PLAYER_FOLDER)
 
 
+LEVELS = {
+    0: ("level_0.map", "EZ PZ"),
+    1: ("level_1.map", "Can we get started?"),
+}
+
+
+def get_level_index_from_name(name):
+    for l in LEVELS:
+        if LEVELS[l][1] == name:
+            return l
+    return -1
+
+
 class LevelConfig:
-    chosen_level = "Level_0.Map"
+    chosen_level = 0
 
 
 class PlayerConfig:

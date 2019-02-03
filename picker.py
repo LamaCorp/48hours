@@ -8,7 +8,7 @@ from graphalama.constants import BOTTOM, WHITESMOKE
 
 from widgets import MenuButton, SettingsButton, PlayButton
 from constants import LIGHT_DARK
-from config import get_available_levels, LevelConfig
+from config import LevelConfig, LEVELS, get_level_index_from_name
 
 
 class PickerScreen(Screen):
@@ -17,7 +17,7 @@ class PickerScreen(Screen):
     def __init__(self, app):
         size = app.display.get_size()
         self.play_button = PlayButton(app, (size[0] // 2, size[1] // 2 + 75))
-        self.selector = CarouselSwitch(options=get_available_levels,
+        self.selector = CarouselSwitch(options=[LEVELS[l][1] for l in LEVELS],
                                        on_choice=PickerScreen.level_setter,
                                        pos=(size[0] // 2, size[1] // 2 - 75),
                                        shape=RoundedRect((400, 75)),
@@ -31,7 +31,8 @@ class PickerScreen(Screen):
             self.selector,
             self.play_button,
         ]
-        self.selector.option_index = 1
+
+        self.selector.option_index = LevelConfig.chosen_level
 
         self.lama_logo = pygame.image.load('assets/players/lama_normal.png').convert()
         for _ in range(4):
@@ -44,7 +45,7 @@ class PickerScreen(Screen):
 
     @staticmethod
     def level_setter(level):
-        LevelConfig.chosen_level = level
+        LevelConfig.chosen_level = get_level_index_from_name(level)
 
     def draw_background(self, display):
         super().draw_background(display)

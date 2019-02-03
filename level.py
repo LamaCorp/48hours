@@ -4,14 +4,15 @@ from typing import List
 
 from blocks import Block, Stone
 from constants import MAPS_FOLDER, START
+from config import LEVELS
 from physics import Space, Pos, clamp
 
 
 class Level:
     OFFSET_THRESHOLD = 40 / 100
 
-    def __init__(self, level='level_0'):
-        self.name = level
+    def __init__(self, level=0):
+        self.num = level
         self.space = Space(self, gravity=(0, 1))
         self.size = Pos(0, 0)
         self.grid = []  # type: List[List[Block]]
@@ -73,7 +74,7 @@ class Level:
         return Level.map_to_world(self.size)
 
     def load_level(self):  # TODO: may we improve this?
-        with open(os.path.join(MAPS_FOLDER, self.name.lower()), 'r') as map_file:
+        with open(os.path.join(MAPS_FOLDER, LEVELS[self.num][0]), 'r') as map_file:
             height, width = list(map(int, map_file.readline().split()))
             self.size = Pos(width, height)
             for h in range(height):
