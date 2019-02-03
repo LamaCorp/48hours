@@ -241,4 +241,4 @@ class Player(Body):
                 if block.deadly:
                     self.space.tile_map.reset()
                 elif block.character == 'E':
-                    self.space.tile_map.explode()
+                    self.space.tile_map.explode(block.pos)

@@ -61,7 +61,7 @@ class AK47(Object, Projectile):
 
         shape = AABB(self.pos[0] * DEFAULT_BLOCK_SIZE, self.pos[1] * DEFAULT_BLOCK_SIZE,
                      *self.img.get_size())
-        Projectile.__init__(self, shape)
+        Projectile.__init__(self, shape, mass=0)
 
     @classproperty
     def img(cls):

@@ -24,6 +24,8 @@ class Level:
         self.screen_size = (0, 0)
         self.over = False
         self.to_reset = False
+        self.expolding = False
+        self.expolsion_heads = []
 
     def __str__(self):
         return "\n".join([
@@ -194,6 +196,10 @@ class Level:
                                 self.world_size.y - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def internal_logic(self):
+        if self.expolding:
+            self.explosion_logic()
+            return
+
         offset = self.world_to_map(self.offset)
         offset_end = (offset + self.world_to_map(self.screen_size)).i
 
@@ -228,6 +234,10 @@ class Level:
     def reset(self):
         self.to_reset = True
 
-    def explode(self):
-        # TODO
-        self.over = True
+    def explode(self, start_pos):
+        self.expolding = True
+        self.expolsion_heads.append(start_pos)
+
+    def explosion_logic(self):
+        for head in self.expolsion_heads:
+            self.grid[head[1]][head[0]].explode()

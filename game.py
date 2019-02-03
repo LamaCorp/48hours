@@ -91,6 +91,8 @@ class GameScreen(Screen):
             self.start_time = time.time()
             level_stats = CONFIG.levels_stats[str(self.level.num)]
             CONFIG.levels_stats[str(self.level.num)] = (level_stats[0] + 1, level_stats[1])
+        elif self.level.expolding:
+            self.level.internal_logic()
         else:
             self.space.simulate()
             self.level.update_offset(self.player.center, self.app.display.get_size())

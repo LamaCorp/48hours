@@ -66,6 +66,9 @@ class Block:
 
         return self.img_at(*self.default_sprite_pos, rotation=rotation)
 
+    def explode(self):
+        self.visible = True
+
     @classmethod
     @lru_cache()
     def img_at(cls, x, y, rotation=0):
