@@ -21,7 +21,7 @@ class PickerScreen(Screen):
             MenuButton(app, (size[0] - 365, 100)),
             SettingsButton(app, (size[0] - 135, 100)),
             CarouselSwitch(options=get_available_levels,
-                           on_choice=self.level_setter,
+                           on_choice=PickerScreen.level_setter,
                            pos=(size[0] // 2, size[1] // 2 - 75),
                            shape=RoundedRect((400, 75)),
                            color=WHITESMOKE,
@@ -40,7 +40,8 @@ class PickerScreen(Screen):
 
         super().__init__(app, widgets, (20, 10, 0))
 
-    def level_setter(self, level):
+    @staticmethod
+    def level_setter(level):
         LevelConfig.chosen_level = level
 
     def draw_background(self, display):

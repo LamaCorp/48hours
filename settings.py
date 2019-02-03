@@ -19,7 +19,7 @@ class SettingsScreen(Screen):
         widgets = [
             MenuButton(app, (size[0] - 365, 100)),
             CarouselSwitch(options=get_available_players,
-                           on_choice=self.player_setter,
+                           on_choice=SettingsScreen.player_setter,
                            pos=(size[0] // 2, size[1] // 2 - 75),
                            shape=RoundedRect((400, 75)),
                            color=WHITESMOKE,
@@ -37,7 +37,8 @@ class SettingsScreen(Screen):
 
         super().__init__(app, widgets, (20, 10, 0))
 
-    def player_setter(self, player):
+    @staticmethod
+    def player_setter(player):
         PlayerConfig.player = player.lower()
 
     def draw_background(self, display):
