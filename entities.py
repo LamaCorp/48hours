@@ -17,13 +17,14 @@ class Brochette(Projectile):
                                (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
         for brochette in get_available_blocks("brochette")]
 
-    def __init__(self, start_pos, direction=(0, 0)):
+    def __init__(self, start_pos, physics=(0, Pos(0, 0))):
         shape = AABB(start_pos, (DEFAULT_BLOCK_SIZE - 2, DEFAULT_BLOCK_SIZE - 2))
         shape.topleft += (1, 1)
         # shape.center = start_pos
         super().__init__(shape, mass=0)
-        self.velocity = Pos(direction) * BROCHETTE_VELOCITY
-        self.sheet = random.choice(Brochette.img)
+        self.velocity = physics[1] * BROCHETTE_VELOCITY
+        self.rotation = physics[0] - 90
+        self.sheet = pygame.transform.rotate(random.choice(Brochette.img), self.rotation)
         self.sheet.set_colorkey((255, 0, 255))
 
     def internal_logic(self):
