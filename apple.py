@@ -56,13 +56,14 @@ class LevelEdit(Level):
         for y in range(0, size[1]):
             line = []
             for x in range(0, size[0]):
-                if x in (0, size[0] - 1) or y in (0, size[1] - 1):
+                if y == size[1] - 1:
+                    line.append(Block.new("B", (x, y)))
+                elif x in (0, size[0] - 1) or y == 0:
                     line.append(Stone((x, y)))
                 else:
                     line.append(Block((x, y)))
             level.grid.append(line)
         return level
-
 
     def get_img_at(self, map_pos):
         x, y = map_pos
