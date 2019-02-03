@@ -28,13 +28,12 @@ class PickerScreen(IdleScreen):
                                      pos=(size[0] // 2, size[1] // 2 + 150),
                                      color=LLAMA,
                                      anchor=CENTER)
-        self.deaths_text = SimpleText(text="You died {} times".format(level_stats[0]),
+
+        self.deaths_text = SimpleText(text=self.death_count_text(level_stats[0]),
                                       pos=(size[0] // 2, size[1] // 2 + 200),
                                       color=WHITESMOKE,
                                       anchor=CENTER)
-        self.best_time = SimpleText(text="Your best time was {}".format("not recorded yet :/"
-                                                                        if level_stats[1] == -1
-                                                                        else datetime.timedelta(seconds=level_stats[1])),
+        self.best_time = SimpleText(text=self.time_text(level_stats[1]),
                                     pos=(size[0] // 2, size[1] // 2 + 250),
                                     color=WHITESMOKE,
                                     anchor=CENTER)
@@ -56,9 +55,34 @@ class PickerScreen(IdleScreen):
     def level_setter(level):
         CONFIG.level = get_index_from_name(LEVELS, level)
 
+    def death_count_text(self, n_death):
+        death_count = "You'll die soon..."
+        if n_death == 1:
+            death_count = "You died once"
+        elif n_death == 2:
+            death_count = "You died twice"
+        elif n_death > 2:
+            death_count = f"You died {n_death} times"
+
+        return death_count
+
+    def time_text(self, seconds):
+        if seconds < 0:
+            return "Your best time was not recorded yet :/"
+
+        seconds, mili = divmod(seconds, 1)
+        minutes, seconds = divmod(seconds, 60)
+
+        mili = round(mili * 1000)
+        seconds = int(seconds)
+        minutes = int(minutes)
+        if minutes:
+            return "Your best time is {:02}:{:02}.{:03}s".format(minutes, seconds, mili)
+        else:
+            return "Your best time is {:02}.{:03}s".format(seconds, mili)
+
     def internal_logic(self):
         level_stats = CONFIG.levels_stats[str(self.selector.option_index)]
-        self.deaths_text.text = "You died {} times".format(level_stats[0])
-        self.best_time.text = "Your best time was {}".format("not recorded yet :/"
-                                                             if level_stats[1] == -1
-                                                             else datetime.timedelta(seconds=level_stats[1]))
+        self.deaths_text.text = self.death_count_text(level_stats[0])
+        self.best_time.text = self.time_text(level_stats[1])
+
