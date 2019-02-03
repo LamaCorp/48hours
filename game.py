@@ -19,7 +19,6 @@ class GameScreen(Screen):
         return self.player.update(event)
 
     def internal_logic(self):
-        self.player.internal_logic()
         self.space.simulate()
         self.level.update_offset(self.player.center, self.app.display.get_size())
         self.level.internal_logic()
@@ -27,5 +26,6 @@ class GameScreen(Screen):
     def render(self, surf):
         super().render(surf)
 
+
         self.level.render(surf)
-        self.player.render(surf, offset=-self.level.offset)
+        # self.space.debug_draw(surf, -self.level.offset)

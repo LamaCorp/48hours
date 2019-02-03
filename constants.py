@@ -18,3 +18,6 @@ LEVELS_GRAPHICAL_FOLDER = os.path.join(LEVELS_FOLDER, 'graphical')
 MAPS_FOLDER = os.path.join(LEVELS_FOLDER, 'maps')
 
 DEFAULT_BLOCK_SIZE = 32
+
+# Physical constant
+BROCHETTE_VELOCITY = 15

@@ -1,12 +1,12 @@
 import os
 import re
-import time
-from functools import lru_cache
+from functools import lru_cache, partial
 from typing import List
 
 import pygame
 
 from constants import LEVELS_GRAPHICAL_FOLDER, MAPS_FOLDER, DEFAULT_BLOCK_SIZE
+from entities import Brochette
 from physics import Space, Pos, clamp
 
 START = "P"
@@ -38,19 +38,22 @@ class Block:
     rotation = 0
     sheet_pattern = [[]]
 
+    def __init__(self, pos=(0, 0)):
+        self.pos = pos
+
     @staticmethod
-    def new(character='.'):
+    def new(character='.', pos=(0, 0)):
         dic = {
-            "D": Dirt(),
-            "S": Stone(),
-            "B": Barbecue(),
-            "V": FieryBarbecue("V"),
-            "^": FieryBarbecue("^"),
-            "<": FieryBarbecue("<"),
-            ">": FieryBarbecue(">"),
+            "D": Dirt,
+            "S": Stone,
+            "B": Barbecue,
+            "V": partial(FieryBarbecue, "V"),
+            "^": partial(FieryBarbecue, "^"),
+            "<": partial(FieryBarbecue, "<"),
+            ">": partial(FieryBarbecue, ">")
         }
 
-        return dic.get(character, Block)
+        return dic.get(character, Block)(pos)
 
     def get_img(self, neighbourg="", rotation=0):
         """Neighbourg is a string of nine chars of the 9 blocks next to this one."""
@@ -68,10 +71,7 @@ class Block:
         return pygame.transform.rotate(cls.sheet.subsurface((x * cls.DEFAULT_BLOCK_SIZE, y * cls.DEFAULT_BLOCK_SIZE,
                                        cls.DEFAULT_BLOCK_SIZE, cls.DEFAULT_BLOCK_SIZE)), rotation)
 
-    def internal_logic(self, pos=None):
-        pass
-
-    def render(self, surf, offset=None):
+    def internal_logic(self, level):
         pass
 
 
@@ -117,7 +117,7 @@ class Stone(Block):
 
 class Barbecue(Block):
     character = "B"
-    solid = True
+    solid = False
     visible = True
     deadly = True
 
@@ -126,26 +126,9 @@ class Barbecue(Block):
     sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
 
-class Brochette:
-    img = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "brochette_1.png")).convert()
-    img.set_colorkey((255, 0, 255))
-    img = pygame.transform.scale(img, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-
-    def __init__(self, start_pos, direction=(0, 0)):
-        self.pos = start_pos
-        self.speed = 25
-        self.direction = direction
-
-    def internal_logic(self):
-        self.pos += self.direction * self.speed
-
-    def render(self, surf, offset=(0, 0)):
-        surf.blit(Brochette.img, self.pos - offset)
-
-
 class FieryBarbecue(Block):
     character = "^"
-    solid = True
+    solid = False
     visible = True
     deadly = True
 
@@ -160,23 +143,18 @@ class FieryBarbecue(Block):
         ">": (-90, Pos(1, 0))
     }
 
-    def __init__(self, character="^"):
+    def __init__(self, character="^", pos=(0, 0)):
+        super().__init__(pos)
         self.character = character
         self.rotation = FieryBarbecue.char_dic[self.character][0]
-        self.previous_spawn = 40
+        self.next_spawn = 5
         self.brochettes = []
 
-    def internal_logic(self, pos=None):
-        self.previous_spawn += 1
-        if self.previous_spawn >= 45:
-            self.brochettes.append(Brochette(pos, FieryBarbecue.char_dic[self.character][1]))
-            self.previous_spawn = 0
-        for brochette in self.brochettes:
-            brochette.internal_logic()
-
-    def render(self, surf, offset=None):
-        for brochette in self.brochettes:
-            brochette.render(surf, offset)
+    def internal_logic(self, level):
+        self.next_spawn -= 1
+        if self.next_spawn == 0:
+            level.spawn(Brochette(level.map_to_world(self.pos), FieryBarbecue.char_dic[self.character][1]))
+            self.next_spawn = 45
 
 
 class Level:
@@ -198,7 +176,7 @@ class Level:
 
     @staticmethod
     def map_to_world(map_pos):
-        return Pos(map_pos) * Block.DEFAULT_BLOCK_SIZE
+        return Pos(map_pos[0] * Block.DEFAULT_BLOCK_SIZE, map_pos[1] * Block.DEFAULT_BLOCK_SIZE)
 
     @staticmethod
     def world_to_map(world_pos):
@@ -251,7 +229,7 @@ class Level:
                 for i in range(len(line)):
                     if line[i] == START:
                         self.start = (i, h)
-                    line[i] = Block.new(line[i])
+                    line[i] = Block.new(line[i], (i, h))
                 self.grid.append(line)
 
     def update_offset(self, player_pos, screen_size):
@@ -282,7 +260,8 @@ class Level:
                           clamp(Level.world_to_map(offset_end)[1] + 20, 0, self.size[1] - 1)):
             for block in range(clamp(Level.world_to_map(self.offset)[0] - 20, 0, self.size[0] - 1),
                                clamp(Level.world_to_map(offset_end)[0] + 20, 0, self.size[0] - 1)):
-                self.get_block((block, line)).internal_logic(self.map_to_world((block, line)))
+                block = self.grid[line][block]
+                block.internal_logic(self)
 
     def render(self, surf):
         self.screen_size = Pos(surf.get_size())
@@ -293,4 +272,9 @@ class Level:
                                clamp(Level.world_to_map(offset_end)[0] + 2, 0, self.size[0] - 1)):
                 if self.grid[line][block].visible:
                     surf.blit(self.get_img_at((block, line)), self.map_to_world((block, line)) - self.offset)
-                    self.get_block((block, line)).render(surf, self.offset)
+
+        for body in self.space.moving_bodies:
+            body.render(surf, -self.offset)
+
+    def spawn(self, body):
+        self.space.add(body)

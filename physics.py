@@ -133,6 +133,11 @@ class Pos:
     def unit_y():
         return Pos(0, 1)
 
+    def debug_draw(self, surf, offset=(0, 0), start=(0, 0), color=(255, 0, 0)):
+        start = Pos(start) + offset
+        end = start + self
+        pygame.draw.line(surf, color, start, end)
+
 
 class AABB:
     """Axis aligned rectangle: the basic shape."""
@@ -238,6 +243,11 @@ class AABB:
     def pygame_rect(self):
         return pygame.Rect(self.topleft, self.size)
 
+    def debug_draw(self, surf, offset=(0, 0)):
+        rect = self.pygame_rect
+        rect.topleft += offset
+        surf.fill((0, 0, 255), rect)
+
 
 class AASegment(AABB):
     def __init__(self, start, end, pos, vertical=False):
@@ -258,6 +268,7 @@ class Body:
 
     def __init__(self, shape, mass=1, elasticity=0, max_velocity=(None, None), space=None):
 
+        self.dead = False
         self.elasticity = elasticity
         self.mass = mass
         self.shape = shape  # type: AABB
@@ -388,6 +399,17 @@ class Body:
         if self.collide_right:
             self.last_collide_right = 0
 
+    def internal_logic(self):
+        """Called once per simulation turn."""
+
+        pass
+
+    def render(self, surf, offset=(0, 0)):
+        pass
+
+    def debug_draw(self, surf, offset=(0, 0)):
+        self.shape.debug_draw(surf, offset)
+        (10 * self.velocity).debug_draw(surf, offset, self.center)
 
 class Space:
     def __init__(self, tile_map=None, gravity=(0, 0)):
@@ -416,10 +438,15 @@ class Space:
                     d[rect] = block
         return d
 
-
     def simulate(self):
         for body in self.moving_bodies:
+            body.internal_logic()
+
+
+        for body in self.moving_bodies[:]:
             body.collisions.clear()
+            if body.dead:
+                self.moving_bodies.remove(body)
 
         for body in self.moving_bodies:
             if body.mass:
@@ -441,3 +468,7 @@ class Space:
 
         for body in self.moving_bodies:
             body.update_history()
+
+    def debug_draw(self, surf, offset=(0, 0)):
+        for body in self.moving_bodies:
+            body.debug_draw(surf, offset)

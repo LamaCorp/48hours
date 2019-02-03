@@ -88,9 +88,6 @@ class Player(Body):
 
     def internal_logic(self):
 
-        for t in self.collisions:
-            print(t)
-
         new_state = self.get_state()
         if self.state == new_state:
             self.state_duration += 1
