@@ -23,6 +23,7 @@ from constants import LEVELS_FOLDER, DEFAULT_BLOCK_SIZE, MAPS_FOLDER
 from level import Level
 from physics import AABB, Pos
 
+MAP_SIZE = (120, 40)
 LEVEL_NAME = "fail"
 
 
@@ -120,7 +121,7 @@ class EditScreen(Screen):
     def __init__(self, app):
         self.start_drag = None
         self.start_drag_map_pos = None
-        self.level = LevelEdit.load(LEVEL_NAME)  # type: LevelEdit
+        self.level = LevelEdit.load(LEVEL_NAME, MAP_SIZE)  # type: LevelEdit
 
         self.menu_width = 240
 
@@ -305,9 +306,13 @@ class Apple(App):
 
 @click.command()
 @click.argument("level_name")
-def main(level_name):
-    global LEVEL_NAME
+@click.argument("width", default=120)
+@click.argument("height", default=40)
+def main(level_name, width, height):
+    global LEVEL_NAME, MAP_SIZE
+
     LEVEL_NAME = MAPS_FOLDER + '/' + level_name + '.map'
+    MAP_SIZE = (width, height)
 
     pygame.init()
     Apple().run()
