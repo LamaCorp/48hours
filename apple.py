@@ -183,7 +183,6 @@ class EditScreen(Screen):
         elif self.tool == self.ERASER:
             return self.erase_img
 
-
     def set_brush_tile(self, i):
         self.tile_index = i
         self.tool = self.BRUSH
@@ -247,9 +246,7 @@ class EditScreen(Screen):
         img = self.current_img_under_cursor
         img = pygame.transform.scale(img, (self.tile_size, ) *2)
         img.set_alpha(128)
-        print(img.get_at((0, 0)))
         pos = self.level.map_to_display(self.level.display_to_map(pygame.mouse.get_pos()))
-        print(pos)
         display.blit(img, (round(pos[0]), round(pos[1])))
 
         self.widgets.render(display)

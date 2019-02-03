@@ -17,7 +17,7 @@ class Object:
     type: str
     pos: (int, int)
 
-    def __init__(self, pos=(0, 0)):
+    def __init__(self, pos=(0, 0), **kwargs):
         self.type = self.__class__.__name__
         self.pos = pos
 
@@ -26,15 +26,12 @@ class Object:
         type = d["type"]
         return OBJECTS[type](**d)
 
-    @classmethod
-    def load(cls, d):
-        pass
-
     def save(self):
-        return {
+        d = {
             "type": self.type,
-            "pos": self.pos
+            "pos": tuple(self.pos)
         }
+        return d
 
 
 class Spawn(Object):

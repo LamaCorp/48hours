@@ -6,6 +6,7 @@ from typing import List
 from blocks import Block, Stone
 from constants import MAPS_FOLDER, START
 from config import LEVELS
+from entities import Spawn, Object
 from physics import Space, Pos, clamp
 
 
@@ -91,7 +92,6 @@ class Level:
         try:
             level = cls.load_v1(path)
             level.path = path
-            print(level)
             return level
         except:
             print('Can not load as v1')
@@ -123,11 +123,18 @@ class Level:
             ]
             for y, line in enumerate(d["blocks"])
         ]
-        objects = []
+        objects = [Object.from_json(o) for o in d["objects"]]
+
 
         level = cls()
         level.size = size
         level.grid = map
+        level.objects = objects
+
+        # spawn
+        for obj in objects:
+            if isinstance(obj, Spawn):
+                level.start = obj.pos
 
         return level
 
@@ -135,7 +142,7 @@ class Level:
         d = {}
         d["size"] = self.size.ti
         d["blocks"] = str(self).splitlines(keepends=False)
-        d["objects"] = [obj.to_json() for obj in self.objects]
+        d["objects"] = [obj.save() for obj in self.objects]
         d["version"] = 2
 
         s = json.dumps(d, indent=4)
