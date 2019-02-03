@@ -48,7 +48,6 @@ class LevelEdit(Level):
         except:
             print('Can not load as v2')
             print("Creating new level")
-            raise
 
         level = cls()
         level.size = Pos(size)

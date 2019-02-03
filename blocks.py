@@ -46,6 +46,7 @@ class Block:
         dic = {
             "D": Dirt,
             "S": Stone,
+            "L": Lava,
             "B": Barbecue,
             "E": EndBlock,
             "V": partial(FieryBarbecue, "V"),
@@ -133,6 +134,21 @@ class Stone(Block):
     ])
 
 
+class Lava(Block):
+    character = "L"
+    solid = True
+    visible = True
+    deadly = True
+
+    @classproperty
+    def sheet(cls):
+        if cls._sheet is None:
+            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "lava.png")).convert()
+            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            cls._sheet = sheet
+        return cls._sheet
+
+
 class Barbecue(Block):
     character = "B"
     solid = True
@@ -208,6 +224,7 @@ class EndBlock(Block):
 BLOCKS = [
     Dirt,
     Stone,
+    Lava,
     Barbecue,
     FieryBarbecue,
     partial(FieryBarbecue, ">"),
