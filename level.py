@@ -103,13 +103,8 @@ class Level:
             return level
         except:
             print('Can not load as v2')
+            raise
 
-        print('Creating new level', path)
-
-        level = cls()
-        level.path = path
-
-        return level
 
     @classmethod
     def load_v2(cls, path):

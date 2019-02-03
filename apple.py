@@ -18,7 +18,7 @@ from graphalama.app import Screen, App
 from graphalama.buttons import CarouselSwitch, Button, ImageButton
 from graphalama.core import Widget
 
-from blocks import Block, BLOCKS
+from blocks import Block, BLOCKS, Stone
 from constants import LEVELS_FOLDER, DEFAULT_BLOCK_SIZE, MAPS_FOLDER
 from level import Level
 from physics import AABB, Pos
@@ -32,6 +32,29 @@ class LevelEdit(Level):
         super().__init__()
         self.path = ''
         self.img_cache = {}
+
+
+    @classmethod
+    def load(cls, path, size=(120, 40)):
+        try:
+            return Level.load(path)
+        except:
+            print("Creating new level")
+
+        level = cls()
+        level.size = Pos(size)
+        level.objects = [Spawn((size[0] // 2, size[1] // 2))]
+
+        for y in range(0, size[1]):
+            line = []
+            for x in range(0, size[0]):
+                if x in (0, size[0] - 1) or y in (0, size[1] - 1):
+                    line.append(Stone((x, y)))
+                else:
+                    line.append(Block((x, y)))
+            level.grid.append(line)
+        return level
+
 
     def get_img_at(self, map_pos):
         x, y = map_pos
