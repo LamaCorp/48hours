@@ -4,7 +4,7 @@ from functools import partial, lru_cache
 
 import pygame
 
-from constants import DEFAULT_BLOCK_SIZE, LEVELS_GRAPHICAL_FOLDER
+from constants import DEFAULT_BLOCK_SIZE, LEVELS_GRAPHICAL_FOLDER, ASSETS
 from entities import Brochette
 from physics import Pos
 
@@ -44,6 +44,7 @@ class Block:
             "D": Dirt,
             "S": Stone,
             "B": Barbecue,
+            "E": EndBlock,
             "V": partial(FieryBarbecue, "V"),
             "^": partial(FieryBarbecue, "^"),
             "<": partial(FieryBarbecue, "<"),
@@ -69,6 +70,9 @@ class Block:
                                                              cls.DEFAULT_BLOCK_SIZE, cls.DEFAULT_BLOCK_SIZE)), rotation)
 
     def internal_logic(self, level):
+        pass
+
+    def on_collision(self, level):
         pass
 
 
@@ -114,7 +118,7 @@ class Stone(Block):
 
 class Barbecue(Block):
     character = "B"
-    solid = False
+    solid = True
     visible = True
     deadly = True
 
@@ -152,3 +156,18 @@ class FieryBarbecue(Block):
         if self.next_spawn == 0:
             level.spawn(Brochette(level.map_to_world(self.pos), FieryBarbecue.char_dic[self.character][1]))
             self.next_spawn = 45
+
+
+class EndBlock(Block):
+    character = "E"
+    solid = True
+    visible = True
+    deadly = False
+
+    sheet = pygame.image.load(os.path.join(ASSETS, "logo.png")).convert()
+    sheet.set_colorkey((255, 255, 255))
+    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+
+    # This isn't called every frame. Instead, it is called when the player touches it
+    def on_collision(self, level):
+        level.explode()

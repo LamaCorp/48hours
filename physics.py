@@ -425,8 +425,13 @@ class Projectile(Body):
     (at least, not automatically)
     """
 
+    deadly = False
+
     def update_sensors(self, shapes):
         # don't care about sensors
+        pass
+
+    def on_collision(self, level):
         pass
 
 
@@ -461,7 +466,6 @@ class Space:
         return d
 
     def simulate(self):
-
         # first we update/move all projectiles
         for proj in self.projectiles[:]:
             proj.internal_logic()

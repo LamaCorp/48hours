@@ -7,7 +7,9 @@ from physics import AABB, Pos, Projectile
 
 
 class Brochette(Projectile):
-    img = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "brochette_1.png")).convert()
+    deadly = True
+
+    img = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "brochette_1.png")).convert()  # TODO: choose between the two available textures
     img.set_colorkey((255, 0, 255))
     img = pygame.transform.scale(img, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
@@ -24,3 +26,10 @@ class Brochette(Projectile):
 
     def render(self, surf, offset=(0, 0)):
         surf.blit(Brochette.img, self.topleft + offset)
+
+    def on_collision(self, level):
+        del self
+
+    def __del__(self):
+        pass
+        # TODO: delete me

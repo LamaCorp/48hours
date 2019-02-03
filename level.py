@@ -19,6 +19,8 @@ class Level:
         self.offset = Pos(0, 0)  # Where we start to draw the map, world coordinates
         self.load_level()
         self.screen_size = (0, 0)
+        self.over = False
+        self.to_reset = False
 
     @property
     def world_start(self):
@@ -131,3 +133,10 @@ class Level:
 
     def spawn(self, body):
         self.space.add(body)
+
+    def reset(self):
+        self.to_reset = True
+
+    def explode(self):
+        # TODO
+        self.over = True

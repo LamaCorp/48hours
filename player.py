@@ -3,7 +3,7 @@ from enum import Enum, auto
 import os
 import pygame
 
-from blocks import Block
+from blocks import Block, EndBlock
 from entities import Brochette
 from physics import Body, AABB, Pos
 from config import PlayerConfig
@@ -38,11 +38,11 @@ class State(Enum):
 
 
 class Player(Body):
-    def __init__(self, start_pos=(0, 0)):
+    def __init__(self, start_pos=(0, 0), respawn = False):
         size = (76 * 3 // 4, 70 * 3 // 4)
         shape = AABB(start_pos, size)
         super().__init__(shape)
-        print(size)
+        self.visible = True
 
         self.img = pygame.image.load(os.path.join(PLAYER_FOLDER, PlayerConfig.player)).convert()
         self.img = pygame.transform.scale(self.img, size)
@@ -56,6 +56,7 @@ class Player(Body):
         self.run = False
         self.state = State.STILL
         self.state_duration = 0
+        self.respawn = 50 if respawn else 0
 
     def render(self, surf, offset=(0, 0)):
         if self.looking == RIGHT:
@@ -63,7 +64,8 @@ class Player(Body):
         else:
             img = self.img_left
 
-        surf.blit(img, self.topleft + offset)
+        if self.visible:
+            surf.blit(img, self.topleft + offset)
 
     def update(self, event):
         if event.type == pygame.KEYDOWN:
@@ -89,6 +91,11 @@ class Player(Body):
                 self.run = False
 
     def internal_logic(self):
+        if self.respawn > 0:
+            self.visible = not self.visible
+            self.respawn -= 1
+        elif self.respawn == 0:
+            self.visible = True
 
         new_state = self.get_state()
         if self.state == new_state:
@@ -208,11 +215,6 @@ class Player(Body):
 
     def handle_collisions(self):
         for colli in self.collisions:
-            if isinstance(colli, Block):
-                if colli.deadly:
-                    self.respawn()
-            elif isinstance(colli, Brochette):
-                self.respawn()
-
-    def respawn(self):
-        self.shape.topleft = Pos(self.space.tile_map.world_start)  # copy
+            colli.on_collision(self.space.tile_map)
+            if colli.deadly:
+                self.space.tile_map.reset()
