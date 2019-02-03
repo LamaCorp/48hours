@@ -1,6 +1,7 @@
 import pygame
 from graphalama.app import Screen
 
+from idle_screen import IdleScreen
 from player import Player
 from level import Level
 from constants import PICKER
@@ -9,9 +10,7 @@ from physics import Pos
 from widgets import Title, ResumeButton, QuitButton, MenuButton, PauseButton
 
 
-class PauseScreen(Screen):
-    FPS = 30
-
+class PauseScreen(IdleScreen):
     def __init__(self, app, game_screen_paused):
         self.paused_game = game_screen_paused  # Type: GameScreen
 
@@ -22,13 +21,8 @@ class PauseScreen(Screen):
             MenuButton(app, size / 2),
             QuitButton(app, size / 2 + (0, 65)),
         ]
-        self.lama_logo = pygame.image.load('assets/players/lama_normal.png').convert()
-        self.lama_logo.set_colorkey((255, 0, 255))
-        for _ in range(4):
-            self.lama_logo = pygame.transform.scale2x(self.lama_logo)
-        self.lama_logo_left = pygame.transform.flip(self.lama_logo, True, False)
 
-        super().__init__(app, widgets)
+        super().__init__(app, widgets, (0, 0, 0))
 
     def update(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -37,19 +31,14 @@ class PauseScreen(Screen):
             super().update(event)
 
     def draw_background(self, display):
-        super().draw_background(display)
-
         self.paused_game.render(display)
 
-        rect = self.lama_logo.get_rect()
-        ss = self.app.display.get_size()
-        rect.center = (ss[0] // 5, ss[1] // 2)
-        display.blit(self.lama_logo, rect)
-        rect.center = (ss[0] * 4/5, ss[1] // 2)
-        display.blit(self.lama_logo_left, rect)
+        super().draw_lamas(display)
 
 
 class GameScreen(Screen):
+    FPS = 60
+
     def __init__(self, app, level):
         size = Pos(app.display.get_size())
         self.level = level
