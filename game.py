@@ -1,4 +1,5 @@
 import pygame
+import time
 from graphalama.app import Screen
 
 from idle_screen import IdleScreen
@@ -45,6 +46,8 @@ class GameScreen(Screen):
         self.player = Player(self.level.world_start)
         self.space = self.level.space
         self.space.add(self.player)
+        self.start_time = time.time()
+        self.pause_time = 0
 
         widgets = [
             PauseButton(self.pause, (size[0] - 30, 30)),
@@ -54,11 +57,13 @@ class GameScreen(Screen):
 
     def pause(self):
         """ Pause the game by going into PauseScreen """
+        self.pause_time = time.time()
         self.app.set_temp_screen(lambda sm: PauseScreen(sm, self))
 
     def resume(self):
         """ Resume the game after a PauseScreen """
         self.app.set_temp_screen(self)
+        self.start_time += (time.time() - self.pause_time)
 
     def update(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -71,6 +76,10 @@ class GameScreen(Screen):
 
     def internal_logic(self):
         if self.level.over:
+            run_time = time.time() - self.start_time
+            level_stats = CONFIG.levels_stats[str(self.level.num)]
+            if level_stats[1] == -1 or run_time < level_stats[1]:
+                CONFIG.levels_stats[str(self.level.num)] = (level_stats[0], run_time)
             if CONFIG.level + 1 in LEVELS:
                 CONFIG.level += 1
             self.app.set_screen(PICKER)
@@ -79,6 +88,9 @@ class GameScreen(Screen):
             self.player = Player(self.level.world_start, respawn=True)
             self.space = self.level.space
             self.space.add(self.player)
+            self.start_time = time.time()
+            level_stats = CONFIG.levels_stats[str(self.level.num)]
+            CONFIG.levels_stats[str(self.level.num)] = (level_stats[0] + 1, level_stats[1])
         else:
             self.space.simulate()
             self.level.update_offset(self.player.center, self.app.display.get_size())

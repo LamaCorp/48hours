@@ -60,11 +60,11 @@ class Config(configlib.Config):
     player = 0
 
     levels_stats = {
-        0: (0, -1),
-        1: (0, -1),
-        2: (0, -1),
-        3: (0, -1),
-        4: (0, -1),
+        '0': (0, -1),  # Number of deaths in the level, best time
+        '1': (0, -1),
+        '2': (0, -1),
+        '3': (0, -1),
+        '4': (0, -1),
     }
 
 

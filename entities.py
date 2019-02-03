@@ -82,6 +82,7 @@ class Brochette(Projectile):
         if self.ttl <= 0:
             self.dead = True
 
+
 class AK47(Projectile):
     character = "K"
     deadly = False
@@ -108,6 +109,7 @@ class AK47(Projectile):
 
     def internal_logic(self, level):
         pass
+
 
 OBJECTS = {
     SPAWN: Spawn,
