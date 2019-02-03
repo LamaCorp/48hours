@@ -47,7 +47,7 @@ class GameScreen(Screen):
         self.space.add(self.player)
 
         widgets = [
-            PauseButton(self.pause, size - (50, 30)),
+            PauseButton(self.pause, (size[0] - 30, 30)),
         ]
 
         super().__init__(app, widgets, bg_color=(0, 165, 255))

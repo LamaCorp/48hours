@@ -6,7 +6,7 @@ from graphalama.buttons import CarouselSwitch
 from graphalama.colors import Gradient, MultiGradient
 from graphalama.constants import (CENTER, NICE_BLUE, PURPLE, GREEN,
                                   Monokai, YELLOW, RED, TOP, WHITESMOKE, RAINBOW, LEFT, RIGHT, TRANSPARENT, LLAMA,
-                                  BOTTOMRIGHT)
+                                  TOPRIGHT)
 from graphalama.font import default_font
 from graphalama.maths import Pos
 from graphalama.shapes import RoundedRect, Rectangle
@@ -108,7 +108,7 @@ def PauseButton(function, pos=None):
                   pos=pos,
                   color=LLAMA,
                   bg_color=TRANSPARENT,
-                  anchor=BOTTOMRIGHT)
+                  anchor=TOPRIGHT)
 
 
 class CountDown(SimpleText):
