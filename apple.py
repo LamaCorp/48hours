@@ -92,7 +92,6 @@ class LevelEdit(Level):
     def erase(self, pos):
         self.grid[pos[1]][pos[0]] = Block(pos)
         for obj in self.objects[:]:
-            print(len(self.objects), obj.pos, pos)
             if obj.pos == pos:
                 self.objects.remove(obj)
                 try:
@@ -107,6 +106,12 @@ class LevelEdit(Level):
             for o in self.objects[:]:
                 if isinstance(o, Spawn):
                     self.objects.remove(o)
+
+        else:
+            for o in self.objects:
+                # Don't add twice the same object at the same position
+                if isinstance(o, type(object)) and o.pos == pos:
+                    return
 
         object.pos = pos
         self.objects.append(object)
