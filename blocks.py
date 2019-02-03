@@ -203,25 +203,8 @@ class EndBlock(Block):
         level.explode()
 
 
-class AK47(Block):
-    character = "K"
-    solid = False
-    visible = True
-    deadly = False
-
-    @classproperty
-    def sheet(cls):
-        if cls._sheet is None:
-            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
-            sheet.set_colorkey((255, 0, 255))
-            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-            cls._sheet = sheet
-        return cls._sheet
-
-
 
 BLOCKS = [
-    Block,
     Dirt,
     Stone,
     Barbecue,
