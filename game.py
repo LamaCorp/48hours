@@ -13,7 +13,7 @@ from widgets import Title, ResumeButton, QuitButton, MenuButton, PauseButton
 
 class PauseScreen(IdleScreen):
     def __init__(self, app, game_screen_paused):
-        self.paused_game = game_screen_paused  # Type: GameScreen
+        self.paused_game = game_screen_paused  # type: GameScreen
 
         size = Pos(app.display.get_size())
         widgets = [
@@ -26,6 +26,7 @@ class PauseScreen(IdleScreen):
         super().__init__(app, widgets, (0, 0, 0))
 
     def update(self, event):
+        self.paused_game.player.update(event)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             self.paused_game.resume()
         else:
