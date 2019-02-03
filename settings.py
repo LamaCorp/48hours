@@ -16,17 +16,21 @@ class SettingsScreen(Screen):
 
     def __init__(self, app):
         size = app.display.get_size()
+
+        self.player_selector = CarouselSwitch(options=get_available_players,
+                                              on_choice=SettingsScreen.player_setter,
+                                              pos=(size[0] // 2, size[1] // 2 - 75),
+                                              shape=RoundedRect((400, 75)),
+                                              color=WHITESMOKE,
+                                              bg_color=LIGHT_DARK,
+                                              arrow_color=WHITESMOKE,
+                                              anchor=BOTTOM)
         widgets = [
             MenuButton(app, (size[0] - 365, 100)),
-            CarouselSwitch(options=get_available_players,
-                           on_choice=SettingsScreen.player_setter,
-                           pos=(size[0] // 2, size[1] // 2 - 75),
-                           shape=RoundedRect((400, 75)),
-                           color=WHITESMOKE,
-                           bg_color=LIGHT_DARK,
-                           arrow_color=WHITESMOKE,
-                           anchor=BOTTOM),
+            self.player_selector,
         ]
+
+        self.player_selector.option_index = 4
 
         self.lama_logo = pygame.image.load('assets/players/lama_normal.png').convert()
         for _ in range(4):
