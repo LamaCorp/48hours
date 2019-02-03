@@ -40,4 +40,5 @@ class GameScreen(Screen):
         super().render(surf)
 
         self.level.render(surf)
+        # De-comment to see hitbox
         # self.space.debug_draw(surf, -self.level.offset)
