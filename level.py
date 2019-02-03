@@ -1,3 +1,4 @@
+import json
 import os
 from functools import lru_cache
 from typing import List
@@ -85,11 +86,66 @@ class Level:
     def world_size(self):
         """(width, height), in pixels"""
         return Level.map_to_world(self.size)
+    @classmethod
+    def load(cls, path):
+        try:
+            level = cls.load_v1(path)
+            level.path = path
+            print(level)
+            return level
+        except:
+            print('Can not load as v1')
+
+
+        try:
+            level = cls.load_v2(path)
+            level.path = path
+            return level
+        except:
+            print('Can not load as v2')
+
+        print('Creating new level', path)
+
+        level = cls()
+        level.path = path
+
+        return level
 
     @classmethod
-    def load_v1_num(cls, num):
+    def load_v2(cls, path):
+        with open(path, "r") as f:
+            d = json.loads(f.read())
+        size = Pos(d["size"])
+        map = [
+            [
+                Block.new(c, (x, y))
+                for x, c in enumerate(line)
+            ]
+            for y, line in enumerate(d["blocks"])
+        ]
+        objects = []
+
+        level = cls()
+        level.size = size
+        level.grid = map
+
+        return level
+
+    def save(self, path):
+        d = {}
+        d["size"] = self.size.ti
+        d["blocks"] = str(self).splitlines(keepends=False)
+        d["objects"] = [obj.to_json() for obj in self.objects]
+        d["version"] = 2
+
+        s = json.dumps(d, indent=4)
+        with open(path, "w") as f:
+            f.write(s)
+
+    @classmethod
+    def load_num(cls, num):
         path = os.path.join(MAPS_FOLDER, LEVELS[num][0])
-        level = cls.load_v1(path)
+        level = cls.load(path)
         level.num = num
         return level
 

@@ -8,6 +8,49 @@ from config import get_available_blocks
 from helper import classproperty
 from physics import AABB, Pos, Projectile
 
+SPAWN = "Spawn"
+
+class Object:
+    _img = None  # type: pygame.Surface
+    img = _img
+
+    type: str
+    pos: (int, int)
+
+    def __init__(self, pos=(0, 0)):
+        self.type = self.__class__.__name__
+        self.pos = pos
+
+    @classmethod
+    def from_json(cls, d):
+        type = d["type"]
+        return OBJECTS[type](**d)
+
+    @classmethod
+    def load(cls, d):
+        pass
+
+    def save(self):
+        return {
+            "type": self.type,
+            "pos": self.pos
+        }
+
+
+class Spawn(Object):
+
+    @classproperty
+    def img(cls):
+        if cls._img is None:
+            img = pygame.Surface((DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            img.set_colorkey((0, 0, 0))
+            # red circle
+            pygame.draw.circle(img, (255, 0, 0), (DEFAULT_BLOCK_SIZE//2,)*2,
+                               (DEFAULT_BLOCK_SIZE//4))
+
+            cls._img = img
+        return cls._img
+
 
 class Brochette(Projectile):
     deadly = True
@@ -17,10 +60,10 @@ class Brochette(Projectile):
     def img(cls):
         if cls._img is None:
             cls._img = [
-            pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER,
-                                                                  brochette.lower())).convert(),
-                                   (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-            for brochette in get_available_blocks("brochette")]
+                pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER,
+                                                                      brochette.lower())).convert(),
+                                       (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+                for brochette in get_available_blocks("brochette")]
         return cls._img
 
     def __init__(self, start_pos, physics=(0, Pos(0, 0))):
@@ -41,7 +84,6 @@ class Brochette(Projectile):
         self.ttl -= 1
         if self.ttl <= 0:
             self.dead = True
-
 
 class AK47(Projectile):
     character = "K"
@@ -69,3 +111,8 @@ class AK47(Projectile):
 
     def internal_logic(self, level):
         pass
+
+OBJECTS = {
+    SPAWN: Spawn,
+    # "AK47": AK47
+}

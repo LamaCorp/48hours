@@ -7,6 +7,8 @@ from typing import Dict, List
 
 import click
 import pygame;
+
+from entities import OBJECTS, Spawn, SPAWN
 from graphalama.colors import ImageBrush
 from graphalama.constants import CENTER
 from graphalama.shapes import Rectangle
@@ -30,52 +32,6 @@ class LevelEdit(Level):
         super().__init__()
         self.path = ''
         self.img_cache = {}
-
-    @classmethod
-    def load(cls, path):
-        try:
-            level = cls.load_v1(path)
-            level.path = path
-            print(level)
-            return level
-        except:
-            print('Can not load as v1')
-
-
-        try:
-            level = cls.load_v2(path)
-            level.path = path
-            return level
-        except:
-            print('Can not load as v2')
-
-        print('Creating new level', path)
-
-        level = cls()
-        level.path = path
-
-        return level
-
-    @classmethod
-    def load_v2(cls, path):
-        with open(path, "r") as f:
-            d = json.loads(f.read())
-        size = Pos(d["size"])
-        map = [
-            [
-                Block.new(c, (x, y))
-                for x, c in enumerate(line)
-            ]
-            for y, line in enumerate(d["blocks"])
-        ]
-        objects = []
-
-        level = cls()
-        level.size = size
-        level.grid = map
-
-        return level
-
 
     def get_img_at(self, map_pos):
         x, y = map_pos
@@ -105,45 +61,53 @@ class LevelEdit(Level):
         self.grid[pos[1]][pos[0]] = Block(pos)
         self.clean_cache_around(pos)
 
+    def add_object(self, pos, object):
+        if isinstance(object, Spawn):
+            for o in self.objects[:]:
+                if isinstance(o, Spawn):
+                    self.objects.remove(o)
+
+        object.pos = pos
+        self.objects.append(object)
+
     def clear(self):
         for y, line in enumerate(self.grid):
             for x, _ in enumerate(line):
                 self.grid[y][x] = Block.new('.', (x, y))
 
+        self.objects.clear()
         self.img_cache.clear()
 
-    def save(self):
-        d = {}
-        d["size"] = self.size.ti
-        d["blocks"] = str(self).splitlines(keepends=False)
-        d["objects"] = [obj.to_json() for obj in self.objects]
-        d["version"] = 2
+    def render(self, surf):
+        super().render(surf)
+        for obj in self.objects:
+            pos = self.map_to_display(obj.pos)
+            surf.blit(obj.img, pos)
 
-        s = json.dumps(d, indent=4)
-        with open(LEVEL_NAME, "w") as f:
-            f.write(s)
 
 EDIT = 1
 
 
 class EditScreen(Screen):
     BRUSH = 1
-    ERASER = 2
+    OBJECTBRUSH = 2
+    ERASER = 3
 
     def __init__(self, app):
         self.start_drag = None
         self.start_drag_map_pos = None
         self.level = LevelEdit.load(LEVEL_NAME)  # type: LevelEdit
-        self.objects = []
 
         self.menu_width = 240
 
         # widgets
         self.widget_bg = Widget((0, 0), (self.menu_width, app.SCREEN_SIZE[0]), bg_color=(200, 200, 200))
-        self.tool_carousel = CarouselSwitch(["Brush", "Eraser"],  self.tool_change, (20, 20),
+        self.tool_carousel = CarouselSwitch(["Brush", "ObjectBrush", "Eraser"],  self.tool_change, (20, 20),
                                             shape=(self.menu_width - 40, 40))
         reset = Button("Reset", self.reset, bg_color=(240, 100, 60))
         save = Button("Save", self.save)
+
+        # tiles buttons
         tiles = []
         for i, block in enumerate(BLOCKS):
             block = block()
@@ -155,17 +119,36 @@ class EditScreen(Screen):
                                      shape=Rectangle((32, 32), padding=0),
                                      color=ImageBrush(block.get_img()),
                                      anchor=CENTER))
-        widgets = (self.widget_bg, self.tool_carousel, reset, save, *tiles)
+
+        # objects buttons
+        objects = []
+        for i, obj in enumerate(OBJECTS.values()):
+            obj = obj()
+            y, x = divmod(i, 5)
+            pos = (self.menu_width - 40*x - 40,
+                   app.SCREEN_SIZE[1] - 40 * y - 40)
+            objects.append(ImageButton(partial(self.set_brush_object, obj.type),
+                                       pos=pos,
+                                       shape=Rectangle((32, 32)),
+                                       color=ImageBrush(obj.img),
+                                       anchor=CENTER))
+
+        widgets = (self.widget_bg, self.tool_carousel, reset, save, *tiles, *objects)
         super().__init__(app, widgets, (20, 40, 90))
 
         # map
         self.tile_size = DEFAULT_BLOCK_SIZE
         self.level.offset.x += self.menu_width
         self._tile_index = 0
+        self._object_index = SPAWN
 
         # editor settings
         self.drawing = False
         self.tool = self.BRUSH
+
+        # Erase pic
+        self.erase_img = pygame.Surface((DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+        self.bg_color.paint(self.erase_img)
 
     @property
     def tile_index(self):
@@ -176,11 +159,38 @@ class EditScreen(Screen):
         self._tile_index = value % len(BLOCKS)
 
     @property
+    def object_index(self):
+        return self._object_index
+
+    @object_index.setter
+    def object_index(self, value):
+        self._object_index = value  #  % len(OBJECTS)
+
+    @property
     def current_tile(self):
         return BLOCKS[self.tile_index]()
 
+    @property
+    def current_object(self):
+        return OBJECTS[self.object_index]()
+
+    @property
+    def current_img_under_cursor(self):
+        if self.tool == self.BRUSH:
+            return self.current_tile.get_img()
+        elif self.tool == self.OBJECTBRUSH:
+            return self.current_object.img
+        elif self.tool == self.ERASER:
+            return self.erase_img
+
+
     def set_brush_tile(self, i):
         self.tile_index = i
+        self.tool = self.BRUSH
+
+    def set_brush_object(self, i):
+        self.object_index = i
+        self.tool = self.OBJECTBRUSH
 
     def tool_change(self, tool_name: str):
         self.tool = getattr(self, tool_name.upper(), self.BRUSH)
@@ -210,10 +220,8 @@ class EditScreen(Screen):
                 self.tool_carousel.option_index = self.tool_carousel.options.index("Brush")
             elif event.key == pygame.K_e:
                 self.tool_carousel.option_index = self.tool_carousel.options.index("Eraser")
-            elif event.key == pygame.K_MINUS:
-                self.scale = min(self.scale - 1, 1)
-            elif event.key == pygame.K_PLUS:
-                self.scale += 1
+            elif event.key == pygame.K_o:
+                self.tool_carousel.option_index = self.tool_carousel.options.index("ObjectBrush")
 
         if self.start_drag:
             self.level.offset = Pos(self.start_drag_map_pos) + 2*(self.start_drag - Pos(pygame.mouse.get_pos()))
@@ -227,6 +235,8 @@ class EditScreen(Screen):
                 self.level.add_block(pos, self.tile_index)
             elif self.tool == self.ERASER:
                 self.level.remove_block(pos)
+            elif self.tool == self.OBJECTBRUSH:
+                self.level.add_object(pos, self.current_object)
 
     def render(self, display):
         self.draw_background(display)
@@ -234,10 +244,12 @@ class EditScreen(Screen):
         self.level.render(display)
 
         # cursor
-        img = self.current_tile.get_img()
+        img = self.current_img_under_cursor
         img = pygame.transform.scale(img, (self.tile_size, ) *2)
         img.set_alpha(128)
-        pos = self.level.map_to_display(self.level.map_to_display(pygame.mouse.get_pos()))
+        print(img.get_at((0, 0)))
+        pos = self.level.map_to_display(self.level.display_to_map(pygame.mouse.get_pos()))
+        print(pos)
         display.blit(img, (round(pos[0]), round(pos[1])))
 
         self.widgets.render(display)
@@ -254,7 +266,7 @@ class EditScreen(Screen):
         self.level.clear()
 
     def save(self):
-        self.level.save()
+        self.level.save(LEVEL_NAME)
 
 
 class Apple(App):

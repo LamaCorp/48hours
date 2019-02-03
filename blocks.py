@@ -208,5 +208,8 @@ BLOCKS = [
     Stone,
     Barbecue,
     FieryBarbecue,
+    partial(FieryBarbecue, ">"),
+    partial(FieryBarbecue, "<"),
+    partial(FieryBarbecue, "V"),
     EndBlock,
 ]
