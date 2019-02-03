@@ -21,7 +21,7 @@ JUMP_GRAVITY_FACTOR = 0.7
 WALL_SLIDE_GRAVITY = 0.8
 WALL_SLIDE_FRICTION = 0.01
 MAX_WALL_VELOCITY = 5
-WALL_STIKY_FRAMES = 20
+WALL_STIKY_FRAMES = 15
 
 
 class State(Enum):
@@ -198,6 +198,6 @@ class Player(Body):
             else:
                 # Walk/Run force
                 force = RUN_FORCE if self.state is State.RUN else WALK_FORCE
-                self.apply_force((-direc * force, 0))
+                self.apply_force((direc * force, 0))
                 # feet friction (aka max speed)
                 self.apply_force(-FEET_FRICTION * self.velocity.horizontal)

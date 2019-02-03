@@ -411,6 +411,7 @@ class Body:
         self.shape.debug_draw(surf, offset)
         (10 * self.velocity).debug_draw(surf, offset, self.center)
 
+
 class Space:
     def __init__(self, tile_map=None, gravity=(0, 0)):
         self.tile_map = tile_map  # type: Level
