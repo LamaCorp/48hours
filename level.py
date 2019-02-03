@@ -22,6 +22,11 @@ class Level:
         self.over = False
         self.to_reset = False
 
+    def __str__(self):
+        return "\n".join([
+            "".join(c.character for c in line) for line in self.grid
+        ])
+
     @property
     def world_start(self):
         return self.map_to_world(self.start)
@@ -119,21 +124,25 @@ class Level:
                                 self.world_size.y - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def internal_logic(self):
-        offset_end = (self.offset + self.screen_size).t
-        for line in range(clamp(self.world_to_map(self.offset)[1] - 20, 0, self.size[1] - 1),
-                          clamp(self.world_to_map(offset_end)[1] + 20, 0, self.size[1] - 1)):
-            for block in range(clamp(self.world_to_map(self.offset)[0] - 20, 0, self.size[0] - 1),
-                               clamp(self.world_to_map(offset_end)[0] + 20, 0, self.size[0] - 1)):
+        offset = self.world_to_map(self.offset)
+        offset_end = (offset + self.world_to_map(self.screen_size)).i
+
+        for line in range(clamp(offset.y - 20, 0, self.size[1] - 1),
+                          clamp(offset_end.y+ 20, 0, self.size[1] - 1)):
+            for block in range(clamp(offset.x - 20, 0, self.size[0] - 1),
+                               clamp(offset_end.x + 20, 0, self.size[0] - 1)):
                 block = self.grid[line][block]
                 block.internal_logic(self)
 
     def render(self, surf):
         self.screen_size = Pos(surf.get_size())
-        offset_end = (self.offset + self.screen_size).t
-        for line in range(self.world_to_map(self.offset)[1],
-                          clamp(self.world_to_map(offset_end)[1] + 2, 0, self.size[1] - 1)):
-            for block in range(self.world_to_map(self.offset)[0],
-                               clamp(self.world_to_map(offset_end)[0] + 2, 0, self.size[0] - 1)):
+        offset = self.world_to_map(self.offset)
+        offset_end = (offset + self.world_to_map(self.screen_size))
+
+        for line in range(clamp(offset.y, 0, self.size[1] - 1),
+                          clamp(offset_end.y + 2, 0, self.size[1])):
+            for block in range(clamp(offset.x, 0, self.size[0] - 1),
+                               clamp(offset_end.x + 2, 0, self.size[0])):
                 if self.grid[line][block].visible:
                     surf.blit(self.get_img_at((block, line)), self.map_to_world((block, line)) - self.offset)
 
