@@ -1,7 +1,7 @@
 import os
 import re
 import configlib
-from constants import PLAYER_FOLDER, LEVELS_GRAPHICAL_FOLDER, ASSETS
+from constants import LEVELS_GRAPHICAL_FOLDER, ASSETS
 
 BLOCKS_BASE_REGEX = r'_[0-9]*\.png'
 
@@ -26,7 +26,7 @@ def get_available_blocks(block_type="dirt"):
 PLAYERS = {
     0: ("lama_normal.png", "Lama"),
     1: ("lama_shadow.png", "Shadow"),
-    2: ("lama_licorne.png", "Licorne"),
+    2: ("lama_licorne.png", "Unicorn"),
     3: ("lama_rasta.png", "Rasta"),
     4: ("lama_kilt.png", "Irish"),
     5: ("lama_gay.png", "Gaaaaaay"),

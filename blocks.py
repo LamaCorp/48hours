@@ -45,6 +45,7 @@ class Block:
             "D": Dirt,
             "S": Stone,
             "B": Barbecue,
+            "K": AK47,
             "E": EndBlock,
             "V": partial(FieryBarbecue, "V"),
             "^": partial(FieryBarbecue, "^"),
@@ -166,9 +167,20 @@ class EndBlock(Block):
     deadly = False
 
     sheet = pygame.image.load(os.path.join(ASSETS, "logo.png")).convert()
-    sheet.set_colorkey((255, 255, 255))
+    sheet.set_colorkey((255, 0, 255))
     sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
 
     # This isn't called every frame. Instead, it is called when the player touches it
     def on_collision(self, level):
         level.explode()
+
+
+class AK47(Block):
+    character = "K"
+    solid = False
+    visible = True
+    deadly = False
+
+    sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
+    sheet.set_colorkey((255, 0, 255))
+    sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
