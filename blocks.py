@@ -209,5 +209,4 @@ BLOCKS = [
     Barbecue,
     FieryBarbecue,
     EndBlock,
-    AK47
 ]

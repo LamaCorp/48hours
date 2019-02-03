@@ -16,6 +16,7 @@ class Level:
         self.space = Space(self, gravity=(0, 1))
         self.size = Pos(0, 0)
         self.grid = []  # type: List[List[Block]]
+        self.objects = []
         self.start = (0, 0)  # Where the players has to spawn, map coordinates
         self.offset = Pos(0, 0)  # Where we start to draw the map, world coordinates
         self.screen_size = (0, 0)
@@ -38,6 +39,14 @@ class Level:
     @staticmethod
     def world_to_map(world_pos):
         return (Pos(world_pos) // Block.DEFAULT_BLOCK_SIZE).i
+
+    def map_to_display(self, map_pos):
+        return Pos(map_pos[0] * Block.DEFAULT_BLOCK_SIZE - self.offset.x,
+                   map_pos[1] * Block.DEFAULT_BLOCK_SIZE - self.offset.y)
+
+    def display_to_map(self, display_pos):
+        return Pos((display_pos[0] + self.offset.x) // Block.DEFAULT_BLOCK_SIZE,
+                   (display_pos[1] + self.offset.y) // Block.DEFAULT_BLOCK_SIZE)
 
     def get_block(self, map_pos):
         x, y = map_pos
