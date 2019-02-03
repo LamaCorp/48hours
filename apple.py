@@ -58,7 +58,24 @@ class LevelEdit(Level):
 
     @classmethod
     def load_v2(cls, path):
-        pass
+        with open(path, "r") as f:
+            d = json.loads(f.read())
+        size = Pos(d["size"])
+        map = [
+            [
+                Block.new(c, (x, y))
+                for x, c in enumerate(line)
+            ]
+            for y, line in enumerate(d["blocks"])
+        ]
+        objects = []
+
+        level = cls()
+        level.size = size
+        level.grid = map
+
+        return level
+
 
     def get_img_at(self, map_pos):
         x, y = map_pos
@@ -98,8 +115,9 @@ class LevelEdit(Level):
     def save(self):
         d = {}
         d["size"] = self.size.ti
-        d["blocks"] = str(self)
+        d["blocks"] = str(self).splitlines(keepends=False)
         d["objects"] = [obj.to_json() for obj in self.objects]
+        d["version"] = 2
 
         s = json.dumps(d, indent=4)
         with open(LEVEL_NAME, "w") as f:
