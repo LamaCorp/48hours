@@ -59,6 +59,7 @@ class Block:
         dic = {
             "D": Dirt,
             "S": Stone,
+            "C": CatCloud,
             "L": Lava,
             "B": Barbecue,
             "E": EndBlock,
@@ -91,7 +92,6 @@ class Block:
 
     def internal_logic(self, level):
         pass
-
 
     def on_collision(self, level):
         pass
@@ -146,6 +146,22 @@ class Stone(Block):
         [".?. ??. .", ".?.???. .", ".?.?? . .", ".?. ? . ."],  # ". . ??.? ", ". .??  ?."],
         [". . ??. .", ". .???. .", ". .?? . .", ". . ? . ."],  # ".?  ??. .", " ?.?? . ."]
     ])
+
+
+class CatCloud(Block):
+    character = "C"
+    solid = False
+    visible = True
+    deadly = False
+
+    @classproperty
+    def sheet(cls):
+        if cls._sheet is None:
+            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "cat_cloud.png")).convert()
+            sheet.set_colorkey((255, 0, 255))
+            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            cls._sheet = sheet
+        return cls._sheet
 
 
 class Lava(Block):
@@ -245,6 +261,7 @@ class EndBlock(Block):
 BLOCKS = [
     Dirt,
     Stone,
+    CatCloud,
     Lava,
     Barbecue,
     FieryBarbecue,
