@@ -45,10 +45,11 @@ LEVELS = {
     '3': ("round_and_round.map", "3: Round and round"),
     '4': ("here_we_go.map", "4: Here we go"),
     '5': ("insert_emotion.map", "5: Insert Emotion"),
-    '6': ("garry.map", "6: Get your shit together, Garry"),
-    '7': ("getting_to_know_each_other.map", "7: Getting to know each other"),
-    '8': ("hf_bro.map", "8: HF bro"),
-    '9': ("highway_to_hell.map", "9: Highway to Hell")
+    '6': ("x4.map", "6: x4"),
+    '7': ("garry.map", "7: Get your shit together, Garry"),
+    '8': ("getting_to_know_each_other.map", "8: Getting to know each other"),
+    '9': ("highway_to_hell.map", "9: Highway to Hell"),
+    '10': ("hf_bro.map", "10: HF bro"),
 }
 
 KEYS_DICTS = {
