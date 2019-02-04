@@ -12,6 +12,8 @@ from config import CONFIG
 
 pygame.init()
 
+__version__ = "1.0"
+
 
 def main():
     App({
