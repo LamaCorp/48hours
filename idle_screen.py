@@ -52,7 +52,7 @@ class IdleScreen(Screen):
         for i in range(self.focused_button_index - 1, -1, -1):
             if isinstance(self.widgets[i], Button) and not isinstance(self.widgets[i], CarouselSwitch):
                 return i
-        for i in range(len(self.widgets) - 1, self.focused_button_index + 1, -1):
+        for i in range(len(self.widgets) - 1, self.focused_button_index - 1, -1):
             if isinstance(self.widgets[i], Button) and not isinstance(self.widgets[i], CarouselSwitch):
                 return i
 
