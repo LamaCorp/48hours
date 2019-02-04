@@ -41,10 +41,12 @@ PLAYERS = {
 LEVELS = {
     '0': ("level_0.map", "0: EZ PZ"),
     '1': ("level_1.map", "1: Can we get started?"),
-    '2': ("level_2.map", "2: A bit more bring stuff"),
-    '3': ("level_3.map", "3: Here we go"),
-    '4': ("level_4.map", "4: Get your shit together, Garry"),
-    '5': ("level_5.map", "5: Getting to know each other"),
+    '2': ("level_2.map", "2: A bit more boring stuff"),
+    '3': ("level_3.map", "3: Round and round"),
+    '4': ("level_4.map", "4: Here we go"),
+    '5': ("level_5.map", "5: Get your shit together, Garry"),
+    '6': ("level_6.map", "6: Getting to know each other"),
+    '7': ("level_7.map", "7: HF bro"),
 }
 
 
@@ -69,6 +71,8 @@ class Config(configlib.Config):
         '3': [0, -1, 0, 0, ],  # number of blocks popped,
         '4': [0, -1, 0, 0, ],
         '5': [0, -1, 0, 0, ],
+        '6': [0, -1, 0, 0, ],
+        '7': [0, -1, 0, 0, ],
     }
 
 
