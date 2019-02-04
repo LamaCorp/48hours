@@ -48,6 +48,7 @@ LEVELS = {
     '6': ("level_6.map", "6: Get your shit together, Garry"),
     '7': ("level_7.map", "7: Getting to know each other"),
     '8': ("level_8.map", "8: HF bro"),
+    '9': ("level_9.map", "9: Highway to Hell")
 }
 
 KEYS_DICTS = {
@@ -95,6 +96,7 @@ class Config(configlib.Config):
         '6': [0, -1, 0, 0, ],
         '7': [0, -1, 0, 0, ],
         '8': [0, -1, 0, 0, ],
+        '9': [0, -1, 0, 0, ]
     }
 
 

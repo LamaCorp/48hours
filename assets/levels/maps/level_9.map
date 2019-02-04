@@ -1,0 +1,65 @@
+{
+    "size": [
+        64,
+        40
+    ],
+    "blocks": [
+        "SDDDDSSSSSSSSSSSSSSSSSSSSLLLSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+        "SDDDD..............FF.....L......................DDDDDDDDDDDDDDS",
+        "SDDDD..............VV.....L......................DDDDDDDDDDDDDDS",
+        "SDDDD.....................L......................DDDDDDDDDDDDDDS",
+        "SDDDD.....................L..........H...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDDD...DDDD.H....DDDLDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDDV...VDDDDD..DDDDDLDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDD..L.DD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDS..L.SD..DDDDDD......C....DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDSLLLLSD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDSLLLLSD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDSSSSSSD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DSDDD..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDSDDD.....DDDDD..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDDDDDDDD...DDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDDDDSDDD....DDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDDDDSDDL....DDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDSD..DDDDDDDDL...HDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDDDDDDDL..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDDSSDDDL..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDSSSDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDSD.....DDDDD..DDSSDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DSDDD..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDSDD.....DDDDD..DDDDSDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....DDDDD..DDDDDSDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDD.....SSSSS..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDSDD.....SLLLS..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDSDDDH...HSLLLS..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDDDDDDD...DSSLSS..DDDDDDDDD..DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDD...........L...............DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDD...........L...............DDDDDD...........DDDDDDDDDDDDDDS",
+        "SDDDD....DDDDDH.L...............DDDDD............DDDDDDDDDDDDDDS",
+        "SDDDD..HDDDDDDD.L.....H.......^^DDDDD............DDDDDDDDDDDDDDS",
+        "SDDDDDDDDD...DSSSSSDDDDDDDDDDDDDDDDD..............DDDDDDDDDDDDDS",
+        "SDDDDDDDDD.........................................DDDDDDDDDDDDS",
+        "SDDDDDDDDD.E...H...................................HHHHH<<<DDDDS",
+        "SDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDLLLLLLLLLLLLDDDDDDDDDDDDDDS",
+        "BDDDDBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+    ],
+    "objects": [
+        {
+            "type": "AK47",
+            "pos": [
+                45,
+                37
+            ]
+        },
+        {
+            "type": "Spawn",
+            "pos": [
+                11,
+                32
+            ]
+        }
+    ],
+    "version": 2
+}
