@@ -160,6 +160,7 @@ class Lava(Block):
             sheets = [pygame.image.load(os.path.join(os.path.join(LEVELS_GRAPHICAL_FOLDER, "lava"),
                                         path.lower())).convert()
                       for path in get_lava_sheets]
+            sheets.reverse()
             for i in range(len(sheets)):
                 sheets[i] = pygame.transform.scale(sheets[i], (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
             cls._sheet = sheets
