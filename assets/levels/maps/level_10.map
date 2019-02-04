@@ -1,0 +1,65 @@
+{
+    "size": [
+        120,
+        40
+    ],
+    "blocks": [
+        "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+        "SDDSDDDDDDDDDDDDDSDDDDDDDDDDDDDDDDDDSSSD........................D......................................................S",
+        "SDDSSDDDD......DDSDSSDDD...........DDSSD........................D........................H.............................S",
+        "SDSSDDD.........DSDSDD..............DSSD.........H...DD.........D..................DDDDDDDD............D...............S",
+        "SSSDDD....H.....DSSSD...............DDSD......DD.DDDDDS.........D..................FSSSSSSF............................S",
+        "SDDD..SDDDDSS...DSSDD..........DD....DSD......SSDDSSSSS.........D...................FSSSSF...D..............D..........S",
+        "SDD...SSDSSS....DSSD..........DDD....DSD......FFSSSFFF..........D....................FSFFF.........D...................S",
+        "SDD....SSS......DSDD..........DDD....DSD.......FFFFF............D.....................FF.........................D.....S",
+        "SD......S.......DSD...........DDD....DSD.........FF.............D.....................F................................S",
+        "SD..............DDD...........DD.....DSD.........F...........................D.........................................S",
+        "SD..............DDDD........D.D......DSD.............................................................................D.S",
+        "SD......DDDDS..BDSSD..........DD.....DSD........................D.......D..............................................S",
+        "SDD......SSSSBBDSSDD.....D.....D.....DDD.......................DDD...............D.....................................S",
+        "SDD.......S..DDDDDD............D.....DD..............D........DDDDD................................................D...S",
+        "SDDD..........................DD.............................DDSSSDD...................................................S",
+        "SDDD...................D......DD...............D............DDSSLSSDD................D..........................D......S",
+        "SDSD..........................DD............D..............DDSSLLLSSDD.....................D......D.......D............S",
+        "SDSSD...D...D...D...D.........DD........D.................DDSSLLLLLSSDD................................................S",
+        "SDSSD.........................DDD....D...................DDSSLLLLLLLSSDD...............................................S",
+        "SDSSSDBBBBBBBBBBBBBBBBBBBBBBBBDSDDDBBBBBBBBBBBBBBBBBB...DDSSLLLLSLLLLSSDD....BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBS",
+        "SDSSSSSSDDDDDDDDDDDDDDDDDDDDDDDSDDDDSDDSSSDDDDDDDDDDD..DDDSLLLLSCSLLLLSDDD...DDDDDSDDDDSSDDDDSSDDDDDDDDDDSDDDDDDDDDDDDDS",
+        "SDSSSSSDDDSDDSSSSSSSDDSSSDDDDSSSSSDDDDDDDSDD.....H......DDSSLLLLSLLLLSSDD......DDDSSSSDDSDDSSSDDSSDDVVDDSSDDD....DDDSSSS",
+        "SDSSSSDDDDSSSDSDDDDD.DDDDDDDDDDDDDDD....DD.......DSLLLLS.DDSSLLLLLLLSSDD.........DDDDD....DDDD.DDDD....DDD.........DDDSS",
+        "SDSSSDDD..DDSDDD......DD..........................DSSLLD..DDSSLLLLLSSDD.........................D...................DDDS",
+        "SDSSDD.....DSD......................H.............FFDSSD...DDSSLLLSSDDD...............................................DS",
+        "SDSDD......DDD.................SDDDDDS.............FFFFF....DDSSLSSDD...D..H...........................................S",
+        "SDDD.......DDD.................SSSDDSS..D............F.......DDSSSDD....DDDD...............................H...........S",
+        "SDD.........DD.................FFSSDSF........................DDDDD.....SSSSDDDDD......................BB..DDD.........S",
+        "SDD......EDDDD...................FSSF.......D..................DDD.........SSDDDDDD.............H......DDDDSSS.........S",
+        "SDD....DDDDSD.....................FF............................D..........SSSDDDDDDD^HDDDD.^DDDDDDS..DDSSSSSF.........S",
+        "SDDD......DSDD...D...D...D...D.................D.............................SSSSDDDDDDDDDDDDDDDDDSS..DSSSSSFF.........S",
+        "SDDD......DDD.................................................................SSSSDDDDDDSSSDSSSDDSS...DFFSSFF..........S",
+        "SDDDD.......D....................................D.......D......D..D............SSSSSSSSS..SS.SSSS......FFSF...........S",
+        "SDDDD^......D................................................D..D..DDD..H.......SSS..SS...................F..........H.S",
+        "SDSDDDDD..............B..............................D..........D..SDSDDD.................H........H.................DDS",
+        "SDSSDDSD............B.D..BB..BB.................................D..SSSSDD.................DDD......D.......H..........SS",
+        "SDSSSSSDD.........B.DBD.BDD..DD.................................D....SSDDDDDDDDDDHDDDDD..DDSDDD.DDDDDD.....DDD.........S",
+        "SSSSSSSSSDDD..D.^BD^DDD^DDD^DDDDH...............................D......SSSSDSSSSDDDDDSDDDDSSSSDDDSSSSDD....FSS.........S",
+        "SSSSSSSDSDDD....DDDDDDDDDDDDDDDDD...............................D.......SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSF.....SF.........S",
+        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+    ],
+    "objects": [
+        {
+            "type": "AK47",
+            "pos": [
+                85,
+                2
+            ]
+        },
+        {
+            "type": "Spawn",
+            "pos": [
+                8,
+                4
+            ]
+        }
+    ],
+    "version": 2
+}
