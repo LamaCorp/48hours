@@ -70,11 +70,11 @@ class IdleScreen(Screen):
     @staticmethod
     def focus_render(widgets: List[Widget], i):
         widgets[i].shape.border = 2
-        widgets[i].border_color = LLAMA  # FIXME: doesn't actually change it
+        widgets[i].border_color = LLAMA
 
     @staticmethod
     def unfocus_render(widgets, i):
-        widgets[i].border_color = GREY  # FIXME: doesn't actually change it
+        widgets[i].border_color = GREY
         widgets[i].shape.border = 0
 
     def update(self, event):
