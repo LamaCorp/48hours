@@ -73,3 +73,7 @@ Before submitting your Merge Request, check the following things:
 
 Have a look at the issues if they are any, otherwise if you have an idea for a feature, drop it in an issue and we'll be
 happy to look at it :D
+
+### Contributors
+
+Special thanks to Valentin 'Faweez' for his wonderful contributions to the maps during this project.
