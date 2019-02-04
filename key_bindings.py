@@ -1,3 +1,4 @@
+import pygame
 from graphalama.buttons import Button, CarouselSwitch, CheckBox
 from graphalama.core import Widget
 from graphalama.shapes import RoundedRect
@@ -6,7 +7,7 @@ from graphalama.constants import BOTTOM, WHITESMOKE, Monokai, CENTER, LEFT, LLAM
 
 from widgets import MenuButton, Title
 from constants import LIGHT_DARK, PLAYER_FOLDER, SETTINGS
-from config import CONFIG, KEYS_DICTS
+from config import CONFIG, KEYS_DICTS, get_index_from_name
 from idle_screen import IdleScreen
 
 
@@ -16,9 +17,7 @@ class KeyBindingsScreen(IdleScreen):
 
         def pos(n, block):
             return (size[0] // 2 + (n - 1.5) * 300,
-                   size[1] // 2 + (block - 0.3) * 150)
-
-
+                    size[1] // 2 + (block - 0.3) * 150)
 
         def check(text, n, block):
             return CheckBox(text=text,
@@ -83,6 +82,13 @@ class KeyBindingsScreen(IdleScreen):
                    anchor=CENTER),
         ]
 
+        if pygame.K_LEFT in CONFIG.key_bindings["LEFT"]:
+            self.selector_move.option_index = 2
+        elif pygame.K_a in CONFIG.key_bindings["LEFT"]:
+            self.selector_move.option_index = 0
+        else:
+            self.selector_move.option_index = 1
+
         for w in widgets:
             if isinstance(w, CheckBox):
                 if w.text_widget.text in KEYS_DICTS["RUN"] and \
@@ -99,9 +105,9 @@ class KeyBindingsScreen(IdleScreen):
         CONFIG.key_bindings["JUMP"] = []
         for w in self.widgets:
             if isinstance(w, CheckBox):
-                if w.text_widget.text in KEYS_DICTS["RUN"]:
+                if w.checked and w.text_widget.text in KEYS_DICTS["RUN"]:
                     CONFIG.key_bindings["RUN"].append(KEYS_DICTS["RUN"][w.text_widget.text])
-                elif w.text_widget.text in KEYS_DICTS["JUMP"]:
+                elif w.checked and w.text_widget.text in KEYS_DICTS["JUMP"]:
                     CONFIG.key_bindings["JUMP"].append(KEYS_DICTS["JUMP"][w.text_widget.text])
 
     @classmethod

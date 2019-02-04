@@ -65,7 +65,7 @@ KEYS_DICTS = {
         "Right Ctrl": pygame.K_RCTRL,
     },
     "JUMP": {
-        "Space bar": pygame.K_SPACE,
+        "Space Bar": pygame.K_SPACE,
         "W": pygame.K_w,
         "Z": pygame.K_z,
         "Up arrow": pygame.K_UP,

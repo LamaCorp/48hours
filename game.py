@@ -105,9 +105,9 @@ class GameScreen(Screen):
             self.level.update_offset(self.player.center, self.app.display.get_size())
             self.level.internal_logic()
 
-        fps = round(self.app.clock.get_fps())
-        if fps < 50 and not self.level.to_reset:
-            print(f"\033[31mLOW FPS: {fps}\033[m")
+        # fps = round(self.app.clock.get_fps())
+        # if fps < 50 and not self.level.to_reset:
+        #     print(f"\033[31mLOW FPS: {fps}\033[m")
 
     def render(self, surf):
         self.draw_background(surf)
