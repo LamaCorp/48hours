@@ -18,6 +18,7 @@ PLAYER_FOLDER = os.path.join(ASSETS, 'players')
 LEVELS_FOLDER = os.path.join(ASSETS, 'levels')
 LEVELS_GRAPHICAL_FOLDER = os.path.join(LEVELS_FOLDER, 'graphical')
 MAPS_FOLDER = os.path.join(LEVELS_FOLDER, 'maps')
+KEYS_FOLDER = os.path.join(ASSETS, 'keys')
 
 # Blocks
 DEFAULT_BLOCK_SIZE = 32
