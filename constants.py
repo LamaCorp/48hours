@@ -11,6 +11,7 @@ KEY_BIND = 1008
 # Colors
 DARK = (31, 32, 65)
 LIGHT_DARK = (62, 64, 130)
+GREY = (30, 30, 30, )
 
 # Folder
 ASSETS = os.path.abspath(os.path.join(os.path.dirname(__file__), 'assets'))

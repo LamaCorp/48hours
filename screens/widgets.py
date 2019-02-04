@@ -3,7 +3,7 @@ from time import time
 
 import pygame
 from graphalama.buttons import CarouselSwitch
-from graphalama.colors import Gradient, MultiGradient
+from graphalama.colors import Gradient, MultiGradient, mix
 from graphalama.constants import (CENTER, NICE_BLUE, PURPLE, GREEN,
                                   Monokai, YELLOW, RED, TOP, WHITESMOKE, RAINBOW, LEFT, RIGHT, TRANSPARENT, LLAMA,
                                   TOPRIGHT, TOPLEFT)
@@ -14,7 +14,7 @@ from graphalama.shadow import NoShadow
 from graphalama.shapes import RoundedRect, Rectangle
 from graphalama.widgets import SimpleText, Button
 
-from constants import MENU, SETTINGS, PICKER, STATS, LIGHT_DARK, DARK
+from constants import MENU, SETTINGS, PICKER, STATS, LIGHT_DARK, DARK, GREY
 
 
 def Title(text, screen_size, anchor=TOP, font_size=150):
@@ -23,7 +23,7 @@ def Title(text, screen_size, anchor=TOP, font_size=150):
                       shape=Rectangle((screen_size[0] + 2, 200), border=1),
                       color=MultiGradient(*RAINBOW),
                       # bg_color=DARK + (172,),
-                      bg_color=(228, 228, 228, 40),
+                      bg_color=(30,) * 3,
                       border_color=MultiGradient(*RAINBOW),
                       font=default_font(font_size),
                       anchor=anchor)
@@ -33,8 +33,8 @@ def SettingsButton(app, pos=None, anchor=CENTER):
     return Button(text="Settings",
                   function=lambda: app.set_screen(SETTINGS),
                   shape=RoundedRect((200, 50), 100),
-                  color=Monokai.PINK,
-                  bg_color=(200, 200, 200, 72),
+                  color=RED,
+                  bg_color=GREY,
                   pos=pos,
                   anchor=anchor)
 
@@ -43,8 +43,8 @@ def StatisticsButton(app, pos=None, anchor=CENTER):
     return Button(text="Statistics",
                   function=lambda: app.set_screen(STATS),
                   shape=RoundedRect((200, 50), 100),
-                  color=Monokai.PURPLE,
-                  bg_color=(200, 200, 200, 72),
+                  color=NICE_BLUE,
+                  bg_color=GREY,
                   pos=pos,
                   anchor=anchor)
 
@@ -52,7 +52,7 @@ def StatisticsButton(app, pos=None, anchor=CENTER):
 def PickerButton(app, pos=None, anchor=CENTER):
     return Button(text="Play",
                   function=lambda: app.set_screen(PICKER),
-                  shape=RoundedRect((200, 50), 100),
+                  shape=RoundedRect((300, 50), 100),
                   color=WHITESMOKE,
                   bg_color=Gradient(NICE_BLUE, PURPLE),
                   pos=pos,
@@ -63,13 +63,10 @@ def PlayButton(app, pos=None, anchor=CENTER):
     from screens.game import GameScreen
     from level import Level
     from config import CONFIG
-    return Button(text="Play",
-                  function=lambda: app.set_temp_screen(lambda app: GameScreen(app, Level.load_num(CONFIG.level))),
-                  pos=pos,
-                  shape=RoundedRect((200, 50), 100),
-                  color=WHITESMOKE,
-                  bg_color=Gradient(NICE_BLUE, PURPLE),
-                  anchor=anchor)
+
+    button = PickerButton(app, pos, anchor)
+    button.function = lambda: app.set_temp_screen(lambda app: GameScreen(app, Level.load_num(CONFIG.level))),
+    return button
 
 
 def ResumeButton(function, pos=None, anchor=CENTER):
@@ -97,7 +94,7 @@ def QuitButton(app, pos=None, anchor=CENTER):
     return Button(text="Quit",
                   function=app.quit,
                   pos=pos,
-                  shape=RoundedRect((200, 50), 100),
+                  shape=RoundedRect((300, 50), 100),
                   color=WHITESMOKE,
                   bg_color=Gradient(YELLOW, RED),
                   anchor=anchor)
@@ -174,7 +171,8 @@ class SurfaceButton(Button):
         self.surf = surf
         if bg_color is None:
             bg_color = TRANSPARENT
-        super().__init__("", function, pos=pos, shape=shape, color=color, bg_color=bg_color, shadow=shadow, anchor=anchor)
+        super().__init__("", function, pos=pos, shape=shape, color=color, bg_color=bg_color, shadow=shadow,
+                         anchor=anchor)
 
     def draw_content(self, content_surf):
         if self.resize_surf:
@@ -186,6 +184,3 @@ class SurfaceButton(Button):
             surf = self.surf
 
         content_surf.blit(surf, (0, 0))
-
-
-
