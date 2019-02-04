@@ -22,6 +22,7 @@ def get_available(what, where):
 
 get_lava_sheets = get_available(LAVA_REGEX, os.path.join(LEVELS_GRAPHICAL_FOLDER, "lava"))
 
+
 def get_available_blocks(block_type="dirt"):
     block_regex = re.compile(block_type + BLOCKS_BASE_REGEX)
     return get_available(block_regex, LEVELS_GRAPHICAL_FOLDER)

@@ -2,6 +2,9 @@ import os
 import pygame
 
 from graphalama.app import Screen
+from graphalama.buttons import Button, CarouselSwitch
+from graphalama.shadow import NoShadow, Shadow
+from graphalama.constants import LLAMA, GREY
 
 from constants import PLAYER_FOLDER
 
@@ -15,6 +18,11 @@ class IdleScreen(Screen):
         for _ in range(4):
             self.lama_logo = pygame.transform.scale2x(self.lama_logo)
         self.lama_logo_left = pygame.transform.flip(self.lama_logo, True, False)
+        self.focused_button_index = -1
+        for i in range(len(widgets)):
+            if isinstance(widgets[i], Button):
+                self.focused_button_index = i
+                break
         super().__init__(app=app, widgets=widgets, bg_color=bg_color)
     
     def draw_background(self, display):
@@ -28,3 +36,62 @@ class IdleScreen(Screen):
         display.blit(self.lama_logo, rect)
         rect.center = (size[0] * 4/5, size[1] // 2)
         display.blit(self.lama_logo_left, rect)
+
+    def get_next_button(self):
+        for i in range(self.focused_button_index + 1, len(self.widgets)):
+            if isinstance(self.widgets[i], Button) and not isinstance(self.widgets[i], CarouselSwitch):
+                return i
+        for i in range(0, self.focused_button_index):
+            if isinstance(self.widgets[i], Button) and not isinstance(self.widgets[i], CarouselSwitch):
+                return i
+
+    def get_previous_button(self):
+        for i in range(self.focused_button_index - 1, -1, -1):
+            if isinstance(self.widgets[i], Button) and not isinstance(self.widgets[i], CarouselSwitch):
+                return i
+        for i in range(len(self.widgets) - 1, self.focused_button_index + 1, -1):
+            if isinstance(self.widgets[i], Button) and not isinstance(self.widgets[i], CarouselSwitch):
+                return i
+
+    def carousel_exists(self):
+        for widget in self.widgets:
+            if isinstance(widget, CarouselSwitch):
+                return True
+        return False
+
+    def get_first_carousel(self):
+        for widget in self.widgets:
+            if isinstance(widget, CarouselSwitch):
+                return widget
+
+    @staticmethod
+    def focus_render(widgets, i):
+        widgets[i].border_color = LLAMA  # FIXME: doesn't actually change it
+
+    @staticmethod
+    def unfocus_render(widgets, i):
+        widgets[i].border_color = GREY  # FIXME: doesn't actually change it
+
+    def update(self, event):
+        if self.focused_button_index == -1:
+            return
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                self.widgets[self.focused_button_index].function()
+            elif event.key == pygame.K_DOWN or event.key == pygame.K_TAB:
+                self.unfocus_render(self.widgets, self.focused_button_index)
+                self.focused_button_index = self.get_next_button()
+                self.focus_render(self.widgets, self.focused_button_index)
+            elif event.key == pygame.K_UP:
+                self.unfocus_render(self.widgets, self.focused_button_index)
+                self.focused_button_index = self.get_previous_button()
+                self.focus_render(self.widgets, self.focused_button_index)
+            if self.carousel_exists():  # Possible amelioration: handle the case where there are several carousels
+                carousel = self.get_first_carousel()
+                if event.key == pygame.K_LEFT:
+                    carousel.option_index -= 1
+                elif event.key == pygame.K_RIGHT:
+                    carousel.option_index += 1
+
+        super().update(event)
