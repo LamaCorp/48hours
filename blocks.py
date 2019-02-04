@@ -37,6 +37,7 @@ def re_compile(matrix):
 
 class Block:
     DEFAULT_BLOCK_SIZE = DEFAULT_BLOCK_SIZE
+    IGNORE_IMG_CACHE = False
 
     character = '.'
     _sheet = None
@@ -153,6 +154,7 @@ class Lava(Block):
     visible = True
     deadly = True
     current_index = 0
+    IGNORE_IMG_CACHE = True
 
     @classproperty
     def sheet(cls):

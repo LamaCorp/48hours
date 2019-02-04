@@ -28,6 +28,7 @@ class Level:
         self.expolding = False
         self.to_explode = []
         self.exploded = []
+        self.img_cache = {}
 
     def __str__(self):
         return "\n".join([
@@ -88,11 +89,19 @@ class Level:
 
     # @lru_cache(maxsize=None)
     def get_img_at(self, map_pos):
+        if map_pos in self.img_cache:
+            return self.img_cache[map_pos]
+
         neigh = "".join(self.get_block((map_pos[0] + dx, map_pos[1] + dy)).character
                         for dy in range(-1, 2)
                         for dx in range(-1, 2))
         block = self.get_block(map_pos)
-        return block.get_img(neigh, rotation=block.rotation)
+        img = block.get_img(neigh, rotation=block.rotation)
+
+        if not block.IGNORE_IMG_CACHE:
+            self.img_cache[map_pos] = img
+
+        return img
 
     @property
     def world_size(self):
