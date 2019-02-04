@@ -5,6 +5,7 @@ import configlib
 from constants import LEVELS_GRAPHICAL_FOLDER, ASSETS
 
 BLOCKS_BASE_REGEX = r'_[0-9]*\.png'
+LAVA_REGEX = re.compile(r'lava_[0-9]*\.png')
 
 
 def get_available(what, where):
@@ -18,6 +19,8 @@ def get_available(what, where):
 
     return sorted(names)
 
+
+get_lava_sheets = get_available(LAVA_REGEX, os.path.join(LEVELS_GRAPHICAL_FOLDER, "lava"))
 
 def get_available_blocks(block_type="dirt"):
     block_regex = re.compile(block_type + BLOCKS_BASE_REGEX)

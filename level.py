@@ -77,7 +77,7 @@ class Level:
         map_pos = self.world_to_map(world_pos)
         return self.get_block(map_pos)
 
-    @lru_cache(maxsize=None)
+    # @lru_cache(maxsize=None)
     def get_img_at(self, map_pos):
         neigh = "".join(self.get_block((map_pos[0] + dx, map_pos[1] + dy)).character
                         for dy in range(-1, 2)

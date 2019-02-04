@@ -1,11 +1,13 @@
 import os
 import re
 import random
+import time
 from functools import partial, lru_cache
 
 import pygame
 
 from constants import DEFAULT_BLOCK_SIZE, LEVELS_GRAPHICAL_FOLDER, ASSETS
+from config import get_lava_sheets
 from entities import Brochette, AK47
 from helper import classproperty
 from physics import Pos
@@ -71,7 +73,7 @@ class Block:
         self.visible = True
 
     @classmethod
-    @lru_cache()
+    # @lru_cache()
     def img_at(cls, x, y, rotation=0):
         return pygame.transform.rotate(cls.sheet.subsurface((x * cls.DEFAULT_BLOCK_SIZE, y * cls.DEFAULT_BLOCK_SIZE,
                                                              cls.DEFAULT_BLOCK_SIZE, cls.DEFAULT_BLOCK_SIZE)), rotation)
@@ -139,14 +141,19 @@ class Lava(Block):
     solid = True
     visible = True
     deadly = True
+    current_index = 0
 
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
-            sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "lava.png")).convert()
-            sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
-            cls._sheet = sheet
-        return cls._sheet
+            sheets = [pygame.image.load(os.path.join(os.path.join(LEVELS_GRAPHICAL_FOLDER, "lava"),
+                                        path.lower())).convert()
+                      for path in get_lava_sheets]
+            for i in range(len(sheets)):
+                sheets[i] = pygame.transform.scale(sheets[i], (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+            cls._sheet = sheets
+        cls.current_index = (time.time() * 15) % len(cls._sheet)
+        return cls._sheet[int(cls.current_index)]
 
 
 class Barbecue(Block):
