@@ -49,6 +49,26 @@ LEVELS = {
     '7': ("level_7.map", "7: HF bro"),
 }
 
+KEYS_DICTS = {
+    "MOVE": {
+        "WASD": (pygame.K_a, pygame.K_d),
+        "ZQSD": (pygame.K_q, pygame.K_d),
+        "Arrows": (pygame.K_LEFT, pygame.K_RIGHT),
+    },
+    "RUN": {
+        "Left Shift": pygame.K_LSHIFT,
+        "Right Shift": pygame.K_RSHIFT,
+        "Left Ctrl": pygame.K_LCTRL,
+        "Right Ctrl": pygame.K_RCTRL,
+    },
+    "JUMP": {
+        "Space bar": pygame.K_SPACE,
+        "W": pygame.K_w,
+        "Z": pygame.K_z,
+        "Up arrow": pygame.K_UP,
+    },
+}
+
 
 class Config(configlib.Config):
     __config_path__ = os.path.abspath(os.path.join(ASSETS, "config.json"))
@@ -58,10 +78,10 @@ class Config(configlib.Config):
     player = 0
 
     key_bindings = {
-        "LEFT": pygame.K_LEFT,
-        "RIGHT": pygame.K_RIGHT,
-        "JUMP": pygame.K_SPACE,
-        "RUN": pygame.K_LSHIFT,
+        "LEFT": [pygame.K_LEFT],
+        "RIGHT": [pygame.K_RIGHT],
+        "JUMP": [pygame.K_SPACE],
+        "RUN": [pygame.K_LSHIFT],
     }
 
     levels_stats = {

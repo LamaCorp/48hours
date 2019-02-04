@@ -82,25 +82,25 @@ class Player(Body):
 
     def update(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == CONFIG.key_bindings["LEFT"]:
+            if event.key in CONFIG.key_bindings["LEFT"]:
                 self.directions[LEFT] = True
-            elif event.key == CONFIG.key_bindings["RIGHT"]:
+            elif event.key in CONFIG.key_bindings["RIGHT"]:
                 self.directions[RIGHT] = True
-            elif event.key == CONFIG.key_bindings["JUMP"]:
+            elif event.key in CONFIG.key_bindings["JUMP"]:
                 if self.collide_right or self.collide_left or self.collide_down:
                     self.jumping = True
                     self.just_jumped = True
-            elif event.key == CONFIG.key_bindings["RUN"]:
+            elif event.key in CONFIG.key_bindings["RUN"]:
                 self.run = True
 
         elif event.type == pygame.KEYUP:
-            if event.key == CONFIG.key_bindings["LEFT"]:
+            if event.key in CONFIG.key_bindings["LEFT"]:
                 self.directions[LEFT] = False
-            elif event.key == CONFIG.key_bindings["RIGHT"]:
+            elif event.key in CONFIG.key_bindings["RIGHT"]:
                 self.directions[RIGHT] = False
-            elif event.key == CONFIG.key_bindings["JUMP"]:
+            elif event.key in CONFIG.key_bindings["JUMP"]:
                 self.jumping = False
-            elif event.key == CONFIG.key_bindings["RUN"]:
+            elif event.key in CONFIG.key_bindings["RUN"]:
                 self.run = False
 
     def internal_logic(self):
