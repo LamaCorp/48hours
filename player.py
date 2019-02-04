@@ -1,13 +1,13 @@
+import os
 from enum import Enum, auto
 
-import os
 import pygame
 
 from blocks import Block
-from entities import AK47
-from physics import Body, AABB, Pos, CollisionData, CollisionType
 from config import CONFIG, PLAYERS
 from constants import PLAYER_FOLDER
+from entities import AK47
+from physics import Body, AABB, Pos, CollisionType
 
 LEFT = 0
 RIGHT = 1
@@ -82,25 +82,25 @@ class Player(Body):
 
     def update(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key in CONFIG.key_bindings["LEFT"]:
+            if event.key == CONFIG.bindings.left:
                 self.directions[LEFT] = True
-            elif event.key in CONFIG.key_bindings["RIGHT"]:
+            elif event.key == CONFIG.bindings.right:
                 self.directions[RIGHT] = True
-            elif event.key in CONFIG.key_bindings["JUMP"]:
+            elif event.key == CONFIG.bindings.jump:
                 if self.collide_right or self.collide_left or self.collide_down:
                     self.jumping = True
                     self.just_jumped = True
-            elif event.key in CONFIG.key_bindings["RUN"]:
+            elif event.key == CONFIG.bindings.run:
                 self.run = True
 
         elif event.type == pygame.KEYUP:
-            if event.key in CONFIG.key_bindings["LEFT"]:
+            if event.key == CONFIG.bindings.left:
                 self.directions[LEFT] = False
-            elif event.key in CONFIG.key_bindings["RIGHT"]:
+            elif event.key == CONFIG.bindings.right:
                 self.directions[RIGHT] = False
-            elif event.key in CONFIG.key_bindings["JUMP"]:
+            elif event.key == CONFIG.bindings.jump:
                 self.jumping = False
-            elif event.key in CONFIG.key_bindings["RUN"]:
+            elif event.key == CONFIG.bindings.run:
                 self.run = False
 
     def internal_logic(self):

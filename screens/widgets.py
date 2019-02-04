@@ -124,100 +124,6 @@ def PauseButton(function, pos=None):
                   anchor=TOPRIGHT)
 
 
-class CountDown(SimpleText):
-    """Big timer before the end of the game."""
-
-    def __init__(self, countdown, pos=None, color=WHITESMOKE, critical_color=RED,
-                 good_color=Monokai.GREEN, font=None, anchor=None):
-        """
-        Timer that goes to 0 after countdown seconds.
-        """
-
-        font = font if font is not None else default_font(150)
-
-        self.timer_at_pause = None
-        self.normal_color = color
-        self.critical_color = critical_color
-        self.good_color = good_color
-        self.countdown = countdown
-        self.start_time = time()
-        self.last_added = time()
-
-        size = font.size("9:99:999")
-        super().__init__("", pos, size, color=color, font=font, anchor=anchor, text_anchor=TOP | LEFT)
-        self.transparency = 128
-
-    @property
-    def remaining_time(self):
-        """Time left before the countdown is over."""
-        remaining = self.start_time + self.countdown - time()
-        if remaining < 0:
-            return 0
-        return remaining
-
-    def pre_render_update(self):
-        if self.timer_at_pause:
-            return
-
-        rem = self.remaining_time
-        milis = int(rem % 1 * 1000)
-        sec = int(rem % 60)
-        minu = int(rem // 60)
-
-        s = '{}:{:02}:{:>03}'.format(minu, sec, milis)
-        self.text = s
-
-        if self.last_added - self.remaining_time < 0.5:
-            self.color = self.good_color
-        elif milis < 200:
-            self.color = self.critical_color
-        elif minu == 0 and sec < 30:
-            self.color = self.critical_color
-        else:
-            self.color = self.normal_color
-
-    @property
-    def over(self):
-        """Countdown is over."""
-        return self.remaining_time == 0
-
-    def pause(self):
-        self.timer_at_pause = self.remaining_time
-
-    def resume(self):
-        self.start_time = time() - (self.countdown - self.timer_at_pause)
-        self.timer_at_pause = None
-
-    def add(self, sec):
-        self.countdown += sec
-        self.last_added = self.remaining_time
-
-    def draw_content(self, content_surf: pygame.Surface):
-        pos = Pos(0, 0)
-        for c in self.text:
-            surf = self.render_char(c, self.color.color)
-            content_surf.blit(surf, pos)
-            pos += surf.get_width(), 0
-
-        content_surf.set_alpha(self.transparency)
-        content_surf.set_colorkey((0, 0, 0))
-
-    @lru_cache(maxsize=11 * 3)  # three colors * (10 digits + colon)
-    def render_char(self, char, color):
-        return self.font.render(char, False, color, )
-
-    @property
-    def content_image(self):
-        if not self._content:
-            # we override this because we don't want per pixel alpha on the big text, otherwise
-            # it takes 20% of the game time to blit it
-
-            # create a normal surface
-            self._content = pygame.Surface(self.content_rect.size)
-            self.draw_content(self._content)
-        return self._content
-
-
 class Segment(Widget):
 
     def __init__(self, a, b, color=None):
@@ -254,5 +160,31 @@ class Segment(Widget):
             pygame.draw.line(content_surf, self.color.color, (0, 0), (w, h))
         else:
             pygame.draw.line(content_surf, self.color.color, (0, h), (w, 0))
+
+
+class SurfaceButton(Button):
+    """A button displaying an image from a surface"""
+
+    def __init__(self, surf, function, resize=False, resize_smooth=False,
+                 pos=None, shape=None,
+                 color=None, bg_color=None, shadow=None, anchor=None):
+        self.resize_surf = resize
+        self.resize_smooth = resize_smooth
+        self.surf = surf
+        if bg_color is None:
+            bg_color = TRANSPARENT
+        super().__init__("", function, pos=pos, shape=shape, color=color, bg_color=bg_color, shadow=shadow, anchor=anchor)
+
+    def draw_content(self, content_surf):
+        if self.resize_surf:
+            if self.resize_smooth:
+                surf = pygame.transform.smoothscale(self.surf, content_surf.get_size())
+            else:
+                surf = pygame.transform.scale(self.surf, content_surf.get_size())
+        else:
+            surf = self.surf
+
+        content_surf.blit(surf, (0, 0))
+
 
 

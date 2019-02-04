@@ -52,25 +52,12 @@ LEVELS = {
     '10': ("hf_bro.map", "10: HF bro"),
 }
 
-KEYS_DICTS = {
-    "MOVE": {
-        "WASD": (pygame.K_a, pygame.K_d),
-        "ZQSD": (pygame.K_q, pygame.K_d),
-        "Arrows": (pygame.K_LEFT, pygame.K_RIGHT),
-    },
-    "RUN": {
-        "Left Shift": pygame.K_LSHIFT,
-        "Right Shift": pygame.K_RSHIFT,
-        "Left Ctrl": pygame.K_LCTRL,
-        "Right Ctrl": pygame.K_RCTRL,
-    },
-    "JUMP": {
-        "Space Bar": pygame.K_SPACE,
-        "W": pygame.K_w,
-        "Z": pygame.K_z,
-        "Up arrow": pygame.K_UP,
-    },
-}
+
+class BindingsConfig(configlib.SubConfig):
+    left = pygame.K_LEFT
+    right = pygame.K_RIGHT
+    jump = pygame.K_SPACE
+    run = pygame.K_LSHIFT
 
 
 class Config(configlib.Config):
@@ -80,12 +67,7 @@ class Config(configlib.Config):
 
     player = 0
 
-    key_bindings = {
-        "LEFT": [pygame.K_LEFT],
-        "RIGHT": [pygame.K_RIGHT],
-        "JUMP": [pygame.K_SPACE],
-        "RUN": [pygame.K_LSHIFT],
-    }
+    bindings = BindingsConfig()
 
     levels_stats = {
         '0': [0, -1, 0, 0, ],  # number of deaths in the level,
