@@ -72,4 +72,4 @@ Before submitting your Merge Request, check the following things:
 ##### Code
 
 Have a look at the issues if they are any, otherwise if you have an idea for a feature, drop it in an issue and we'll be
-happy to look at it.
+happy to look at it :D
