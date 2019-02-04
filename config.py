@@ -39,16 +39,16 @@ PLAYERS = {
 }
 
 LEVELS = {
-    '0': ("level_0.map", "0: EZ PZ"),
-    '1': ("level_1.map", "1: Can we get started?"),
-    '2': ("level_2.map", "2: A bit more boring stuff"),
-    '3': ("level_3.map", "3: Round and round"),
-    '4': ("level_4.map", "4: Here we go"),
-    '5': ("level_5.map", "5: Insert Emotion"),
-    '6': ("level_6.map", "6: Get your shit together, Garry"),
-    '7': ("level_7.map", "7: Getting to know each other"),
-    '8': ("level_8.map", "8: HF bro"),
-    '9': ("level_9.map", "9: Highway to Hell")
+    '0': ("ez_pz.map", "0: EZ PZ"),
+    '1': ("can_we_get_started.map", "1: Can we get started?"),
+    '2': ("a_bit_more_boring_stuff.map", "2: A bit more boring stuff"),
+    '3': ("round_and_round.map", "3: Round and round"),
+    '4': ("here_we_go.map", "4: Here we go"),
+    '5': ("insert_emotion.map", "5: Insert Emotion"),
+    '6': ("garry.map", "6: Get your shit together, Garry"),
+    '7': ("getting_to_know_each_other.map", "7: Getting to know each other"),
+    '8': ("hf_bro.map", "8: HF bro"),
+    '9': ("highway_to_hell.map", "9: Highway to Hell")
 }
 
 KEYS_DICTS = {
