@@ -22,7 +22,8 @@ def Title(text, screen_size, anchor=TOP, font_size=150):
                       pos=(screen_size[0] / 2, 50),
                       shape=Rectangle((screen_size[0] + 2, 200), border=1),
                       color=MultiGradient(*RAINBOW),
-                      bg_color=DARK + (172,),
+                      # bg_color=DARK + (172,),
+                      bg_color=(228, 228, 228, 40),
                       border_color=MultiGradient(*RAINBOW),
                       font=default_font(font_size),
                       anchor=anchor)

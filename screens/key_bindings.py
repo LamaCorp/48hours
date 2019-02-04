@@ -11,7 +11,7 @@ from graphalama.constants import BOTTOM, WHITESMOKE, Monokai, CENTER, LLAMA, LEF
 
 from physics import Pos
 from screens.widgets import Title, SurfaceButton
-from constants import LIGHT_DARK, SETTINGS
+from constants import LIGHT_DARK, SETTINGS, DARK
 from config import CONFIG
 from screens.idle_screen import IdleScreen
 from screens import keys
@@ -30,12 +30,12 @@ class KeyBindingsScreen(IdleScreen):
 
         size = app.display.get_size()
         def bind(binding, n):
-            y = size[1] // 2 + 100 * (n - 1.5)
+            y = size[1] // 2 + 90 * (n - 1.5)
             x = size[0] // 2 - 150
 
             text = SimpleText(text=binding.value,
                                  pos=(x, y),
-                                 color=WHITESMOKE,
+                                 color=LLAMA,
                                  anchor=LEFT)
 
             img = keys.name_to_img(self.get_binding_key(binding))
@@ -52,11 +52,17 @@ class KeyBindingsScreen(IdleScreen):
 
             return text, key
 
+        self.hint_label = SimpleText(text="Press anything to set the ... binding",
+                                     pos=(size[0] // 2, size[1] - 100),
+                                     anchor=BOTTOM,
+                                     color=LLAMA)
+        self.hint_label.visible = False
+
         widgets = [
             Title("Key bindings", size),
             Widget((size[0] // 2, size[1] // 2),
-                   shape=RoundedRect((400, 400), rounding=20, percent=False),
-                   bg_color=(100, 100, 100, 180),
+                   shape=RoundedRect((400, 450), rounding=20, percent=False),
+                   bg_color=DARK,
                    anchor=CENTER),
             *bind(Binding.LEFT, 0),
             *bind(Binding.RIGHT, 1),
@@ -64,14 +70,17 @@ class KeyBindingsScreen(IdleScreen):
             *bind(Binding.RUN, 3),
             Button(text="Back",
                    function=lambda: app.set_screen(SETTINGS),
-                   shape=RoundedRect((200, 50), 100),
-                   color=Monokai.PINK,
-                   bg_color=(200, 200, 200, 72),
-                   pos=(size[0] // 2, size[1] - 200),
+                   shape=RoundedRect((200, 50), 100, border=2),
+                   color=LLAMA,
+                   bg_color=DARK,
+                   border_color=LLAMA,
+                   pos=(size[0] // 2, size[1] // 2 + 225),
                    anchor=CENTER),
+            self.hint_label,
         ]
 
-        super().__init__(app, widgets, (20, 10, 0))
+
+        super().__init__(app, widgets, (0, 0, 0))
 
     def update(self, event):
         if self.binding_setting is not None:
@@ -86,15 +95,16 @@ class KeyBindingsScreen(IdleScreen):
                 wid.size = img.get_size()
                 wid.invalidate_content()
 
+                self.hint_label.visible = False
                 self.binding_setting = None
                 return True
         super().update(event)
 
-
     def start_set_func(self, binding):
         def inner():
-            print("set", binding)
             self.binding_setting = binding
+            self.hint_label.text = "Press anything to set the {} binding.".format(binding.value.lower())
+            self.hint_label.visible = True
         return inner
 
     def get_binding_key(self, binding: Binding):

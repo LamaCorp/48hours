@@ -16,7 +16,7 @@ class IdleScreen(Screen):
     def __init__(self, app, widgets=(), bg_color=()):
         self.lama_logo = pygame.image.load(os.path.join(PLAYER_FOLDER, "lama_normal.png")).convert()
         self.lama_logo.set_colorkey((255, 0, 255))
-        for _ in range(4):
+        for _ in range(3):
             self.lama_logo = pygame.transform.scale2x(self.lama_logo)
         self.lama_logo_left = pygame.transform.flip(self.lama_logo, True, False)
         self.focused_button_index = -1
@@ -24,7 +24,7 @@ class IdleScreen(Screen):
             if isinstance(widgets[i], Button):
                 self.focused_button_index = i
                 break
-        super().__init__(app=app, widgets=widgets, bg_color=bg_color)
+        super().__init__(app=app, widgets=widgets, bg_color=(0, 0, 0))
     
     def draw_background(self, display):
         super().draw_background(display)
