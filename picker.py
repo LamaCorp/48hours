@@ -1,19 +1,28 @@
-import datetime
+import os
 
+import pygame
 from graphalama.buttons import CarouselSwitch
 from graphalama.text import SimpleText
 from graphalama.shapes import RoundedRect
 from graphalama.constants import BOTTOM, WHITESMOKE, LLAMA, CENTER
+from graphalama.maths import Pos
 
 from widgets import MenuButton, SettingsButton, PlayButton
 from constants import LIGHT_DARK
-from config import CONFIG, LEVELS, get_index_from_name, get_available_levels
+from config import CONFIG, LEVELS, get_index_from_name, get_available_levels, LEVELS_GRAPHICAL_FOLDER
 from idle_screen import IdleScreen
 
 
 class PickerScreen(IdleScreen):
     def __init__(self, app):
         size = app.display.get_size()
+
+        self.ak47 = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
+        self.ak47.set_colorkey((255, 0, 255))
+        for _ in range(2):
+            self.ak47 = pygame.transform.scale2x(self.ak47)
+        self.ak47 = pygame.transform.rotate(self.ak47, -30)
+
         self.play_button = PlayButton(app, (size[0] // 2, size[1] // 2 + 75))
         self.selector = CarouselSwitch(options=get_available_levels,
                                        on_choice=PickerScreen.level_setter,
@@ -100,3 +109,9 @@ class PickerScreen(IdleScreen):
         self.best_time.text = self.time_text(level_stats[1])
         self.exploded_blocks.text = self.blocks_exploded_text(level_stats[3])
 
+    def render(self, display):
+        super().render(display)
+        if CONFIG.levels_stats[str(CONFIG.level)][2] >= 1:
+            rect = self.ak47.get_rect()
+            rect.center = self.selector.absolute_topleft + Pos(self.selector.size[0] - 100, 10)
+            display.blit(self.ak47, rect)
