@@ -1,9 +1,10 @@
 import json
 import os
+import random
 from functools import lru_cache
 from typing import List
 
-from blocks import Block, Stone
+from blocks import Block, Stone, get_boom_img
 from constants import MAPS_FOLDER, START
 from config import LEVELS, CONFIG, get_index_from_name
 from entities import Spawn, Object, AK47
@@ -25,7 +26,8 @@ class Level:
         self.over = False
         self.to_reset = False
         self.expolding = False
-        self.expolsion_heads = set()
+        self.to_explode = []
+        self.exploded = []
 
     def __str__(self):
         return "\n".join([
@@ -220,6 +222,10 @@ class Level:
                 block.internal_logic(self)
 
     def render(self, surf):
+        if self.expolding:
+            self.render_explode(surf)
+            return
+
         self.screen_size = Pos(surf.get_size())
         offset = self.world_to_map(self.offset)
         offset_end = (offset + self.world_to_map(self.screen_size))
@@ -245,22 +251,40 @@ class Level:
 
     def explode(self, start_pos):
         self.expolding = True
-        self.expolsion_heads.add(start_pos)
+        self.to_explode = [
+            b
+            for line in self.grid
+            for b in line
+            if self.inside_display(b.pos) and b.solid
+        ]
+        self.exploded = []
 
     def explosion_logic(self):
-        for head in self.expolsion_heads:
-            self.grid[head[1]][head[0]].explode()
+        for i in range(min(5, len(self.to_explode))):
+            b = random.choice(self.to_explode)
+            self.to_explode.remove(b)
+            self.exploded.append(b)
+            b.explode()
 
-        # we spread the explosions to al neighbours not exploded
-        new_heads = set()
-        for head in self.expolsion_heads:
-            for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
-                x, y = head[0] + dx, head[1] + dy
-                if self.inside_display((x, y)) and not self.grid[y][x].exploded:
-                    new_heads.add((x, y))
-
-        self.expolsion_heads.clear()
-        self.expolsion_heads = new_heads
-
-        if not self.expolsion_heads:
+        if not self.to_explode and not self.exploded:
             self.over = True
+        return
+
+    def render_explode(self, surf):
+
+        for block in self.to_explode:
+            world_pos = self.map_to_display(block.pos)
+            surf.blit(self.get_img_at(block.pos), world_pos)
+
+        for block in self.exploded[:]:
+            world_pos = self.map_to_display(block.pos)
+            if block.visible:
+                surf.blit(self.get_img_at(block.pos), world_pos)
+            surf.blit(get_boom_img(int(block.explode_frame)), world_pos - (16, 16))
+
+            if block.explode_frame <= 15:
+                block.explode_frame += 1/3
+                if block.explode_frame > 4:
+                    block.visible = False
+            else:
+                self.exploded.remove(block)

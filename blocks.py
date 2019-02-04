@@ -13,6 +13,14 @@ from helper import classproperty
 from physics import Pos
 
 
+@lru_cache()
+def get_boom_img(i):
+    path = os.path.join(LEVELS_GRAPHICAL_FOLDER, 'boom', f'BOOOM{i}.png')
+    img = pygame.image.load(path).convert()
+    img.set_colorkey((0, 0, 0))
+    return img
+
+
 def re_compile(matrix):
     """Compile the matrix of pattern and replace the " " by dots to match the air."""
     compiled = []
@@ -43,6 +51,7 @@ class Block:
     def __init__(self, pos=(0, 0)):
         self.pos = pos
         self.exploded = False
+        self.explode_frame = 1
 
     @staticmethod
     def new(character='.', pos=(0, 0)):
@@ -71,7 +80,6 @@ class Block:
         return self.img_at(*self.default_sprite_pos, rotation=rotation)
 
     def explode(self):
-        self.visible = False
         self.exploded = True
 
     @classmethod
@@ -82,6 +90,7 @@ class Block:
 
     def internal_logic(self, level):
         pass
+
 
     def on_collision(self, level):
         pass
