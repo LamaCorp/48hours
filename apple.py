@@ -21,7 +21,17 @@ pygame.init()
 
 MAP_SIZE = (120, 40)
 LEVEL_NAME = "fail"
+EDIT = 1
 
+
+def square_range(a, b):
+    """Yield all positions in the rectangle between A and B."""
+    tl = min(a[0], b[0]), min(a[1], b[1])
+    br = max(a[0], b[0]), max(a[1], b[1])
+
+    for y in range(tl[1], br[1] + 1):
+        for x in range(tl[0], br[0] + 1):
+            yield x, y
 
 class LevelEdit(Level):
 
@@ -133,9 +143,6 @@ class LevelEdit(Level):
             surf.blit(obj.img, pos)
 
 
-EDIT = 1
-
-
 class EditScreen(Screen):
     BRUSH = 1
     OBJECTBRUSH = 2
@@ -189,6 +196,10 @@ class EditScreen(Screen):
         self.level.offset.x += self.menu_width
         self._tile_index = 0
         self._object_index = SPAWN
+
+        # Rectangle stuff
+        self.last_placed = (0, 0)
+        self.rectangle = False
 
         # editor settings
         self.drawing = False
@@ -269,6 +280,11 @@ class EditScreen(Screen):
                 self.tool_carousel.option_index = self.tool_carousel.options.index("Eraser")
             elif event.key == pygame.K_o:
                 self.tool_carousel.option_index = self.tool_carousel.options.index("ObjectBrush")
+            elif event.key == pygame.K_LSHIFT:
+                self.rectangle = True
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LSHIFT:
+                self.rectangle = False
 
         if self.start_drag:
             self.level.offset = Pos(self.start_drag_map_pos) + 2*(self.start_drag - Pos(pygame.mouse.get_pos()))
@@ -279,11 +295,25 @@ class EditScreen(Screen):
             pos = self.level.display_to_map(pos)
 
             if self.tool == self.BRUSH:
-                self.level.add_block(pos, self.tile_index)
+                if self.rectangle:
+                    for pos in square_range(self.last_placed, pos):
+                        self.level.add_block(pos, self.tile_index)
+                else:
+                    self.level.add_block(pos, self.tile_index)
             elif self.tool == self.ERASER:
-                self.level.erase(pos)
+                if self.rectangle:
+                    for pos in square_range(self.last_placed, pos):
+                        self.level.erase(pos)
+                else:
+                    self.level.erase(pos)
             elif self.tool == self.OBJECTBRUSH:
-                self.level.add_object(pos, self.current_object)
+                if self.rectangle:
+                    for pos in square_range(self.last_placed, pos):
+                        self.level.add_object(pos, self.current_object)
+                else:
+                    self.level.add_object(pos, self.current_object)
+
+            self.last_placed = pos
 
     def render(self, display):
         self.draw_background(display)
