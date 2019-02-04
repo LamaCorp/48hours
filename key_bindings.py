@@ -1,7 +1,8 @@
 from graphalama.buttons import Button, CarouselSwitch, CheckBox
+from graphalama.core import Widget
 from graphalama.shapes import RoundedRect
 from graphalama.text import SimpleText
-from graphalama.constants import BOTTOM, WHITESMOKE, Monokai, CENTER
+from graphalama.constants import BOTTOM, WHITESMOKE, Monokai, CENTER, LEFT, LLAMA
 
 from widgets import MenuButton, Title
 from constants import LIGHT_DARK, PLAYER_FOLDER, SETTINGS
@@ -13,6 +14,18 @@ class KeyBindingsScreen(IdleScreen):
     def __init__(self, app):
         size = app.display.get_size()
 
+        def pos(n, block):
+            return (size[0] // 2 + (n - 1.5) * 300,
+                   size[1] // 2 + (block - 0.3) * 150)
+
+
+
+        def check(text, n, block):
+            return CheckBox(text=text,
+                            pos=pos(n, block),
+                            color=WHITESMOKE,
+                            anchor=CENTER)
+
         self.selector_move = CarouselSwitch(options=list(KEYS_DICTS["MOVE"]),
                                             on_choice=KeyBindingsScreen.bindings_setter,
                                             pos=(size[0] // 2, size[1] // 2 - 150),
@@ -21,51 +34,31 @@ class KeyBindingsScreen(IdleScreen):
                                             bg_color=LIGHT_DARK,
                                             arrow_color=WHITESMOKE,
                                             anchor=BOTTOM)
-        self.run_lshift_checkbox = CheckBox(text="Left Shift",
-                                            pos=(size[0] // 2 - 450, size[1] // 2 - 50),
-                                            color=WHITESMOKE,
-                                            anchor=CENTER)
-        self.run_rshift_checkbox = CheckBox(text="Right Shift",
-                                            pos=(size[0] // 2 - 150, size[1] // 2 - 50),
-                                            color=WHITESMOKE,
-                                            anchor=CENTER)
-        self.run_lctrl_checkbox = CheckBox(text="Left Ctrl",
-                                           pos=(size[0] // 2 + 150, size[1] // 2 - 50),
-                                           color=WHITESMOKE,
-                                           anchor=CENTER)
-        self.run_rctrl_checkbox = CheckBox(text="Right Ctrl",
-                                           pos=(size[0] // 2 + 450, size[1] // 2 - 50),
-                                           color=WHITESMOKE,
-                                           anchor=CENTER)
+        self.run_lshift_checkbox = check("Left Shift", 0, 0)
+        self.run_rshift_checkbox = check('Right Shift', 1, 0)
+        self.run_lctrl_checkbox = check('Left Ctrl', 2, 0)
+        self.run_rctrl_checkbox = check('Right Ctrl', 3, 0)
 
-        self.jump_space_checkbox = CheckBox(text="Space bar",
-                                            pos=(size[0] // 2 - 450, size[1] // 2 + 150),
-                                            color=WHITESMOKE,
-                                            anchor=CENTER)
-        self.jump_w_checkbox = CheckBox(text="W",
-                                        pos=(size[0] // 2 - 150, size[1] // 2 + 150),
-                                        color=WHITESMOKE,
-                                        anchor=CENTER)
-        self.jump_z_checkbox = CheckBox(text="Z",
-                                        pos=(size[0] // 2 + 150, size[1] // 2 + 150),
-                                        color=WHITESMOKE,
-                                        anchor=CENTER)
-        self.jump_uparrow_checkbox = CheckBox(text="Up arrow",
-                                              pos=(size[0] // 2 + 450, size[1] // 2 + 150),
-                                              color=WHITESMOKE,
-                                              anchor=CENTER)
+        self.jump_space_checkbox = check('Space Bar', 0, 1)
+        self.jump_w_checkbox = check('W', 1, 1)
+        self.jump_z_checkbox = check('Z', 2, 1)
+        self.jump_uparrow_checkbox = check('Up arrow', 3, 1)
 
         widgets = [
             Title("Key bindings", size),
+            Widget((size[0] // 2, size[1] // 2),
+                   shape=RoundedRect((1200, 400), rounding=20, percent=False),
+                   bg_color=(100, 100, 100, 180),
+                   anchor=CENTER),
             SimpleText(text="Moving around",
                        pos=(size[0] // 2, size[1] // 2 - 255),
-                       color=WHITESMOKE,
+                       color=LLAMA,
                        anchor=CENTER),
             self.selector_move,
 
             SimpleText(text="Running",
                        pos=(size[0] // 2, size[1] // 2 - 100),
-                       color=WHITESMOKE,
+                       color=LLAMA,
                        anchor=CENTER),
             self.run_lshift_checkbox,
             self.run_rshift_checkbox,
@@ -74,7 +67,7 @@ class KeyBindingsScreen(IdleScreen):
 
             SimpleText(text="Might as well jump!",
                        pos=(size[0] // 2, size[1] // 2 + 50),
-                       color=WHITESMOKE,
+                       color=LLAMA,
                        anchor=CENTER),
             self.jump_space_checkbox,
             self.jump_w_checkbox,
