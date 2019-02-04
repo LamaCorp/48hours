@@ -77,13 +77,16 @@ class IdleScreen(Screen):
             return
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
+            if event.key in (pygame.K_RETURN, pygame.K_SPACE):
                 self.widgets[self.focused_button_index].function()
             elif event.key == pygame.K_DOWN or event.key == pygame.K_TAB:
                 self.unfocus_render(self.widgets, self.focused_button_index)
                 self.focused_button_index = self.get_next_button()
                 self.focus_render(self.widgets, self.focused_button_index)
-            elif event.key == pygame.K_UP:
+            elif event.key == pygame.K_UP or \
+                    (((pygame.key.get_mods() & pygame.KMOD_LSHIFT) or
+                      (pygame.key.get_mods() & pygame.KMOD_RSHIFT))
+                     and event.key == pygame.K_TAB):
                 self.unfocus_render(self.widgets, self.focused_button_index)
                 self.focused_button_index = self.get_previous_button()
                 self.focus_render(self.widgets, self.focused_button_index)

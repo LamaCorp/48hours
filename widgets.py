@@ -246,7 +246,6 @@ class Segment(Widget):
 
     def draw_content(self, content_surf):
         w, h = content_surf.get_size()
-        print(w, h)
         if self.case == "-":
             pygame.draw.line(content_surf, self.color.color, (0, 0), (w, 0))
         elif self.case == "|":

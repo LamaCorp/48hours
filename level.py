@@ -107,6 +107,7 @@ class Level:
     def world_size(self):
         """(width, height), in pixels"""
         return Level.map_to_world(self.size)
+
     @classmethod
     def load(cls, path, num=-1):
         try:
@@ -114,14 +115,13 @@ class Level:
             level.path = path
             return level
         except:
-            print('Can not load as v1')
+            pass
 
         try:
             level = cls.load_v2(path, num)
             level.path = path
             return level
         except:
-            print('Can not load as v2')
             raise
 
     @classmethod
@@ -149,12 +149,10 @@ class Level:
             if isinstance(obj, Spawn):
                 level.start = obj.pos
             elif isinstance(obj, Projectile):
-                print(level.num)
                 if not is_editor and isinstance(obj, AK47) and CONFIG.levels_stats[str(num)][2] >= 1:
                     pass
                 else:
                     level.spawn(obj)
-                    print(obj)
 
         return level
 
