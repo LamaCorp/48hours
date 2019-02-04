@@ -42,14 +42,14 @@ class PickerScreen(IdleScreen):
                                           color=WHITESMOKE,
                                           anchor=CENTER)
         widgets = [
-            MenuButton(app, (size[0] - 365, 100)),
-            SettingsButton(app, (size[0] - 135, 100)),
             self.selector,
             self.play_button,
             self.level_text,
             self.deaths_text,
             self.best_time,
             self.exploded_blocks,
+            MenuButton(app, (size[0] - 365, 100)),
+            SettingsButton(app, (size[0] - 135, 100)),
         ]
 
         self.selector.option_index = CONFIG.level

@@ -27,12 +27,12 @@ class StatisticsScreen(IdleScreen):
 
         widgets = [
             Title("Statistics, math, numbers, science", size, font_size=110),
-            MenuButton(app, (size[0] - 135, 250)),
             *stats("Death count", self.get_total_deaths(), 0),
             *stats("Average death per level", self.get_avg_deaths_per_lvl(), 1),
             *stats("Total blocks exploded", self.get_total_blocks_exploded(), 2),
             *stats("Total completion", self.get_total_completion(), 3),
             *stats("Автомат Калашникова picked up", get_nb_ak47(), 4),
+            MenuButton(app, (size[0] - 135, 250)),
         ]
 
         super().__init__(app, widgets, (20, 10, 0))

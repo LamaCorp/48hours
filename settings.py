@@ -27,12 +27,11 @@ class SettingsScreen(IdleScreen):
                                               anchor=BOTTOM)
         widgets = [
             Title("Settings", size),
-            MenuButton(app, (size[0] - 135, 250)),
+            self.player_selector,
             SimpleText(text="Get more Kalachnikovs to unlock more!",
                        pos=(size[0] // 2, size[1] // 2 + 25),
                        color=WHITESMOKE,
                        anchor=BOTTOM),
-            self.player_selector,
             Button(text="Key Bindings",
                    function=lambda: app.set_screen(KEY_BIND),
                    shape=RoundedRect((250, 50), 100),
@@ -40,6 +39,7 @@ class SettingsScreen(IdleScreen):
                    bg_color=(200, 200, 200, 72),
                    pos=(size[0] // 2, size[1] // 2 + 100),
                    anchor=BOTTOM),
+            MenuButton(app, (size[0] - 135, 250)),
 
         ]
 

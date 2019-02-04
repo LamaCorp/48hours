@@ -8,8 +8,8 @@ class MenuScreen(IdleScreen):
         widgets = [
             Title("Llama destroys the world", size),
             PickerButton(app, (size[0] // 2, size[1] // 2 - 98)),
-            SettingsButton(app, (size[0] // 2, size[1] // 2 - 33)),
-            StatisticsButton(app, (size[0] // 2, size[1] // 2 + 33)),
+            StatisticsButton(app, (size[0] // 2, size[1] // 2 - 33)),
+            SettingsButton(app, (size[0] // 2, size[1] // 2 + 33)),
             QuitButton(app, (size[0] // 2, size[1] // 2 + 98)),
         ]
 
