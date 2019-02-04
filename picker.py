@@ -42,8 +42,8 @@ class PickerScreen(IdleScreen):
                                           color=WHITESMOKE,
                                           anchor=CENTER)
         widgets = [
-            self.selector,
             self.play_button,
+            self.selector,
             self.level_text,
             self.deaths_text,
             self.best_time,
