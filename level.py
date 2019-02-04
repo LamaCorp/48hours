@@ -87,7 +87,6 @@ class Level:
         map_pos = self.world_to_map(world_pos)
         return self.get_block(map_pos)
 
-    # @lru_cache(maxsize=None)
     def get_img_at(self, map_pos):
         if map_pos in self.img_cache:
             return self.img_cache[map_pos]

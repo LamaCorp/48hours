@@ -1,8 +1,11 @@
 import os
+from typing import List
+
 import pygame
 
 from graphalama.app import Screen
 from graphalama.buttons import Button, CarouselSwitch
+from graphalama.core import Widget
 from graphalama.shadow import NoShadow, Shadow
 from graphalama.constants import LLAMA, GREY
 
@@ -65,12 +68,14 @@ class IdleScreen(Screen):
                 return widget
 
     @staticmethod
-    def focus_render(widgets, i):
+    def focus_render(widgets: List[Widget], i):
+        widgets[i].shape.border = 2
         widgets[i].border_color = LLAMA  # FIXME: doesn't actually change it
 
     @staticmethod
     def unfocus_render(widgets, i):
         widgets[i].border_color = GREY  # FIXME: doesn't actually change it
+        widgets[i].shape.border = 0
 
     def update(self, event):
         if self.focused_button_index == -1:
