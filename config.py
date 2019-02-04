@@ -44,10 +44,10 @@ LEVELS = {
     '2': ("level_2.map", "2: A bit more boring stuff"),
     '3': ("level_3.map", "3: Round and round"),
     '4': ("level_4.map", "4: Here we go"),
-    '5': ("level_5.map", "5: Get your shit together, Garry"),
-    '6': ("level_6.map", "6: Getting to know each other"),
-    '7': ("level_7.map", "7: HF bro"),
-    '8': ("level_8.map", "8: Insert Emotion"),
+    '5': ("level_5.map", "5: Insert Emotion"),
+    '6': ("level_6.map", "6: Get your shit together, Garry"),
+    '7': ("level_7.map", "7: Getting to know each other"),
+    '8': ("level_8.map", "8: HF bro"),
 }
 
 KEYS_DICTS = {
