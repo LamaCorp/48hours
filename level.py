@@ -274,6 +274,7 @@ class Level:
             self.to_explode.remove(b)
             self.exploded.append(b)
             b.explode()
+            CONFIG.levels_stats[str(self.num)][3] += 1
 
         if not self.to_explode and not self.exploded:
             self.over = True

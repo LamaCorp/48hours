@@ -89,10 +89,12 @@ class GameScreen(Screen):
             self.start_time = time.time()
             CONFIG.levels_stats[str(self.level.num)][0] += 1
         elif self.level.expolding:
+            # Saving run time if best
             run_time = time.time() - self.start_time
             level_stats = CONFIG.levels_stats[str(self.level.num)]
             if level_stats[1] == -1 or run_time < level_stats[1]:
                 CONFIG.levels_stats[str(self.level.num)][1] = run_time
+            # Actually explode
             self.level.internal_logic()
         else:
             self.space.simulate()

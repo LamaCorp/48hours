@@ -63,12 +63,12 @@ class Config(configlib.Config):
     }
 
     levels_stats = {
-        '0': [0, -1, 0],  # Number of deaths in the level, best time, has the AK-47 been taken?
-        '1': [0, -1, 0],
-        '2': [0, -1, 0],
-        '3': [0, -1, 0],
-        '4': [0, -1, 0],
-        '5': [0, -1, 0],
+        '0': [0, -1, 0, 0, ],  # number of deaths in the level,
+        '1': [0, -1, 0, 0, ],  # best time,
+        '2': [0, -1, 0, 0, ],  # has the AK-47 been taken?,
+        '3': [0, -1, 0, 0, ],  # number of blocks popped,
+        '4': [0, -1, 0, 0, ],
+        '5': [0, -1, 0, 0, ],
     }
 
 

@@ -30,8 +30,9 @@ class StatisticsScreen(IdleScreen):
             MenuButton(app, (size[0] - 135, 250)),
             *stats("Death count", self.get_total_deaths(), 0),
             *stats("Average death per level", self.get_avg_deaths_per_lvl(), 1),
-            *stats("Total completion", self.get_total_completion(), 2),
-            *stats("Автомат Калашникова picked up", get_nb_ak47(), 3)
+            *stats("Total blocks exploded", self.get_total_blocks_exploded(), 2),
+            *stats("Total completion", self.get_total_completion(), 3),
+            *stats("Автомат Калашникова picked up", get_nb_ak47(), 4),
         ]
 
         super().__init__(app, widgets, (20, 10, 0))
@@ -61,3 +62,10 @@ class StatisticsScreen(IdleScreen):
 
         percent = levels_completed * 100 / len(CONFIG.levels_stats)
         return f"{int(percent)}%"
+
+    @staticmethod
+    def get_total_blocks_exploded():
+        total = 0
+        for level in CONFIG.levels_stats:
+            total += CONFIG.levels_stats[level][3]
+        return total

@@ -37,6 +37,10 @@ class PickerScreen(IdleScreen):
                                     pos=(size[0] // 2, size[1] // 2 + 250),
                                     color=WHITESMOKE,
                                     anchor=CENTER)
+        self.exploded_blocks = SimpleText(text=self.blocks_exploded_text(level_stats[3]),
+                                          pos=(size[0] // 2, size[1] // 2 + 300),
+                                          color=WHITESMOKE,
+                                          anchor=CENTER)
         widgets = [
             MenuButton(app, (size[0] - 365, 100)),
             SettingsButton(app, (size[0] - 135, 100)),
@@ -45,6 +49,7 @@ class PickerScreen(IdleScreen):
             self.level_text,
             self.deaths_text,
             self.best_time,
+            self.exploded_blocks,
         ]
 
         self.selector.option_index = CONFIG.level
@@ -81,8 +86,17 @@ class PickerScreen(IdleScreen):
         else:
             return "Your best time is {:02}.{:03}s".format(seconds, mili)
 
+    def blocks_exploded_text(self, n_blocks):
+        block_count = "You didn't explode any blocks"
+        if n_blocks == 1:
+            block_count = f"You exploded {n_blocks} block"
+        elif n_blocks > 1:
+            block_count = f"You exploded {n_blocks} blocks"
+        return block_count
+
     def internal_logic(self):
         level_stats = CONFIG.levels_stats[str(self.selector.option_index)]
         self.deaths_text.text = self.death_count_text(level_stats[0])
         self.best_time.text = self.time_text(level_stats[1])
+        self.exploded_blocks.text = self.blocks_exploded_text(level_stats[3])
 
