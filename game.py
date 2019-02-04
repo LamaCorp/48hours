@@ -1,11 +1,14 @@
+import os
+
 import pygame
 import time
 from graphalama.app import Screen
+from graphalama.colors import ImageBrush
 
 from idle_screen import IdleScreen
 from player import Player
 from level import Level
-from constants import PICKER
+from constants import PICKER, LEVELS_GRAPHICAL_FOLDER
 from config import CONFIG, LEVELS
 from physics import Pos
 from widgets import Title, ResumeButton, QuitButton, MenuButton, PauseButton
@@ -54,7 +57,8 @@ class GameScreen(Screen):
             PauseButton(self.pause, (size[0] - 30, 30)),
         ]
 
-        super().__init__(app, widgets, bg_color=(0, 165, 255))
+        bg = ImageBrush.from_file(os.path.join(LEVELS_GRAPHICAL_FOLDER, 'bg.jpg'))
+        super().__init__(app, widgets, bg_color=bg)
 
     def pause(self):
         """ Pause the game by going into PauseScreen """
