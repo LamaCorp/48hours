@@ -5,13 +5,13 @@ import time
 from graphalama.app import Screen
 from graphalama.colors import ImageBrush
 
-from idle_screen import IdleScreen
+from screens.idle_screen import IdleScreen
 from player import Player
 from level import Level
 from constants import PICKER, LEVELS_GRAPHICAL_FOLDER
 from config import CONFIG, LEVELS
 from physics import Pos
-from widgets import Title, ResumeButton, QuitButton, MenuButton, PauseButton
+from screens.widgets import Title, ResumeButton, QuitButton, MenuButton, PauseButton
 
 
 class PauseScreen(IdleScreen):

@@ -59,7 +59,7 @@ def PickerButton(app, pos=None, anchor=CENTER):
 
 
 def PlayButton(app, pos=None, anchor=CENTER):
-    from game import GameScreen
+    from screens.game import GameScreen
     from level import Level
     from config import CONFIG
     return Button(text="Play",

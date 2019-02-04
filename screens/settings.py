@@ -7,10 +7,10 @@ from graphalama.shapes import RoundedRect
 from graphalama.text import SimpleText
 from graphalama.constants import BOTTOM, WHITESMOKE, Monokai
 
-from widgets import MenuButton, Title
+from screens.widgets import MenuButton, Title
 from constants import LIGHT_DARK, PLAYER_FOLDER, KEY_BIND
 from config import get_available_players, CONFIG, get_index_from_name, PLAYERS
-from idle_screen import IdleScreen
+from screens.idle_screen import IdleScreen
 
 
 class SettingsScreen(IdleScreen):

@@ -1,5 +1,5 @@
-from idle_screen import IdleScreen
-from widgets import Title, PickerButton, SettingsButton, QuitButton, StatisticsButton
+from screens.idle_screen import IdleScreen
+from screens.widgets import Title, PickerButton, SettingsButton, QuitButton, StatisticsButton
 
 
 class MenuScreen(IdleScreen):

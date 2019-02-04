@@ -1,8 +1,8 @@
 from graphalama.text import SimpleText
 from graphalama.constants import (WHITESMOKE, LEFT, RIGHT)
-from idle_screen import IdleScreen
+from screens.idle_screen import IdleScreen
 from config import CONFIG, get_nb_ak47
-from widgets import Title, MenuButton, Segment
+from screens.widgets import Title, MenuButton, Segment
 
 
 class StatisticsScreen(IdleScreen):

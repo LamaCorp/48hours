@@ -7,10 +7,10 @@ from graphalama.shapes import RoundedRect
 from graphalama.constants import BOTTOM, WHITESMOKE, LLAMA, CENTER
 from graphalama.maths import Pos
 
-from widgets import MenuButton, SettingsButton, PlayButton
+from screens.widgets import MenuButton, SettingsButton, PlayButton
 from constants import LIGHT_DARK
 from config import CONFIG, LEVELS, get_index_from_name, get_available_levels, LEVELS_GRAPHICAL_FOLDER
-from idle_screen import IdleScreen
+from screens.idle_screen import IdleScreen
 
 
 class PickerScreen(IdleScreen):

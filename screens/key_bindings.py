@@ -3,12 +3,12 @@ from graphalama.buttons import Button, CarouselSwitch, CheckBox
 from graphalama.core import Widget
 from graphalama.shapes import RoundedRect
 from graphalama.text import SimpleText
-from graphalama.constants import BOTTOM, WHITESMOKE, Monokai, CENTER, LEFT, LLAMA
+from graphalama.constants import BOTTOM, WHITESMOKE, Monokai, CENTER, LLAMA
 
-from widgets import MenuButton, Title
-from constants import LIGHT_DARK, PLAYER_FOLDER, SETTINGS
-from config import CONFIG, KEYS_DICTS, get_index_from_name
-from idle_screen import IdleScreen
+from screens.widgets import Title
+from constants import LIGHT_DARK, SETTINGS
+from config import CONFIG, KEYS_DICTS
+from screens.idle_screen import IdleScreen
 
 
 class KeyBindingsScreen(IdleScreen):

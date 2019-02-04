@@ -2,12 +2,10 @@ import os
 from typing import List
 
 import pygame
-
 from graphalama.app import Screen
 from graphalama.buttons import Button, CarouselSwitch
-from graphalama.core import Widget
-from graphalama.shadow import NoShadow, Shadow
 from graphalama.constants import LLAMA, GREY
+from graphalama.core import Widget
 
 from constants import PLAYER_FOLDER
 
