@@ -6,7 +6,7 @@ from graphalama.buttons import CarouselSwitch
 from graphalama.colors import Gradient, MultiGradient, mix
 from graphalama.constants import (CENTER, NICE_BLUE, PURPLE, GREEN,
                                   Monokai, YELLOW, RED, TOP, WHITESMOKE, RAINBOW, LEFT, RIGHT, TRANSPARENT, LLAMA,
-                                  TOPRIGHT, TOPLEFT)
+                                  TOPRIGHT, TOPLEFT, ORANGE)
 from graphalama.core import Widget
 from graphalama.font import default_font
 from graphalama.maths import Pos
@@ -23,7 +23,7 @@ def Title(text, screen_size, anchor=TOP, font_size=150):
                       shape=Rectangle((screen_size[0] + 2, 200), border=1),
                       color=MultiGradient(*RAINBOW),
                       # bg_color=DARK + (172,),
-                      bg_color=(30,) * 3,
+                      bg_color=GREY,
                       border_color=MultiGradient(*RAINBOW),
                       font=default_font(font_size),
                       anchor=anchor)
@@ -65,7 +65,7 @@ def PlayButton(app, pos=None, anchor=CENTER):
     from config import CONFIG
 
     button = PickerButton(app, pos, anchor)
-    button.function = lambda: app.set_temp_screen(lambda app: GameScreen(app, Level.load_num(CONFIG.level))),
+    button.function = lambda: app.set_temp_screen(lambda app: GameScreen(app, Level.load_num(CONFIG.level)))
     return button
 
 
@@ -84,7 +84,7 @@ def MenuButton(app, pos=None, anchor=CENTER):
                   function=lambda: app.set_screen(MENU),
                   shape=RoundedRect((200, 50), 100),
                   color=WHITESMOKE,
-                  bg_color=Gradient(GREEN, Monokai.GREEN),
+                  bg_color=Gradient(Monokai.GREEN, GREEN),
                   pos=pos,
                   anchor=anchor)
 

@@ -10,7 +10,7 @@ class StatisticsScreen(IdleScreen):
         size = app.display.get_size()
 
         def stats(text, figure, n):
-            y = size[1] // 2 + 100 * (n + 1)
+            y = size[1] // 2 + 100 * (n - 2)
             x = size[0] // 2 - 300
             text = SimpleText(text=text,
                               pos=(x, y),
