@@ -69,19 +69,7 @@ class Config(configlib.Config):
 
     bindings = BindingsConfig()
 
-    levels_stats = {
-        '0': [0, -1, 0, 0, ],  # number of deaths in the level,
-        '1': [0, -1, 0, 0, ],  # best time,
-        '2': [0, -1, 0, 0, ],  # has the AK-47 been taken?,
-        '3': [0, -1, 0, 0, ],  # number of blocks popped,
-        '4': [0, -1, 0, 0, ],
-        '5': [0, -1, 0, 0, ],
-        '6': [0, -1, 0, 0, ],
-        '7': [0, -1, 0, 0, ],
-        '8': [0, -1, 0, 0, ],
-        '9': [0, -1, 0, 0, ],
-        '10': [0, -1, 0, 0, ],
-    }
+    levels_stats = {i: [0, -1, 0, 0] for i in LEVELS}
 
 
 CONFIG = Config()
