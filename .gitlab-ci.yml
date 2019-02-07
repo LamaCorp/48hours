@@ -16,7 +16,7 @@ code_quality:
     paths: [gl-code-quality-report.json]
 
 archlinux:
-  image: base/archlinux
+  image: archlinux/base
   script:
     - echo -e "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
     - pacman -Syu --noconfirm
