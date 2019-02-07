@@ -8,10 +8,11 @@ Let's see what can come out of it
 
 To run it:
 ```bash
-# Create a venv if you want to
-git clone https://gitlab.com/lama-corp/48hours.git lama-destroys-the-world
-cd lama-destroys-the-world
-pip3 install -r requirements.txt
+git clone -b master --single-branch --depth=1 git@gitlab.com:lama-corp/48hours.git
+cd 48hours
+python3 -m venv .venv
+source .venv/bin/activate
+pip3 install -U -r requirements.txt
 python .
 # Have fun!
 ```
