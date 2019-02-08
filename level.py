@@ -7,7 +7,7 @@ from typing import List
 from blocks import Block, Stone, get_boom_img
 from constants import MAPS_FOLDER, START
 from config import LEVELS, CONFIG, get_index_from_name
-from entities import Spawn, Object, AK47
+from entities import Spawn, Object, AK47, Particle
 from physics import Space, Pos, clamp, Projectile
 
 
@@ -28,6 +28,7 @@ class Level:
         self.expolding = False
         self.to_explode = []
         self.exploded = []
+        self.particles = []
         self.img_cache = {}
 
     def __str__(self):
@@ -261,19 +262,30 @@ class Level:
             b
             for line in self.grid
             for b in line
-            if self.inside_display(b.pos) and b.solid
+            if self.inside_display(b.pos) and b.visible
         ]
         self.exploded = []
 
     def explosion_logic(self):
+
+        for part in self.particles:
+            part.internal_logic()
+        self.particles = [p for p in self.particles if not p.dead and p.pos.y < self.screen_size[1]]
+
         for i in range(min(5, len(self.to_explode))):
             b = random.choice(self.to_explode)
             self.to_explode.remove(b)
             self.exploded.append(b)
             b.explode()
+            # particles
+            for i in range(5):
+                angle = random.randint(0, 360)
+                velocity = 25 * Pos.unit_y().rotate(angle)
+                pos = self.map_to_display(b.pos)
+                self.particles.append(Particle(pos, velocity, size=6))
             CONFIG.levels_stats[str(self.num)][3] += 1
 
-        if not self.to_explode and not self.exploded:
+        if not self.to_explode and not self.exploded and not self.particles:
             self.over = True
         return
 
@@ -295,3 +307,9 @@ class Level:
                     block.visible = False
             else:
                 self.exploded.remove(block)
+
+        for part in self.particles:
+            part.render(surf)
+
+        dx, dy = random.randint(-5, 6), random.randint(-5, 6)
+        surf.scroll(dx, dy)

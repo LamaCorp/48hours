@@ -3,6 +3,7 @@ import random
 from functools import lru_cache
 
 import pygame
+from graphalama.colors import mix
 
 from constants import LEVELS_GRAPHICAL_FOLDER, DEFAULT_BLOCK_SIZE, BROCHETTE_VELOCITY, FRAME_BEFORE_DESPAWN
 from config import get_available_blocks
@@ -130,6 +131,46 @@ class Brochette(Projectile):
             self.ttl -= 1
             if self.ttl <= 0:
                 self.dead = True
+
+class Particle:
+    def __init__(self, pos, velocity=(0, 0), acceleration=(0, 1), friction=0.1, life_time: int=60, size=3,
+                 color=(255, 165, 0), color_shift=(80, 00, 0)):
+        """Create a particle with a constant acceleration"""
+        self.pos = Pos(pos)
+        self.velocity = Pos(velocity)
+        self.acceleration = Pos(acceleration)
+        self.friction = friction
+        self.life_time = life_time
+        self.age = 0
+        self.color = color
+        self.color_shift = color_shift
+        self.size = size
+        self.dead = False
+
+    def internal_logic(self):
+        self.velocity += self.acceleration - self.friction * self.velocity
+        self.pos += self.velocity
+        self.age += 1
+        if self.age > self.life_time:
+            self.dead = True
+
+    def render(self, surf: pygame.Surface):
+        life_prop = 1 - self.age / self.life_time
+        color = mix(self.color, self.color_shift, life_prop)
+
+        rect = (self.pos, (self.size, self.size))
+        surf.fill(color, rect)
+
+        # img = self.get_img_surf(self.size, color, 255 * life_prop)
+        # surf.blit(img, self.pos)
+
+    @lru_cache()
+    def get_img_surf(self, size, color, alpha):
+        img = pygame.Surface((size, size))
+        img.fill(color)
+        # img.set_alpha(round(alpha))
+        return img
+
 
 
 OBJECTS = {
