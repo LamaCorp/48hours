@@ -56,8 +56,12 @@ class GameScreen(Screen):
         widgets = [
             PauseButton(self.pause, (size[0] - 30, 30)),
         ]
+        bg = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, 'bg.png'))
+        for i in range(2):
+            bg = pygame.transform.scale2x(bg)
 
-        bg = ImageBrush.from_file(os.path.join(LEVELS_GRAPHICAL_FOLDER, 'bg.jpg'))
+
+        bg = ImageBrush(bg)
         super().__init__(app, widgets, bg_color=bg)
 
     def pause(self):
