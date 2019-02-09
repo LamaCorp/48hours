@@ -65,9 +65,11 @@ class StatisticsScreen(IdleScreen):
         levels_completed = 0
         for level in CONFIG.levels_stats:
             if CONFIG.levels_stats[level][1] != -1:
+                levels_completed += 2
+            if CONFIG.levels_stats[level][2] == 1:
                 levels_completed += 1
 
-        percent = levels_completed * 100 / len(CONFIG.levels_stats)
+        percent = levels_completed * 100 / (len(CONFIG.levels_stats) * 3)
         return f"{int(percent)}%"
 
     @staticmethod

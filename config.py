@@ -66,7 +66,8 @@ class BindingsConfig(configlib.SubConfig):
 class Config(configlib.Config):
     __config_path__ = os.path.abspath(os.path.join(ASSETS, "config.json"))
     __version__ = VERSION
-    __xor_key__ = b"Lamas will rule the world, so get prepared... Anyway, that's a secret key, so you should know it !?"
+    __xor_key__ = b"Lamas will rule the world, so get prepared..." \
+                  b"Anyway, that's a secret key, so should you really know it!?"
 
     level = 0
 
@@ -74,7 +75,7 @@ class Config(configlib.Config):
 
     bindings = BindingsConfig()
 
-    levels_stats = {i: [0, -1, 0, 0] for i in LEVELS}
+    levels_stats = {i: [0, -1, 0, 0] for i in LEVELS}  # nb of deaths, best time, nb of ak47, nb blocks exploded
 
     send_log = False
 
