@@ -1,20 +1,24 @@
 import json
 import os
 import random
-from functools import lru_cache
+import logging
+from time import time
 from typing import List
 
 from blocks import Block, Stone, get_boom_img
 from constants import MAPS_FOLDER, START
-from config import LEVELS, CONFIG, get_index_from_name
+from config import LEVELS, CONFIG
 from entities import Spawn, Object, AK47, Particle
 from physics import Space, Pos, clamp, Projectile
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Level:
     OFFSET_THRESHOLD = 40 / 100
 
     def __init__(self):
+        LOGGER.info("Initialized new level")
         self.num = 0
         self.space = Space(self, gravity=(0, 1))
         self.size = Pos(0, 0)
@@ -25,7 +29,7 @@ class Level:
         self.screen_size = (0, 0)
         self.over = False
         self.to_reset = False
-        self.expolding = False
+        self.exploding = False
         self.to_explode = []
         self.exploded = []
         self.particles = []
@@ -57,18 +61,19 @@ class Level:
                    (display_pos[1] + self.offset.y) // Block.DEFAULT_BLOCK_SIZE)
 
     def inside_map(self, map_pos):
-       return 0 <= map_pos[0] < self.size.x and 0 <= map_pos[1] < self.size.y
+        return 0 <= map_pos[0] < self.size.x and 0 <= map_pos[1] < self.size.y
 
     def inside_display(self, map_pos):
         world = self.map_to_world(map_pos)
-        return (self.offset.x <= world.x < self.offset.x + self.screen_size[0]
-            and self.offset.y <= world.y < self.offset.y + self.screen_size[1])
+        return (self.offset.x <= world.x < self.offset.x + self.screen_size[0] and
+                self.offset.y <= world.y < self.offset.y + self.screen_size[1])
 
     def get_block(self, map_pos):
         x, y = map_pos
         if self.inside_map(map_pos):
             return self.grid[y][x]
 
+        LOGGER.debug(f"Level - get_block - {x}, {y} not inside map. Return a Stone by default.")
         return Stone()
 
     def get_slice(self, map_top_left, map_bottom_right):
@@ -110,26 +115,31 @@ class Level:
 
     @classmethod
     def load(cls, path, num=-1):
+        LOGGER.info(f"Starting to load map {num} from path {path}")
         try:
             level = cls.load_v1(path)
             level.path = path
             return level
-        except:
-            pass
+        except Exception as e:
+            LOGGER.info(f"Could not load map as v1. This is ok as we should only have v2 maps. "
+                         f"To be deprecated. Here is the actual exception: {e}")
 
         try:
             level = cls.load_v2(path, num)
             level.path = path
             return level
-        except:
-            raise
+        except Exception as e:
+            LOGGER.critical(f"Could not load map as v2. Here is the exception: {e}")
 
     @classmethod
     def load_v2(cls, path, num=-1, is_editor=False):
+        LOGGER.info(f"Trying to load #{num} as v2 from path {path}. is_editor: {is_editor}")
         with open(path, "r") as f:
             d = json.loads(f.read())
+        LOGGER.info("Dict loaded: %s", d)
 
         size = Pos(d["size"])
+        LOGGER.info("Level size: %s", size)
         map = [
             [
                 Block.new(c, (x, y))
@@ -138,6 +148,7 @@ class Level:
             for y, line in enumerate(d["blocks"])
         ]
         objects = [Object.from_json(o) for o in d["objects"]]
+        LOGGER.info("Loaded %s objects", len(objects))
 
         level = cls()
         level.size = size
@@ -148,20 +159,24 @@ class Level:
         for obj in objects:
             if isinstance(obj, Spawn):
                 level.start = obj.pos
+                LOGGER.info("Spawn set at %s", obj.pos)
             elif isinstance(obj, Projectile):
                 if not is_editor and isinstance(obj, AK47) and CONFIG.levels_stats[str(num)][2] >= 1:
                     pass
                 else:
                     level.spawn(obj)
 
+        LOGGER.info("Loaded as v2.")
         return level
 
     def save(self, path):
-        d = {}
+        LOGGER.info("Saving level to %s", path)
+        d = dict()
         d["size"] = self.size.ti
         d["blocks"] = str(self).splitlines(keepends=False)
         d["objects"] = [obj.save() for obj in self.objects]
         d["version"] = 2
+        LOGGER.info("Dictionary to save: %s", d)
 
         s = json.dumps(d, indent=4)
         with open(path, "w") as f:
@@ -169,7 +184,9 @@ class Level:
 
     @classmethod
     def load_num(cls, num):
+        LOGGER.info("Loading level from number: %s", num)
         path = os.path.join(MAPS_FOLDER, LEVELS[str(num)][0])
+        LOGGER.info("Deduced level path: %s", path)
         level = cls.load(path, num)
         level.num = num
         return level
@@ -177,6 +194,7 @@ class Level:
     @classmethod
     def load_v1(cls, path):  # TODO: may we improve this?
         level = cls()
+        LOGGER.info(f"Trying to load as v1 from path {path}")
 
         with open(path, 'r') as map_file:
             height, width = list(map(int, map_file.readline().split()))
@@ -189,6 +207,7 @@ class Level:
                     line[i] = Block.new(line[i], (i, h))
                 level.grid.append(line)
 
+        LOGGER.warning(f"Loaded as v1. To be deprecated")
         return level
 
     def update_offset(self, player_pos, screen_size):
@@ -214,7 +233,7 @@ class Level:
                                 self.world_size.y - screen_size[1] - Block.DEFAULT_BLOCK_SIZE))
 
     def internal_logic(self):
-        if self.expolding:
+        if self.exploding:
             self.explosion_logic()
             return
 
@@ -222,14 +241,14 @@ class Level:
         offset_end = (offset + self.world_to_map(self.screen_size)).i
 
         for line in range(clamp(offset.y - 20, 0, self.size[1] - 1),
-                          clamp(offset_end.y+ 20, 0, self.size[1] - 1)):
+                          clamp(offset_end.y + 20, 0, self.size[1] - 1)):
             for block in range(clamp(offset.x - 20, 0, self.size[0] - 1),
                                clamp(offset_end.x + 20, 0, self.size[0] - 1)):
                 block = self.grid[line][block]
                 block.internal_logic(self)
 
     def render(self, surf):
-        if self.expolding:
+        if self.exploding:
             self.render_explode(surf)
             return
 
@@ -254,10 +273,12 @@ class Level:
         self.space.add(body)
 
     def reset(self):
+        LOGGER.info("Level: to_reset = True")
         self.to_reset = True
 
     def explode(self, start_pos):
-        self.expolding = True
+        LOGGER.info("Starting to explode the level.")
+        self.exploding = True
         self.to_explode = [
             b
             for line in self.grid
@@ -265,6 +286,7 @@ class Level:
             if self.inside_display(b.pos) and b.visible
         ]
         self.exploded = []
+        LOGGER.info("We're going to explode %s blocks", len(self.to_explode))
 
     def explosion_logic(self):
 
@@ -290,6 +312,7 @@ class Level:
         return
 
     def render_explode(self, surf):
+        t = time()
 
         for block in self.to_explode:
             world_pos = self.map_to_display(block.pos)
@@ -310,6 +333,9 @@ class Level:
 
         for part in self.particles:
             part.render(surf)
+
+        LOGGER.info("Level - rendered %s blocks and explosions and %s particles in %s",
+                    len(self.exploded) + len(self.to_explode), len(self.particles), time() - t)
 
         dx, dy = random.randint(-5, 6), random.randint(-5, 6)
         surf.scroll(dx, dy)

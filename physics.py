@@ -3,15 +3,17 @@ Custom physics engine that take care only of AABBs.
 
 Maybe one day it'll get bigger.
 """
+import logging
 from enum import Enum, auto
 from math import cos, sin, pi, sqrt
 from typing import List, TYPE_CHECKING
 from typing import Union
-
 import pygame
 
 if TYPE_CHECKING:
     from level import Level, Block
+
+LOGGER = logging.getLogger(__name__)
 
 
 class CollisionType(Enum):
@@ -22,10 +24,13 @@ class CollisionType(Enum):
 
 
 class CollisionData:
-    def __init__(self, type: CollisionType, object, shape):
+    def __init__(self, type: CollisionType, obj, shape):
         self.type = type
-        self.object = object  # type: Union[Body, Projectile, Block]
+        self.object = obj  # type: Union[Body, Projectile, Block]
         self.shape = shape
+
+    def __str__(self):
+        return f"<CollisionData(type={self.type}, object={self.object}, shape={self.shape})>"
 
 
 def clamp(x, mini=float('-inf'), maxi=float('inf')):
@@ -175,6 +180,7 @@ class AABB:
             tl = args[:2]
             s = args[2:]
         else:
+            LOGGER.error("Trying to create an AABB with %s args: %s", len(args), args)
             raise TypeError(f"Arguments are not in a rect style: {args}")
 
         self.topleft = Pos(tl)
@@ -283,6 +289,7 @@ class Body:
 
     def __init__(self, shape, mass=1, elasticity=0, max_velocity=(None, None), space=None):
 
+        LOGGER.info(f"Creating Body. shape = {shape}, mass = {mass}, elasticity = {elasticity}")
         self.dead = False
         self.sleep = False
         """Ignore all collisions with and from this body."""
@@ -326,6 +333,7 @@ class Body:
     def update_x(self, tiles):
         """Updates the position on the x coordinate and check for collision with the shapes."""
 
+        LOGGER.info(f"Updating x position for {self} against the tiles.")
         self.velocity.x += self.acceleration.x
         self.clamp_speed()
         self.shape.x += self.velocity.x
@@ -340,6 +348,7 @@ class Body:
                     self.velocity.x *= -self.elasticity
 
                     colli = CollisionData(CollisionType.BLOCK, tiles[aabb], shape=aabb)
+                    LOGGER.info("New collision: %s", colli)
                     self.collisions.append(colli)
         elif self.velocity.x < 0:
             # we are going left
@@ -349,11 +358,13 @@ class Body:
                     self.velocity.x *= -self.elasticity
 
                     colli = CollisionData(CollisionType.BLOCK, tiles[aabb], shape=aabb)
+                    LOGGER.info("New collision: %s", colli)
                     self.collisions.append(colli)
 
         self.acceleration.x = 0
 
     def update_y(self, tiles):
+        LOGGER.info(f"Updating y position for {self} against the tiles.")
         self.velocity.y += self.acceleration.y
         self.clamp_speed()
         self.shape.y += self.velocity.y
@@ -368,6 +379,7 @@ class Body:
                     self.velocity.y *= -self.elasticity
 
                     colli = CollisionData(CollisionType.BLOCK, tiles[aabb], shape=aabb)
+                    LOGGER.info("New collision: %s", colli)
                     self.collisions.append(colli)
 
         elif self.velocity.y < 0:
@@ -378,15 +390,19 @@ class Body:
                     self.velocity.y *= -self.elasticity
 
                     colli = CollisionData(CollisionType.BLOCK, tiles[aabb], shape=aabb)
+                    LOGGER.info("New collision: %s", colli)
                     self.collisions.append(colli)
 
         self.acceleration.y = 0
 
     def check_collisions(self, projectiles):
+        LOGGER.info(f"Checking colisions for {self} against {len(projectiles)} projectiles")
         for proj in projectiles:
             if self.shape.collide(proj.shape):
                 proj_coli = CollisionData(CollisionType.BODY, self, self.shape)
                 self_coli = CollisionData(CollisionType.PROJECTILE, proj, proj.shape)
+                LOGGER.info(f"New collision for {proj}: {proj_coli}")
+                LOGGER.info(f"New collision for {self}: {self_coli}")
                 self.collisions.append(self_coli)
                 proj.collisions.append(proj_coli)
 
@@ -418,6 +434,10 @@ class Body:
         self.collide_right = any(right.collide(s) for s in shapes)
         self.collide_down = any(bottom.collide(s) for s in shapes)
         self.collide_top = any(top.collide(s) for s in shapes)
+
+        LOGGER.info(f"Sensor updated for {self}")
+        LOGGER.info(f"Left={self.collide_left}, Right={self.collide_right}, "
+                    f"top={self.collide_top}, down={self.collide_down}")
 
     def update_history(self):
         self.last_collide_top += 1
@@ -472,6 +492,8 @@ class Space:
 
     def add(self, *bodies):
         for body in bodies:
+            LOGGER.info(f"Adding {body} in the space")
+
             if isinstance(body, Projectile):
                 self.projectiles.append(body)
             elif isinstance(body, Body):
@@ -493,8 +515,11 @@ class Space:
         return d
 
     def simulate(self):
+        LOGGER.info("Simulating space.")
+        LOGGER.info(f"Number of projectiles: {len(self.projectiles)}")
+        LOGGER.info(f"Number of moving_bodies: {len(self.moving_bodies)}")
+
         # first we update/move all projectiles
-        from entities import Brochette
         for proj in self.projectiles[:]:
             proj.internal_logic()
             if proj.dead:
@@ -526,7 +551,7 @@ class Space:
                 body.update_y(self.possible_collision_for(body))
 
                 # we check for collisions with projectiles
-                body.check_collisions(proj for proj in self.projectiles if not proj.sleep)
+                body.check_collisions([proj for proj in self.projectiles if not proj.sleep])
 
                 # Finally we check if we are grounded/against a wall...
                 body.update_sensors(self.possible_collision_for(body))

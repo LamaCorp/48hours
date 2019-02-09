@@ -1,14 +1,16 @@
 import os
 import random
 from functools import lru_cache
-
 import pygame
 from graphalama.colors import mix
+import logging
 
 from constants import LEVELS_GRAPHICAL_FOLDER, DEFAULT_BLOCK_SIZE, BROCHETTE_VELOCITY, FRAME_BEFORE_DESPAWN
 from config import get_available_blocks
 from helper import classproperty
 from physics import AABB, Pos, Projectile, CollisionType
+
+LOGGER = logging.getLogger(__name__)
 
 SPAWN = "Spawn"
 
@@ -24,12 +26,17 @@ class Object:
         self.type = self.__class__.__name__
         self.pos = pos
 
+    def __str__(self):
+        return f"<{self.__class__}({self.pos})>"
+
     @classmethod
     def from_json(cls, d):
+        LOGGER.info("Loading object from %s", d)
         type = d["type"]
         return OBJECTS[type](**d)
 
     def save(self):
+        LOGGER.info("Saving object %s to dict", self)
         d = {
             "type": self.type,
             "pos": tuple(self.pos)
@@ -42,6 +49,7 @@ class Spawn(Object):
     @classproperty
     def img(cls):
         if cls._img is None:
+            LOGGER.info("Brochette - Setting sheet")
             img = pygame.Surface((DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
             img.set_colorkey((0, 0, 0))
             # red circle
@@ -67,6 +75,7 @@ class AK47(Object, Projectile):
     @classproperty
     def img(cls):
         if cls._img is None:
+            LOGGER.info("AK47 - Setting sheet")
             # size = (32, 10)
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "ak47.png")).convert()
             sheet.set_colorkey((255, 0, 255))
@@ -92,6 +101,7 @@ class Brochette(Projectile):
     @classproperty
     def img(cls):
         if cls._img is None:
+            LOGGER.info("Brochette - Setting sheet")
             cls._img = [
                 pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER,
                                                                       brochette.lower())).convert(),
@@ -122,9 +132,8 @@ class Brochette(Projectile):
                   self.topleft + offset)
 
     def internal_logic(self):
-
         for colli in self.collisions:
-            if colli.type == CollisionType.BLOCK:
+            if colli.type == CollisionType.BLOCK and not self.sleep:
                 self.sleep = True
 
         if self.sleep:
@@ -170,7 +179,6 @@ class Particle:
         img.fill(color)
         # img.set_alpha(round(alpha))
         return img
-
 
 
 OBJECTS = {

@@ -1,12 +1,18 @@
+import logging
+
 from graphalama.text import SimpleText
 from graphalama.constants import (WHITESMOKE, LEFT, RIGHT)
+
 from screens.idle_screen import IdleScreen
 from config import CONFIG, get_nb_ak47
 from screens.widgets import Title, MenuButton, Segment
 
+LOGGER = logging.getLogger(__name__)
+
 
 class StatisticsScreen(IdleScreen):
     def __init__(self, app):
+        LOGGER.info("Starting a StatisticsScreen")
         size = app.display.get_size()
 
         def stats(text, figure, n):
@@ -37,7 +43,8 @@ class StatisticsScreen(IdleScreen):
 
         super().__init__(app, widgets, (20, 10, 0))
 
-    def format_stat(self, text, number):
+    @staticmethod
+    def format_stat(text, number):
         number = str(number)
         return "{} {:.>{dots}} {}".format(text, "", number,
                                           dots=40 - len(text) - len(number))

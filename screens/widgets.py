@@ -1,20 +1,17 @@
-from functools import lru_cache
-from time import time
-
 import pygame
+
 from graphalama.buttons import CarouselSwitch
-from graphalama.colors import Gradient, MultiGradient, mix
+from graphalama.colors import Gradient, MultiGradient, to_color, Color
 from graphalama.constants import (CENTER, NICE_BLUE, PURPLE, GREEN,
                                   Monokai, YELLOW, RED, TOP, WHITESMOKE, RAINBOW, LEFT, RIGHT, TRANSPARENT, LLAMA,
-                                  TOPRIGHT, TOPLEFT, ORANGE)
+                                  TOPRIGHT, TOPLEFT, BLACK)
 from graphalama.core import Widget
 from graphalama.font import default_font
-from graphalama.maths import Pos
 from graphalama.shadow import NoShadow
 from graphalama.shapes import RoundedRect, Rectangle
 from graphalama.widgets import SimpleText, Button
 
-from constants import MENU, SETTINGS, PICKER, STATS, LIGHT_DARK, DARK, GREY
+from constants import MENU, SETTINGS, PICKER, STATS, LIGHT_DARK, DARK_GREY
 
 
 def Title(text, screen_size, anchor=TOP, font_size=150):
@@ -23,7 +20,7 @@ def Title(text, screen_size, anchor=TOP, font_size=150):
                       shape=Rectangle((screen_size[0] + 2, 200), border=1),
                       color=MultiGradient(*RAINBOW),
                       # bg_color=DARK + (172,),
-                      bg_color=GREY,
+                      bg_color=DARK_GREY,
                       border_color=MultiGradient(*RAINBOW),
                       font=default_font(font_size),
                       anchor=anchor)
@@ -34,7 +31,7 @@ def SettingsButton(app, pos=None, anchor=CENTER):
                   function=lambda: app.set_screen(SETTINGS),
                   shape=RoundedRect((200, 50), 100),
                   color=RED,
-                  bg_color=GREY,
+                  bg_color=DARK_GREY,
                   pos=pos,
                   anchor=anchor)
 
@@ -44,7 +41,7 @@ def StatisticsButton(app, pos=None, anchor=CENTER):
                   function=lambda: app.set_screen(STATS),
                   shape=RoundedRect((200, 50), 100),
                   color=NICE_BLUE,
-                  bg_color=GREY,
+                  bg_color=DARK_GREY,
                   pos=pos,
                   anchor=anchor)
 
@@ -135,7 +132,7 @@ class Segment(Widget):
             if a[1] == b[1]:
                 self.case = "-"  # horizontal
             elif a[0] == b[0]:
-                self.case = "|"  # veritcal
+                self.case = "|"  # vertical
             else:
                 self.case = "\\"  # diagonal segment \
         else:
@@ -162,6 +159,7 @@ class Segment(Widget):
 
 class SurfaceButton(Button):
     """A button displaying an image from a surface"""
+    HAS_CONTENT = True
 
     def __init__(self, surf, function, resize=False, resize_smooth=False,
                  pos=None, shape=None,
@@ -184,3 +182,46 @@ class SurfaceButton(Button):
             surf = self.surf
 
         content_surf.blit(surf, (0, 0))
+
+
+class UnderlinedSimpleText(SimpleText):
+    def __init__(self, text, pos=None, shape=None,
+                 color=None, bg_color=None, border_color=None, underline_color=None,
+                 font=None, shadow=None, anchor=None, text_anchor=None):
+
+        self._underline_color : Color = None
+        self.underline_color = underline_color if underline_color is not None else BLACK
+        print(self.underline_color)
+
+        super().__init__(text, pos, shape, color, bg_color, border_color, font, shadow, anchor, text_anchor)
+
+
+    @property
+    def underline_color(self):
+        return self._underline_color
+
+    @underline_color.setter
+    def underline_color(self, value):
+        print(value, to_color(value))
+        self._underline_color = to_color(value)
+        self.invalidate_content()
+
+    def draw_content(self, content_surf):
+        super(UnderlinedSimpleText, self).draw_content(content_surf)
+
+        text_rect = pygame.Rect((0, 0), self.font.size(self.text))
+
+        atr_name = self.anchor_to_rect_attr(self.text_anchor)
+        setattr(text_rect, atr_name, getattr(content_surf.get_rect(), atr_name))
+
+        baseline = self.font.get_ascent()
+        y = baseline + text_rect.top + 1
+        underline_rect = pygame.Rect(text_rect.x, y, text_rect.width, 1)
+
+        underline = content_surf.subsurface(underline_rect)
+        self.underline_color.paint(underline)
+
+
+
+
+

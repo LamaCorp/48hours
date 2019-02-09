@@ -1,6 +1,5 @@
 import os
 from functools import lru_cache
-
 import pygame
 
 from constants import KEYS_FOLDER
@@ -25,6 +24,7 @@ index_to_name.extend([
     "space",
 ])
 
+
 @lru_cache()
 def name_to_img(name):
     if name in index_to_name:
@@ -42,8 +42,3 @@ def name_to_img(name):
         img = img.subsurface((0, 0, 16, 16))
 
     return img
-
-
-
-
-

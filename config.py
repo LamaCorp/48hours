@@ -2,7 +2,10 @@ import os
 import re
 import pygame
 import configlib
-from constants import LEVELS_GRAPHICAL_FOLDER, ASSETS
+import sentry_sdk
+
+from constants import LEVELS_GRAPHICAL_FOLDER, ASSETS, VERSION
+from log import init_sentry
 
 BLOCKS_BASE_REGEX = r'_[0-9]*\.png'
 LAVA_REGEX = re.compile(r'lava_[0-9]*\.png')
@@ -62,6 +65,8 @@ class BindingsConfig(configlib.SubConfig):
 
 class Config(configlib.Config):
     __config_path__ = os.path.abspath(os.path.join(ASSETS, "config.json"))
+    __version__ = VERSION
+    __xor_key__ = b"Lamas will rule the world, so get prepared... Anyway, that's a secret key, so you should know it !?"
 
     level = 0
 
@@ -70,6 +75,19 @@ class Config(configlib.Config):
     bindings = BindingsConfig()
 
     levels_stats = {i: [0, -1, 0, 0] for i in LEVELS}
+
+    send_log = False
+
+    first_time_launch = True
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        if key == "send_log":
+            init_sentry(self.send_log)
+        with sentry_sdk.configure_scope() as sentry_sdk_scope:
+            sentry_sdk_scope.set_extra("Current config", str(self))
+
+    __setattr__ = __setitem__
 
 
 CONFIG = Config()

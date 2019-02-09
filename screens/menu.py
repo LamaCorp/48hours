@@ -1,12 +1,19 @@
+import logging
+
 from screens.idle_screen import IdleScreen
 from screens.widgets import Title, PickerButton, SettingsButton, QuitButton, StatisticsButton
+
+LOGGER = logging.getLogger(__name__)
 
 
 class MenuScreen(IdleScreen):
     def __init__(self, app):
+        LOGGER.info("Starting a MenuScreen")
         size = app.display.get_size()
+
         def pos(n):
-            return (size[0] // 2, size[1] // 2 + 75 * (n - 1.5))
+            return size[0] // 2, size[1] // 2 + 75 * (n - 1.5)
+
         widgets = [
             Title("Llama destroys the world", size),
             PickerButton(app, pos(0)),

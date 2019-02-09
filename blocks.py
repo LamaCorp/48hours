@@ -3,14 +3,16 @@ import re
 import random
 import time
 from functools import partial, lru_cache
-
 import pygame
+import logging
 
 from constants import DEFAULT_BLOCK_SIZE, LEVELS_GRAPHICAL_FOLDER, ASSETS
 from config import get_lava_sheets
-from entities import Brochette, AK47
+from entities import Brochette
 from helper import classproperty
 from physics import Pos
+
+LOGGER = logging.getLogger(__name__)
 
 
 @lru_cache()
@@ -128,6 +130,7 @@ class Dirt(Block):
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
+            LOGGER.info("Dirt - Setting sheet")
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "dirt_sheet.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
@@ -145,6 +148,7 @@ class Stone(Block):
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
+            LOGGER.info("Stone - Setting sheet")
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "stone_sheet.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (Pos(sheet.get_size()) * DEFAULT_BLOCK_SIZE / 16).i)
@@ -171,6 +175,7 @@ class Bush(Block):
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
+            LOGGER.info("Bush - Setting sheet")
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "bush.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
@@ -187,6 +192,7 @@ class Cloud(Block):
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
+            LOGGER.info("Cloud - Setting sheet")
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "cloud.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
@@ -203,6 +209,7 @@ class CatCloud(Block):
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
+            LOGGER.info("CatCloud - Setting sheet")
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "cat_cloud.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
@@ -241,6 +248,7 @@ class Barbecue(Block):
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
+            LOGGER.info("Barbecue - Setting sheet")
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "barbecue.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
@@ -264,6 +272,7 @@ class FieryBarbecue(Block):
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
+            LOGGER.info("FieryBarbecue - Setting sheet")
             sheet = pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER, "fiery_barbecue.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
@@ -293,6 +302,7 @@ class EndBlock(Block):
     @classproperty
     def sheet(cls):
         if cls._sheet is None:
+            LOGGER.info("EndBlock - Setting sheet")
             sheet = pygame.image.load(os.path.join(ASSETS, "logo.png")).convert()
             sheet.set_colorkey((255, 0, 255))
             sheet = pygame.transform.scale(sheet, (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))

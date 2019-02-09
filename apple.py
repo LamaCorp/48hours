@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-
+from log import init_logger, log_sysinfo; init_logger()
+import logging
 from functools import partial
-
 import click
+import pygame
+
 from graphalama.app import Screen, App
 from graphalama.buttons import CarouselSwitch, Button, ImageButton
 from graphalama.colors import ImageBrush
 from graphalama.constants import CENTER
 from graphalama.core import Widget
 from graphalama.shapes import Rectangle
-import pygame
 
 from blocks import Block, BLOCKS, Stone
 from constants import DEFAULT_BLOCK_SIZE, MAPS_FOLDER
@@ -22,6 +23,7 @@ pygame.init()
 MAP_SIZE = (120, 40)
 LEVEL_NAME = "fail"
 EDIT = 1
+LOGGER = logging.getLogger(__name__)
 
 
 def square_range(a, b):
@@ -33,32 +35,32 @@ def square_range(a, b):
         for x in range(tl[0], br[0] + 1):
             yield x, y
 
-class LevelEdit(Level):
 
+class LevelEdit(Level):
     def __init__(self):
         super().__init__()
         self.path = ''
         self.img_cache = {}
 
-
     @classmethod
     def load(cls, path, size=(120, 40)):
         try:
+            LOGGER.info(f"Starting to load map from path {path}")
             level = cls.load_v1(path)
             level.path = path
             return level
-        except:
-            print('Can not load as v1')
-
+        except Exception as e:
+            LOGGER.info(f"Could not load map as v1. This is ok as we should only have v2 maps. "
+                        f"To be deprecated. Here is the actual exception: {e}")
 
         try:
             level = cls.load_v2(path, is_editor=True)
             level.path = path
             return level
-        except:
-            print('Can not load as v2')
-            print("Creating new level")
+        except Exception:
+            LOGGER.info(f"Could not load map as v2. This might be normal if no map with this name exists.")
 
+        LOGGER.info("Creating new empty LevelEdit.")
         level = cls()
         level.size = Pos(size)
         level.objects = [Spawn((size[0] // 2, size[1] // 2))]
@@ -88,6 +90,7 @@ class LevelEdit(Level):
         return self.img_cache[map_pos]
 
     def clean_cache_around(self, pos):
+        LOGGER.info("Cleaning image cache around %s", pos)
         for dx in range(-1, 2):
             for dy in range(-1, 2):
                 p = pos[0] + dx, pos[1] + dy
@@ -96,38 +99,48 @@ class LevelEdit(Level):
 
     def add_block(self, pos, block):
         if 0 <= pos[0] < self.size[0] and 0 <= pos[1] < self.size[1]:
+            LOGGER.info("Adding block %s at %s", block, pos)
             block = BLOCKS[block](pos=pos)
             self.grid[pos[1]][pos[0]] = block
             self.clean_cache_around(pos)
+        else:
+            LOGGER.info("Cannot add block %s at %s: position outside of the map.", block, pos)
 
     def erase(self, pos):
+        LOGGER.info("Erasing block and objects at %s", pos)
         self.grid[pos[1]][pos[0]] = Block(pos)
         for obj in self.objects[:]:
             if obj.pos == pos:
                 self.objects.remove(obj)
+                LOGGER.info("Removing object %s.", obj)
                 try:
                     self.space.projectiles.remove(obj)
+                    LOGGER.info("Removing it from projectiles too.")
                 except ValueError:
                     pass
 
         self.clean_cache_around(pos)
 
-    def add_object(self, pos, object):
-        if isinstance(object, Spawn):
+    def add_object(self, pos, obj):
+        LOGGER.info("Adding object %s at %s", obj, pos)
+        if isinstance(obj, Spawn):
             for o in self.objects[:]:
                 if isinstance(o, Spawn):
+                    LOGGER.info("Removing previous spawn point, there can be only one.")
                     self.objects.remove(o)
 
         else:
             for o in self.objects:
                 # Don't add twice the same object at the same position
-                if isinstance(o, type(object)) and o.pos == pos:
+                if isinstance(o, type(obj)) and o.pos == pos:
+                    LOGGER.info("There is already a object of the same type at the same position: %s", o)
                     return
 
-        object.pos = pos
-        self.objects.append(object)
+        obj.pos = pos
+        self.objects.append(obj)
 
     def clear(self):
+        LOGGER.info("Clearing level (map + objects + projectiles + img_cache).")
         for y, line in enumerate(self.grid):
             for x, _ in enumerate(line):
                 self.grid[y][x] = Block.new('.', (x, y))
@@ -147,8 +160,10 @@ class EditScreen(Screen):
     BRUSH = 1
     OBJECTBRUSH = 2
     ERASER = 3
+    FPS = 30
 
     def __init__(self, app):
+        LOGGER.info("Starting an EditScreen.")
         self.start_drag = None
         self.start_drag_map_pos = None
         self.level = LevelEdit.load(LEVEL_NAME, MAP_SIZE)  # type: LevelEdit
@@ -174,6 +189,7 @@ class EditScreen(Screen):
                                      shape=Rectangle((32, 32), padding=0),
                                      color=ImageBrush(block.get_img()),
                                      anchor=CENTER))
+        LOGGER.info("Added %s tiles buttons.", len(tiles))
 
         # objects buttons
         objects = []
@@ -187,6 +203,7 @@ class EditScreen(Screen):
                                        shape=Rectangle((32, 32)),
                                        color=ImageBrush(obj.img),
                                        anchor=CENTER))
+        LOGGER.info("Added %s object buttons.", len(objects))
 
         widgets = (self.widget_bg, self.tool_carousel, reset, save, *tiles, *objects)
         super().__init__(app, widgets, (20, 40, 90))
@@ -196,6 +213,7 @@ class EditScreen(Screen):
         self.level.offset.x += self.menu_width
         self._tile_index = 0
         self._object_index = SPAWN
+        LOGGER.info("Tile size: %s", self.tile_size)
 
         # Rectangle stuff
         self.last_placed = (0, 0)
@@ -203,11 +221,22 @@ class EditScreen(Screen):
 
         # editor settings
         self.drawing = False
+        self._tool = self.BRUSH
         self.tool = self.BRUSH
+        LOGGER.info("Tool: %s", self.tool)
 
         # Erase pic
         self.erase_img = pygame.Surface((DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
         self.bg_color.paint(self.erase_img)
+
+    @property
+    def tool(self):
+        return self._tool
+
+    @tool.setter
+    def tool(self, value):
+        LOGGER.info("Switching tools. Old: %s, New: %s", self.tool, value)
+        self._tool = value
 
     @property
     def tile_index(self):
@@ -216,6 +245,7 @@ class EditScreen(Screen):
     @tile_index.setter
     def tile_index(self, value):
         self._tile_index = value % len(BLOCKS)
+        LOGGER.info("Setting tile index to %s. New value: %s", value, self._tile_index)
 
     @property
     def object_index(self):
@@ -223,7 +253,8 @@ class EditScreen(Screen):
 
     @object_index.setter
     def object_index(self, value):
-        self._object_index = value  #  % len(OBJECTS)
+        self._object_index = value  # % len(OBJECTS)
+        LOGGER.info("Setting object index to %s. New value: %s", value, self._object_index)
 
     @property
     def current_tile(self):
@@ -322,7 +353,7 @@ class EditScreen(Screen):
 
         # cursor
         img = self.current_img_under_cursor
-        img = pygame.transform.scale(img, (self.tile_size, ) *2)
+        img = pygame.transform.scale(img, (self.tile_size, ) * 2)
         img.set_alpha(128)
         pos = self.level.map_to_display(self.level.display_to_map(pygame.mouse.get_pos()))
         display.blit(img, (round(pos[0]), round(pos[1])))
@@ -332,8 +363,11 @@ class EditScreen(Screen):
     def drag(self):
         self.start_drag = pygame.mouse.get_pos()
         self.start_drag_map_pos = self.level.offset
+        LOGGER.info("Start dragging map. start_drag = %s, "
+                    "start level offset = %s", self.start_drag, self.start_drag_map_pos)
 
     def drop(self):
+        LOGGER.info("Stop dragging.")
         self.start_drag = None
         self.start_drag_map_pos = None
 
@@ -341,12 +375,12 @@ class EditScreen(Screen):
         self.level.clear()
 
     def save(self):
+        LOGGER.info("Saving level to %s.", LEVEL_NAME)
         self.level.save(LEVEL_NAME)
 
 
 class Apple(App):
     SCREEN_SIZE = (1600, 1008)
-    FPS = 30
 
     def __init__(self):
         screens = {
@@ -362,9 +396,12 @@ class Apple(App):
 @click.argument("width", default=120)
 @click.argument("height", default=40)
 def main(level_name, width, height):
+    LOGGER.info("Starting apple with arguments: level_name = %s"
+                "width = %s, height = %s", level_name, width, height)
     global LEVEL_NAME, MAP_SIZE
 
     LEVEL_NAME = MAPS_FOLDER + '/' + level_name + '.map'
+    LOGGER.info("File that we edit: %s", LEVEL_NAME)
     MAP_SIZE = (width, height)
 
     pygame.init()
@@ -373,4 +410,5 @@ def main(level_name, width, height):
 
 
 if __name__ == '__main__':
+    log_sysinfo()
     main()

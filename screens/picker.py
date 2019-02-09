@@ -1,23 +1,27 @@
 import os
-
 import pygame
+import logging
+
 from graphalama.buttons import CarouselSwitch
 from graphalama.colors import MultiGradient
 from graphalama.core import Widget
 from graphalama.text import SimpleText
 from graphalama.shapes import RoundedRect, Rectangle
-from graphalama.constants import BOTTOM, WHITESMOKE, LLAMA, CENTER, RIGHT, TOP, RAINBOW, LEFT
+from graphalama.constants import BOTTOM, WHITESMOKE, CENTER, RIGHT, TOP, RAINBOW, LEFT
 from graphalama.maths import Pos
 
 from blocks import get_boom_img
-from screens.widgets import MenuButton, SettingsButton, PlayButton, Title, SurfaceButton
-from constants import LIGHT_DARK, GREY, ASSETS
+from screens.widgets import MenuButton, SettingsButton, PlayButton, Title, StatisticsButton
+from constants import LIGHT_DARK, DARK_GREY, ASSETS
 from config import CONFIG, LEVELS, get_index_from_name, get_available_levels, LEVELS_GRAPHICAL_FOLDER
 from screens.idle_screen import IdleScreen
+
+LOGGER = logging.getLogger(__name__)
 
 
 class PickerScreen(IdleScreen):
     def __init__(self, app):
+        LOGGER.info("Starting a PickerScreen")
         size = app.display.get_size()
 
         # loading images
@@ -43,7 +47,7 @@ class PickerScreen(IdleScreen):
         # backgrounds
         self.bottom_band = Widget((x, size[1] + 1),
                                   shape=Rectangle((size[0] + 2, 75), border=1),
-                                  bg_color=GREY,
+                                  bg_color=DARK_GREY,
                                   border_color=MultiGradient(*RAINBOW),
                                   anchor=BOTTOM)
         # principal buttons
@@ -56,8 +60,9 @@ class PickerScreen(IdleScreen):
                                        arrow_color=WHITESMOKE,
                                        anchor=BOTTOM)
         self.play_button = PlayButton(app, (x, size[1] // 2 + 20), anchor=TOP)
-        menu = MenuButton(app, (size[0] - 45, 250), anchor=RIGHT)
-        settings = SettingsButton(app, (menu.topleft.x - 20, 250), anchor=RIGHT)
+        settings = SettingsButton(app, (size[0] - 45, 250), anchor=RIGHT)
+        statistics = StatisticsButton(app, (settings.topleft.x - 20, 250), anchor=RIGHT)
+        menu = MenuButton(app, (statistics.topleft.x - 20, 250), anchor=RIGHT)
         level_stats = CONFIG.levels_stats[str(self.selector.option_index)]
 
         # stats
@@ -76,15 +81,16 @@ class PickerScreen(IdleScreen):
                                           anchor=RIGHT)
 
         widgets = [
-            Title("Choose where you die", size),
+            Title("Choose where you'll die", size),
             self.bottom_band,
             self.play_button,
             self.selector,
             self.deaths_text,
             self.best_time,
             self.exploded_blocks,
-            settings,
             menu,
+            statistics,
+            settings,
         ]
 
         self.selector.option_index = CONFIG.level
@@ -93,12 +99,15 @@ class PickerScreen(IdleScreen):
 
     @staticmethod
     def level_setter(level):
+        LOGGER.info(f"Setting CONFIG.level to {level}")
         CONFIG.level = int(get_index_from_name(LEVELS, level))
 
-    def death_count_text(self, n_death):
+    @staticmethod
+    def death_count_text(n_death):
         return str(n_death)
 
-    def time_text(self, seconds):
+    @staticmethod
+    def time_text(seconds):
         if seconds < 0:
             return "Not finished"
 
@@ -113,7 +122,8 @@ class PickerScreen(IdleScreen):
         else:
             return "{:02}.{:03}s".format(seconds, mili)
 
-    def blocks_exploded_text(self, n_blocks):
+    @staticmethod
+    def blocks_exploded_text(n_blocks):
         return str(n_blocks)
 
     def internal_logic(self):
@@ -143,4 +153,3 @@ class PickerScreen(IdleScreen):
         rect = self.boom_img.get_rect()
         rect.midright = (size[0] - 10, y)
         display.blit(self.boom_img, rect)
-

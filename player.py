@@ -1,13 +1,15 @@
 import os
 from enum import Enum, auto
-
 import pygame
+import logging
 
 from blocks import Block
 from config import CONFIG, PLAYERS
 from constants import PLAYER_FOLDER
 from entities import AK47
 from physics import Body, AABB, Pos, CollisionType
+
+LOGGER = logging.getLogger(__name__)
 
 LEFT = 0
 RIGHT = 1
@@ -23,7 +25,7 @@ JUMP_GRAVITY_FACTOR = 0.7
 WALL_SLIDE_GRAVITY = 0.8
 WALL_SLIDE_FRICTION = 0.01
 MAX_WALL_VELOCITY = 5
-WALL_STIKY_FRAMES = 15
+WALL_STICKY_FRAMES = 15
 
 
 class State(Enum):
@@ -39,6 +41,7 @@ class State(Enum):
 
 class Player(Body):
     def __init__(self, start_pos=(0, 0), respawn=False):
+        LOGGER.info(f"Started initializing a player at pos {start_pos}. Respawning? {respawn}")
         size = (76 * 3 // 4, 70 * 3 // 4)
         shape = AABB(start_pos, size)
         super().__init__(shape, max_velocity=(16, 16))
@@ -83,24 +86,33 @@ class Player(Body):
     def update(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == CONFIG.bindings.left:
+                LOGGER.info("Player - Pressing left.")
                 self.directions[LEFT] = True
             elif event.key == CONFIG.bindings.right:
+                LOGGER.info("Player - Pressing right.")
                 self.directions[RIGHT] = True
             elif event.key == CONFIG.bindings.jump:
+                LOGGER.info("Player - Pressing jump.")
                 if self.collide_right or self.collide_left or self.collide_down:
                     self.jumping = True
                     self.just_jumped = True
+                    LOGGER.info("Player - jumping because any of right, left or bottom sensor collide.")
             elif event.key == CONFIG.bindings.run:
+                LOGGER.info("Player - Pressing run.")
                 self.run = True
 
         elif event.type == pygame.KEYUP:
             if event.key == CONFIG.bindings.left:
+                LOGGER.info("Player - Stop pressing left.")
                 self.directions[LEFT] = False
             elif event.key == CONFIG.bindings.right:
+                LOGGER.info("Player - Stop pressing right.")
                 self.directions[RIGHT] = False
             elif event.key == CONFIG.bindings.jump:
+                LOGGER.info("Player - Stop pressing jump.")
                 self.jumping = False
             elif event.key == CONFIG.bindings.run:
+                LOGGER.info("Player - Stop pressing run.")
                 self.run = False
 
     def internal_logic(self):
@@ -117,6 +129,10 @@ class Player(Body):
             self.state_duration = 0
 
         self.state = new_state
+        LOGGER.info("Player - State: %s", self.state)
+        LOGGER.info("Player - Position: %s", self.shape.topleft)
+        LOGGER.info("Player - Velocity: %s", self.velocity)
+        LOGGER.info("Player - Acceleration: %s", self.acceleration)
 
         self.vertical_logic()
         self.horizontal_logic()
@@ -188,7 +204,7 @@ class Player(Body):
 
         if self.state is State.STILL:
             # we want to stop quickly
-            self.apply_force(-self.velocity.horizontal / FRAMES_TO_STILL )
+            self.apply_force(-self.velocity.horizontal / FRAMES_TO_STILL)
         elif self.state in (State.WALK, State.RUN):
             # Walk/Run force
             force = RUN_FORCE if self.state is State.RUN else WALK_FORCE
@@ -214,10 +230,10 @@ class Player(Body):
             else:
                 direc = 1
             self.velocity = Pos(0, 0)
-            self.apply_force((direc * JUMP_FORCE * (self.run * 0.5  + 1), 0))
+            self.apply_force((direc * JUMP_FORCE * (self.run * 0.5 + 1), 0))
         elif self.state is State.OUT_OF_WALL_SLIDE:
             # The wall is sticky
-            if self.state_duration < WALL_STIKY_FRAMES:
+            if self.state_duration < WALL_STICKY_FRAMES:
                 pass
             else:
                 # Walk/Run force
@@ -231,8 +247,10 @@ class Player(Body):
             if colli.type == CollisionType.PROJECTILE:
                 proj = colli.object
                 if proj.deadly:
+                    LOGGER.info(f"Player hit {proj} and will now die.")
                     self.space.tile_map.reset()
                 if isinstance(proj, AK47):
+                    LOGGER.info("Player collected AK47")
                     self.ak47 = True
                     CONFIG.levels_stats[str(self.space.tile_map.num)][2] = 1
                     proj.dead = True  # we picked it up
@@ -240,6 +258,8 @@ class Player(Body):
                 block = colli.object
                 assert isinstance(block, Block)
                 if block.deadly:
+                    LOGGER.info(f"Player hit {block} and will now die.")
                     self.space.tile_map.reset()
                 elif block.character == 'E':
+                    LOGGER.info(f"Player hit end block.")
                     self.space.tile_map.explode(block.pos)

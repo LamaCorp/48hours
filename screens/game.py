@@ -1,7 +1,8 @@
 import os
-
+import logging
 import pygame
 import time
+
 from graphalama.app import Screen
 from graphalama.colors import ImageBrush
 
@@ -13,9 +14,12 @@ from config import CONFIG, LEVELS
 from physics import Pos
 from screens.widgets import Title, ResumeButton, QuitButton, MenuButton, PauseButton
 
+LOGGER = logging.getLogger(__name__)
+
 
 class PauseScreen(IdleScreen):
     def __init__(self, app, game_screen_paused):
+        LOGGER.info("Entered pause screen")
         self.paused_game = game_screen_paused  # type: GameScreen
 
         size = Pos(app.display.get_size())
@@ -45,6 +49,8 @@ class GameScreen(Screen):
     FPS = 60
 
     def __init__(self, app, level):
+        LOGGER.info("Entered game screen")
+        LOGGER.info(f"Level is {level.num}")
         size = Pos(app.display.get_size())
         self.level = level
         self.player = Player(self.level.world_start)
@@ -52,6 +58,7 @@ class GameScreen(Screen):
         self.space.add(self.player)
         self.start_time = time.time()
         self.pause_time = 0
+        self.level.update_offset(self.level.world_start, size)
 
         widgets = [
             PauseButton(self.pause, (size[0] - 30, 30)),
@@ -60,17 +67,18 @@ class GameScreen(Screen):
         for i in range(2):
             bg = pygame.transform.scale2x(bg)
 
-
         bg = ImageBrush(bg)
         super().__init__(app, widgets, bg_color=bg)
 
     def pause(self):
         """ Pause the game by going into PauseScreen """
+        LOGGER.info("Pausing the game by going into PauseScreen")
         self.pause_time = time.time()
         self.app.set_temp_screen(lambda sm: PauseScreen(sm, self))
 
     def resume(self):
         """ Resume the game after a PauseScreen """
+        LOGGER.info("Resuming the game after a PauseScreen")
         self.app.set_temp_screen(self)
         self.start_time += (time.time() - self.pause_time)
 
@@ -85,23 +93,25 @@ class GameScreen(Screen):
 
     def internal_logic(self):
         if self.level.over:
-
+            LOGGER.info(f"Level is over. Level was {self.level.num}")
             if str(CONFIG.level + 1) in LEVELS:
                 CONFIG.level += 1
+            level_stats = CONFIG.levels_stats[str(self.level.num)]
+            run_time = time.time() - self.start_time
+            if level_stats[1] == -1 or run_time < level_stats[1]:
+                CONFIG.levels_stats[str(self.level.num)][1] = run_time
             self.app.set_screen(PICKER)
         elif self.level.to_reset:
+            LOGGER.info("Level is resetting (it means the player died, in case you weren't aware of that)")
             self.level = Level.load_num(self.level.num)
             self.player = Player(self.level.world_start, respawn=True)
             self.space = self.level.space
             self.space.add(self.player)
+            self.level.update_offset(self.level.world_start, self.app.display.get_size())
             self.start_time = time.time()
             CONFIG.levels_stats[str(self.level.num)][0] += 1
-        elif self.level.expolding:
+        elif self.level.exploding:
             # Saving run time if best
-            run_time = time.time() - self.start_time
-            level_stats = CONFIG.levels_stats[str(self.level.num)]
-            if level_stats[1] == -1 or run_time < level_stats[1]:
-                CONFIG.levels_stats[str(self.level.num)][1] = run_time
             # Actually explode
             self.level.internal_logic()
         else:
@@ -109,9 +119,9 @@ class GameScreen(Screen):
             self.level.update_offset(self.player.center, self.app.display.get_size())
             self.level.internal_logic()
 
-        # fps = round(self.app.clock.get_fps())
-        # if fps < 50 and not self.level.to_reset:
-        #     print(f"\033[31mLOW FPS: {fps}\033[m")
+        fps = round(self.app.clock.get_fps())
+        if fps < 50 and not self.level.to_reset:
+            LOGGER.debug(f"Low FPS: {fps}")
 
     def render(self, surf):
         self.draw_background(surf)

@@ -21,6 +21,7 @@ class ClassPropertyDescriptor(object):
         self.fset = func
         return self
 
+
 def classproperty(func):
     if not isinstance(func, (classmethod, staticmethod)):
         func = classmethod(func)

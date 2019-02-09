@@ -1,3 +1,4 @@
 pygame
 -e git+https://gitlab.com/lama-corp/graphalama.git@dev#egg=graphalama
 pyconfiglib
+sentry-sdk==0.7.0

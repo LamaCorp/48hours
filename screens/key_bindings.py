@@ -1,20 +1,23 @@
-from enum import Enum, auto
-
+from enum import Enum
 import pygame
-from graphalama.buttons import Button, CarouselSwitch, CheckBox, ImageButton
+import logging
+
+from graphalama.buttons import Button
 from graphalama.colors import ImageBrush
 from graphalama.core import Widget
 from graphalama.shadow import NoShadow
 from graphalama.shapes import RoundedRect, Rectangle
 from graphalama.text import SimpleText
-from graphalama.constants import BOTTOM, WHITESMOKE, Monokai, CENTER, LLAMA, LEFT, RIGHT
+from graphalama.constants import BOTTOM, CENTER, LLAMA, LEFT, RIGHT
 
 from physics import Pos
 from screens.widgets import Title, SurfaceButton
-from constants import LIGHT_DARK, SETTINGS, DARK
+from constants import SETTINGS, DARK
 from config import CONFIG
 from screens.idle_screen import IdleScreen
 from screens import keys
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Binding(Enum):
@@ -23,20 +26,23 @@ class Binding(Enum):
     JUMP = 'Jump'
     RUN = 'Run'
 
+
 class KeyBindingsScreen(IdleScreen):
     def __init__(self, app):
+        LOGGER.info("Starting a KeyBindingsScreen")
         self.binding_setting = None
         self.binding_widgets = {}
 
         size = app.display.get_size()
+
         def bind(binding, n):
             y = size[1] // 2 + 90 * (n - 1.5)
             x = size[0] // 2 - 150
 
             text = SimpleText(text=binding.value,
-                                 pos=(x, y),
-                                 color=LLAMA,
-                                 anchor=LEFT)
+                              pos=(x, y),
+                              color=LLAMA,
+                              anchor=LEFT)
 
             img = keys.name_to_img(self.get_binding_key(binding))
             img = pygame.transform.scale(img, Pos(img.get_size()) * 4)
@@ -79,15 +85,15 @@ class KeyBindingsScreen(IdleScreen):
             self.hint_label,
         ]
 
-
-        super().__init__(app, widgets, (0, 0, 0))
+        super().__init__(app, widgets, (20, 10, 0))
 
     def update(self, event):
         if self.binding_setting is not None:
             if event.type == pygame.KEYDOWN:
+                LOGGER.info(f"Setting a binding. Key code: {event.key}")
                 self.set_binding(self.binding_setting, event.key)
 
-                # update the inage
+                # update the image
                 wid = self.binding_widgets[self.binding_setting]
                 img = keys.name_to_img(self.get_binding_key(self.binding_setting))
                 img = pygame.transform.scale(img, Pos(img.get_size()) * 4)
@@ -107,11 +113,12 @@ class KeyBindingsScreen(IdleScreen):
             self.hint_label.visible = True
         return inner
 
-    def get_binding_key(self, binding: Binding):
+    @staticmethod
+    def get_binding_key(binding: Binding):
         key_code = getattr(CONFIG.bindings, binding.value.lower())
         name = pygame.key.name(key_code)
         return name
 
-    def set_binding(self, binding: Binding, keycode: int):
+    @staticmethod
+    def set_binding(binding: Binding, keycode: int):
         setattr(CONFIG.bindings, binding.value.lower(), keycode)
-

@@ -32,3 +32,5 @@ archlinux:
     - python . &
     - sleep 10
     - killall python
+  artifacts:
+    paths: [assets/config.json, assets/48hours.log, assets/48hours.log.*]
