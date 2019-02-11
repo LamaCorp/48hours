@@ -1,7 +1,7 @@
 import os
 import logging
 import pygame
-import time
+from time import time
 
 from graphalama.app import Screen
 from graphalama.colors import ImageBrush
@@ -46,7 +46,8 @@ class PauseScreen(IdleScreen):
 
 
 class GameScreen(Screen):
-    FPS = 60
+    FPS = 600
+    UPDATE_FPS = 60
 
     def __init__(self, app, level):
         LOGGER.info("Entered game screen")
@@ -56,7 +57,7 @@ class GameScreen(Screen):
         self.player = Player(self.level.world_start)
         self.space = self.level.space
         self.space.add(self.player)
-        self.start_time = time.time()
+        self.start_time = time()
         self.pause_time = 0
         self.level.update_offset(self.level.world_start, size)
 
@@ -70,17 +71,20 @@ class GameScreen(Screen):
         bg = ImageBrush(bg)
         super().__init__(app, widgets, bg_color=bg)
 
+        self.last_internal_logic = time()
+        self.internal_logic_dt = 0
+
     def pause(self):
         """ Pause the game by going into PauseScreen """
         LOGGER.info("Pausing the game by going into PauseScreen")
-        self.pause_time = time.time()
+        self.pause_time = time()
         self.app.set_temp_screen(lambda sm: PauseScreen(sm, self))
 
     def resume(self):
         """ Resume the game after a PauseScreen """
         LOGGER.info("Resuming the game after a PauseScreen")
         self.app.set_temp_screen(self)
-        self.start_time += (time.time() - self.pause_time)
+        self.start_time += (time() - self.pause_time)
 
     def update(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -92,12 +96,21 @@ class GameScreen(Screen):
         return self.player.update(event)
 
     def internal_logic(self):
+        # The goal is to have constant update frame rate -> constant player speed
+        self.internal_logic_dt += time() - self.last_internal_logic
+        self.last_internal_logic = time()
+
+        while self.internal_logic_dt > 1 / self.UPDATE_FPS:
+            self.internal_logic_dt -= 1 / self.UPDATE_FPS
+            self._internal_logic()
+
+    def _internal_logic(self):
         if self.level.over:
             LOGGER.info(f"Level is over. Level was {self.level.num}")
             if str(CONFIG.level + 1) in LEVELS:
                 CONFIG.level += 1
             level_stats = CONFIG.levels_stats[str(self.level.num)]
-            run_time = time.time() - self.start_time
+            run_time = time() - self.start_time
             if level_stats[1] == -1 or run_time < level_stats[1]:
                 CONFIG.levels_stats[str(self.level.num)][1] = run_time
             self.app.set_screen(PICKER)
@@ -108,7 +121,7 @@ class GameScreen(Screen):
             self.space = self.level.space
             self.space.add(self.player)
             self.level.update_offset(self.level.world_start, self.app.display.get_size())
-            self.start_time = time.time()
+            self.start_time = time()
             CONFIG.levels_stats[str(self.level.num)][0] += 1
         elif self.level.exploding:
             # Saving run time if best
