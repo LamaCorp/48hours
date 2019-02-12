@@ -283,14 +283,15 @@ class FieryBarbecue(Block):
         super().__init__(pos)
         self.character = character
         self.rotation = FieryBarbecue.char_dic[self.character][0]
-        self.next_spawn = random.randint(5, 30)
+        self.next_spawn = 15
         self.brochettes = []
 
     def internal_logic(self, level):
         self.next_spawn -= 1
         if self.next_spawn <= 0:
-            level.spawn(Brochette(level.map_to_world(self.pos), FieryBarbecue.char_dic[self.character]))
-            self.next_spawn = random.randint(60, 90)
+            level.spawn(Brochette(level.map_to_world(self.pos) + Pos(DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE) / 2,
+                                  FieryBarbecue.char_dic[self.character]))
+            self.next_spawn = 75
 
 
 class EndBlock(Block):

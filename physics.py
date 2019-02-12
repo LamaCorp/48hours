@@ -134,6 +134,9 @@ class Pos:
         return Pos(c * self[0] + s * self[1],
                    s * self[0] - c * self[1])
 
+    def __reversed__(self):
+        return Pos(self.y, self.x)
+
     def copy(self):
         return Pos(self.x, self.y)
 

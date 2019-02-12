@@ -39,7 +39,7 @@ class Object:
         LOGGER.info("Saving object %s to dict", self)
         d = {
             "type": self.type,
-            "pos": tuple(self.pos)
+        "pos": tuple(self.pos)
         }
         return d
 
@@ -105,7 +105,7 @@ class Brochette(Projectile):
             cls._img = [
                 pygame.transform.scale(pygame.image.load(os.path.join(LEVELS_GRAPHICAL_FOLDER,
                                                                       brochette.lower())).convert(),
-                                       (DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE))
+                                       (DEFAULT_BLOCK_SIZE, 14))
                 for brochette in get_available_blocks("brochette")]
         return cls._img
 
@@ -118,18 +118,26 @@ class Brochette(Projectile):
         return img
 
     def __init__(self, start_pos, physics=(0, Pos(0, 0))):
-        shape = AABB(start_pos, (DEFAULT_BLOCK_SIZE - 2, DEFAULT_BLOCK_SIZE - 2))
-        shape.topleft += (1, 1)
-        # shape.center = start_pos
+
+        if abs(physics[0]) == 90:  # horizontal
+            hitbox = Pos(DEFAULT_BLOCK_SIZE - 2,
+                      DEFAULT_BLOCK_SIZE * 14 / 32)
+        else:  # vertical
+            hitbox = Pos(DEFAULT_BLOCK_SIZE * 14 / 32,
+                      DEFAULT_BLOCK_SIZE - 2)
+
+        shape = AABB(start_pos - hitbox / 2, hitbox)
+
         super().__init__(shape, mass=0)
+
         self.velocity = physics[1] * BROCHETTE_VELOCITY
         self.rotation = physics[0] - 90
         self.variant = random.choice(self.img)
         self.ttl = FRAME_BEFORE_DESPAWN
 
     def render(self, surf, offset=(0, 0)):
-        surf.blit(self.get_image(self.rotation, 255 * self.ttl / FRAME_BEFORE_DESPAWN, self.variant),
-                  self.topleft + offset)
+        image = self.get_image(self.rotation, 255 * self.ttl / FRAME_BEFORE_DESPAWN, self.variant)
+        surf.blit(image, self.shape.topleft + offset)
 
     def internal_logic(self):
         for colli in self.collisions:
@@ -137,9 +145,11 @@ class Brochette(Projectile):
                 self.sleep = True
 
         if self.sleep:
+
             self.ttl -= 1
             if self.ttl <= 0:
                 self.dead = True
+
 
 class Particle:
     def __init__(self, pos, velocity=(0, 0), acceleration=(0, 1), friction=0.1, life_time: int=60, size=3,
