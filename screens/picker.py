@@ -71,7 +71,7 @@ class PickerScreen(IdleScreen):
                                       pos=(10*2 + self.deaths_img.get_width(), y),
                                       color=WHITESMOKE,
                                       anchor=LEFT)
-        self.best_time = SimpleText(text=self.time_text(level_stats[1]),
+        self.best_time = SimpleText(text=self.best_time_text(level_stats[1]),
                                     pos=(x, y),
                                     color=WHITESMOKE,
                                     anchor=CENTER)
@@ -107,7 +107,7 @@ class PickerScreen(IdleScreen):
         return str(n_death)
 
     @staticmethod
-    def time_text(seconds):
+    def best_time_text(seconds):
         if seconds < 0:
             return "Not finished"
 
@@ -128,9 +128,16 @@ class PickerScreen(IdleScreen):
 
     def internal_logic(self):
         level_stats = CONFIG.levels_stats[str(self.selector.option_index)]
-        self.deaths_text.text = self.death_count_text(level_stats[0])
-        self.best_time.text = self.time_text(level_stats[1])
-        self.exploded_blocks.text = self.blocks_exploded_text(level_stats[3])
+        death_count_txt = self.death_count_text(level_stats[0])
+        best_time_txt = self.best_time_text(level_stats[1])
+        exploded_blocks_txt = self.blocks_exploded_text(level_stats[3])
+
+        if self.deaths_text.text != death_count_txt:
+            self.deaths_text.text = death_count_txt
+        if self.best_time.text != best_time_txt:
+            self.best_time.text = best_time_txt
+        if self.exploded_blocks.text != exploded_blocks_txt:
+            self.exploded_blocks.text = exploded_blocks_txt
 
     def render(self, display):
         super().render(display)
