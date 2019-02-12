@@ -129,10 +129,6 @@ class Player(Body):
             self.state_duration = 0
 
         self.state = new_state
-        LOGGER.info("Player - State: %s", self.state)
-        LOGGER.info("Player - Position: %s", self.shape.topleft)
-        LOGGER.info("Player - Velocity: %s", self.velocity)
-        LOGGER.info("Player - Acceleration: %s", self.acceleration)
 
         self.vertical_logic()
         self.horizontal_logic()

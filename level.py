@@ -73,7 +73,8 @@ class Level:
         if self.inside_map(map_pos):
             return self.grid[y][x]
 
-        LOGGER.debug(f"Level - get_block - {x}, {y} not inside map. Return a Stone by default.")
+        # TODO: this happens way to often. Why the fuck?!
+        # LOGGER.debug(f"Level - get_block - {x}, {y} not inside map. Return a Stone by default.")
         return Stone()
 
     def get_slice(self, map_top_left, map_bottom_right):
@@ -122,7 +123,7 @@ class Level:
             return level
         except Exception as e:
             LOGGER.info(f"Could not load map as v1. This is ok as we should only have v2 maps. "
-                         f"To be deprecated. Here is the actual exception: {e}")
+                        f"To be deprecated. Here is the actual exception: {e}")
 
         try:
             level = cls.load_v2(path, num)
@@ -286,7 +287,7 @@ class Level:
             if self.inside_display(b.pos) and b.visible
         ]
         self.exploded = []
-        LOGGER.info("We're going to explode %s blocks", len(self.to_explode))
+        LOGGER.info(f"We're going to explode {len(self.to_explode)} blocks")
 
     def explosion_logic(self):
 
@@ -333,9 +334,6 @@ class Level:
 
         for part in self.particles:
             part.render(surf)
-
-        LOGGER.info("Level - rendered %s blocks and explosions and %s particles in %s",
-                    len(self.exploded) + len(self.to_explode), len(self.particles), time() - t)
 
         dx, dy = random.randint(-5, 6), random.randint(-5, 6)
         surf.scroll(dx, dy)
