@@ -292,7 +292,7 @@ class Body:
 
     def __init__(self, shape, mass=1, elasticity=0, max_velocity=(None, None), space=None):
 
-        LOGGER.info(f"Creating Body. shape = {shape}, mass = {mass}, elasticity = {elasticity}")
+        # LOGGER.debug(f"Creating Body. shape = {shape}, mass = {mass}, elasticity = {elasticity}")
         self.dead = False
         self.sleep = False
         """Ignore all collisions with and from this body."""
@@ -480,7 +480,7 @@ class Space:
 
     def add(self, *bodies):
         for body in bodies:
-            LOGGER.info(f"Adding {body} in the space")
+            # LOGGER.debug(f"Adding {body} in the space")
 
             if isinstance(body, Projectile):
                 self.projectiles.append(body)
