@@ -60,6 +60,8 @@ class GameScreen(Screen):
         self.start_time = time()
         self.pause_time = 0
         self.level.update_offset(self.level.world_start, size)
+        self.black_screen = pygame.Surface(app.display.get_size())
+        self.black_screen.fill((0, 0, 0))
 
         widgets = [
             PauseButton(self.pause, (size[0] - 30, 30)),
@@ -70,6 +72,7 @@ class GameScreen(Screen):
 
         bg = ImageBrush(bg)
         super().__init__(app, widgets, bg_color=bg)
+        self.fade_out_black()
 
         self.last_internal_logic = time()
         self.internal_logic_dt = 0
@@ -106,6 +109,7 @@ class GameScreen(Screen):
 
     def _internal_logic(self):
         if self.level.over:
+            self.fade_in_black()
             LOGGER.info(f"Level is over. Level was {self.level.num}")
             if str(CONFIG.level + 1) in LEVELS:
                 CONFIG.level += 1
@@ -116,13 +120,15 @@ class GameScreen(Screen):
             self.app.set_screen(PICKER)
         elif self.level.to_reset:
             LOGGER.info("Level is resetting (it means the player died, in case you weren't aware of that)")
+            self.fade_in_black()
             self.level = Level.load_num(self.level.num)
             self.player = Player(self.level.world_start, respawn=True)
             self.space = self.level.space
             self.space.add(self.player)
             self.level.update_offset(self.level.world_start, self.app.display.get_size())
-            self.start_time = time()
             CONFIG.levels_stats[str(self.level.num)][0] += 1
+            self.fade_out_black()
+            self.start_time = time()
         elif self.level.exploding:
             # Saving run time if best
             # Actually explode
@@ -144,3 +150,17 @@ class GameScreen(Screen):
 
         # De-comment to see hitbox
         # self.space.debug_draw(surf, -self.level.offset)
+
+    def fade_in_black(self):
+        for a in range(0, 255, 15):
+            self.black_screen.set_alpha(a)
+            self.render(self.app.display)
+            self.app.display.blit(self.black_screen, (0, 0))
+            pygame.display.flip()
+
+    def fade_out_black(self):
+        for a in range(255, -1, -15):
+            self.black_screen.set_alpha(a)
+            self.render(self.app.display)
+            self.app.display.blit(self.black_screen, (0, 0))
+            pygame.display.flip()
