@@ -16,6 +16,7 @@ pip3 install -U -r requirements.txt
 python .
 # Have fun!
 ```
+![level 4](assets/screenshot_1.png)
 
 ### Contributing
 
